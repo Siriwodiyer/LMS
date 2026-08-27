@@ -1,4 +1,3 @@
-```tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { Reel } from '../../types';
 import { useApp } from '../../context/AppContext';
@@ -10,10 +9,6 @@ import {
   Volume2,
   VolumeX,
   Play,
-  Pause,
-  Sparkles,
-  CheckCircle2,
-  Check
 } from 'lucide-react';
 import { CommentSheet } from './CommentSheet';
 import { ShareModal } from './ShareModal';
@@ -35,11 +30,10 @@ export const ReelCard: React.FC<ReelCardProps> = ({
     toggleLikeReel,
     toggleBookmarkReel,
     markReelWatched,
-    showToast,
-    currentUser
   } = useApp();
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [showHeartAnim, setShowHeartAnim] = useState(false);
@@ -48,7 +42,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
   const [isDescExpanded, setIsDescExpanded] = useState(false);
   const [progressPercent, setProgressPercent] = useState(0);
 
-  // Play or pause based on active visibility
+  /* Play or pause based on active reel */
   useEffect(() => {
     if (videoRef.current) {
       if (isActive) {
@@ -68,21 +62,23 @@ export const ReelCard: React.FC<ReelCardProps> = ({
     }
   }, [isActive]);
 
+  /* Video progress */
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       const current = videoRef.current.currentTime;
       const total = videoRef.current.duration || 1;
+
       const pct = (current / total) * 100;
 
       setProgressPercent(pct);
 
-      // Trigger watched completion after 5 seconds
       if (current >= 5 && isActive) {
         markReelWatched(reel.id);
       }
     }
   };
 
+  /* Play / pause */
   const handleVideoClick = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -95,6 +91,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
     }
   };
 
+  /* Double click like */
   const handleDoubleTap = (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -103,9 +100,13 @@ export const ReelCard: React.FC<ReelCardProps> = ({
     }
 
     setShowHeartAnim(true);
-    setTimeout(() => setShowHeartAnim(false), 800);
+
+    setTimeout(() => {
+      setShowHeartAnim(false);
+    }, 800);
   };
 
+  /* Category colors */
   const categoryColors: Record<string, string> = {
     Tech: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
     AI: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
@@ -143,10 +144,10 @@ export const ReelCard: React.FC<ReelCardProps> = ({
           className="w-full h-full object-cover"
         />
 
-        {/* Floating Gradient Backdrop */}
+        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/90 pointer-events-none" />
 
-        {/* Heart Burst */}
+        {/* Heart Animation */}
         {showHeartAnim && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
             <Heart
@@ -156,7 +157,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
           </div>
         )}
 
-        {/* Play/Pause Overlay */}
+        {/* Play Button */}
         {!isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none z-20">
             <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
@@ -165,9 +166,11 @@ export const ReelCard: React.FC<ReelCardProps> = ({
           </div>
         )}
 
-        {/* Top Floating Badges */}
+        {/* Top Badges */}
         <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
+
           <div className="flex items-center gap-2">
+
             <span
               className={`px-2.5 py-0.5 rounded-full text-xs font-bold border backdrop-blur-md ${
                 categoryColors[reel.category] ||
@@ -180,8 +183,10 @@ export const ReelCard: React.FC<ReelCardProps> = ({
             <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/50 text-slate-300 border border-white/10 backdrop-blur-md">
               {reel.difficulty}
             </span>
+
           </div>
 
+          {/* Mute Button */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -190,8 +195,13 @@ export const ReelCard: React.FC<ReelCardProps> = ({
             className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white border border-white/15 hover:bg-black/80 transition-all"
             title={isMuted ? 'Unmute' : 'Mute'}
           >
-            {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+            {isMuted ? (
+              <VolumeX size={15} />
+            ) : (
+              <Volume2 size={15} />
+            )}
           </button>
+
         </div>
 
         {/* Right Action Sidebar */}
@@ -250,7 +260,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
               e.stopPropagation();
               toggleBookmarkReel(reel.id);
             }}
-            className="flex flex-col items-center group"
+            className={`flex flex-col items-center group`}
           >
             <div
               className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
@@ -290,13 +300,15 @@ export const ReelCard: React.FC<ReelCardProps> = ({
               Share
             </span>
           </button>
+
         </div>
 
-        {/* Bottom Content Metadata Overlay */}
+        {/* Bottom Content */}
         <div className="absolute left-4 right-16 bottom-4 z-20 text-left">
 
           {/* Creator Profile */}
           <div className="flex items-center gap-2.5 mb-2">
+
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center border border-white/30 shrink-0 shadow-md">
               {reel.creatorName
                 .split(' ')
@@ -307,6 +319,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
             </div>
 
             <div className="flex items-center gap-1.5">
+
               <span className="font-bold text-sm text-white drop-shadow">
                 {reel.creatorName}
               </span>
@@ -314,6 +327,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/40 text-blue-200 border border-blue-400/30">
                 {reel.creatorRole}
               </span>
+
             </div>
           </div>
 
@@ -329,7 +343,9 @@ export const ReelCard: React.FC<ReelCardProps> = ({
               setIsDescExpanded(!isDescExpanded);
             }}
             className={`text-xs text-slate-300/90 drop-shadow cursor-pointer ${
-              isDescExpanded ? 'line-clamp-none' : 'line-clamp-2'
+              isDescExpanded
+                ? 'line-clamp-none'
+                : 'line-clamp-2'
             }`}
           >
             {reel.description}
@@ -340,38 +356,24 @@ export const ReelCard: React.FC<ReelCardProps> = ({
               </span>
             )}
           </p>
+
         </div>
       </div>
 
-      {/* Interactive Modals */}
+      {/* Comment Modal */}
       <CommentSheet
         reelId={reel.id}
         isOpen={isCommentOpen}
         onClose={() => setIsCommentOpen(false)}
       />
 
+      {/* Share Modal */}
       <ShareModal
         reel={reel}
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
       />
+
     </div>
   );
 };
-```
-
-**The main change is this line:**
-
-```tsx
-max-w-[460px] max-h-[850px]
-```
-
-instead of:
-
-```tsx
-max-w-[420px] max-h-[820px]
-```
-
-The video already uses `w-full h-full object-cover`, so it will fill the Reel automatically.
-
-**Before replacing the file, make a backup or use Git so you can undo the change if needed.**
