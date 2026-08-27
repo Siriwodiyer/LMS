@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { AdminOverview } from './AdminOverview';
 import { LearnersManagement } from './LearnersManagement';
@@ -43,7 +43,14 @@ export const AdminPortal: React.FC = () => {
     showToast
   } = useApp();
 
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    return localStorage.getItem('lms_admin_active_tab') || 'dashboard';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('lms_admin_active_tab', activeTab);
+  }, [activeTab]);
+
   const [isUsersOpen, setIsUsersOpen] = useState(true);
   const [isContentOpen, setIsContentOpen] = useState(true);
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
@@ -122,6 +129,7 @@ export const AdminPortal: React.FC = () => {
         return (
           <ContentManagement
             initialSubTab="courses"
+            onSubTabChange={subTab => setActiveTab(`content-${subTab}`)}
             onOpenCreateContent={type => handleOpenCreateWithType(type || 'course')}
           />
         );
@@ -129,6 +137,7 @@ export const AdminPortal: React.FC = () => {
         return (
           <ContentManagement
             initialSubTab="quizzes"
+            onSubTabChange={subTab => setActiveTab(`content-${subTab}`)}
             onOpenCreateContent={type => handleOpenCreateWithType(type || 'quiz')}
           />
         );
@@ -136,6 +145,7 @@ export const AdminPortal: React.FC = () => {
         return (
           <ContentManagement
             initialSubTab="assignments"
+            onSubTabChange={subTab => setActiveTab(`content-${subTab}`)}
             onOpenCreateContent={type => handleOpenCreateWithType(type || 'assignment')}
           />
         );

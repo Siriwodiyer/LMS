@@ -116,7 +116,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full max-w-[400px] max-h-[760px] rounded-3xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl flex flex-col select-none">
+    <div className="relative w-full max-w-[380px] h-[675px] max-h-[calc(100vh-200px)] aspect-[9/16] rounded-3xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl flex flex-col select-none mx-auto">
       {/* Top Video Progress Bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 z-30">
         <div

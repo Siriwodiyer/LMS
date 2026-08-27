@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Course, CourseReel } from '../../types';
+import { Course, CourseReel, Assignment } from '../../types';
 import { useApp } from '../../context/AppContext';
+import { CourseAssignmentModal } from './CourseAssignmentModal';
 import {
   BookOpen,
   PlayCircle,
@@ -19,7 +20,11 @@ import {
   Send,
   Sparkles,
   PlaySquare,
-  ChevronRight
+  ChevronRight,
+  FileCheck2,
+  Lock,
+  Unlock,
+  ArrowRight
 } from 'lucide-react';
 
 interface CourseDetailsModalProps {
@@ -38,6 +43,7 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
     completedCourseReels,
     markCourseReelCompleted,
     isCourseReelCompleted,
+    assignments,
     showToast
   } = useApp();
 
@@ -45,6 +51,9 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
   const [couponCode, setCouponCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
+
+  // Assignment Modal State
+  const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
 
   // Feedback State
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
@@ -303,7 +312,7 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
               <div className="p-5 rounded-2xl bg-blue-50 border border-blue-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-bold text-blue-900">Get Instant Access to all 5 Reels</span>
+                    <span className="text-xs font-bold text-blue-900">Get Instant Access to all 5 Reels & Assignment</span>
                     <div className="flex items-baseline gap-2 mt-0.5">
                       <span className="text-2xl font-black text-slate-900">${finalPrice}</span>
                       {course.discountedPrice && (
@@ -349,7 +358,7 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
               <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs text-emerald-900">
                 <div className="flex items-center gap-2 font-bold">
                   <CheckCircle2 size={18} className="text-emerald-600" />
-                  <span>You are enrolled in this course. Watch all 5 reels to master the material!</span>
+                  <span>You are enrolled in this course. Complete all 5 reels to unlock the assignment!</span>
                 </div>
                 <button
                   onClick={() => setShowFeedbackForm(!showFeedbackForm)}
@@ -359,6 +368,141 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
                 </button>
               </div>
             )}
+
+            {/* Course Assignment Section */}
+            {(() => {
+              const courseAssignment: Assignment = assignments.find(a => a.courseId === course.id) || {
+                id: `ass-${course.id}`,
+                courseId: course.id,
+                courseTitle: course.title,
+                moduleId: 'mod-1',
+                moduleTitle: 'Module 1: Capstone',
+                title: `${course.title} - Capstone Assignment`,
+                instructions: `Implement the architectural requirements and core concepts learned in the 5 course reels. Submit your solution or repository link for mentor review.`,
+                dueDate: '2026-09-30T23:59:59Z',
+                maxMarks: 100,
+                submissionType: 'code',
+                submissions: []
+              };
+
+              const completedReelsForCourse = completedCourseReels[course.id] || [];
+              const completedReelsCount = completedReelsForCourse.length;
+              const isAssignmentUnlocked = completedReelsCount >= 5;
+              const userSubmission = (courseAssignment.submissions || []).find(s => s.userId === currentUser.id);
+
+              return (
+                <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
+                        <FileCheck2 size={18} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                          Course Assignment
+                        </span>
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-900">{courseAssignment.title}</h3>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      {isAssignmentUnlocked ? (
+                        <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold flex items-center gap-1">
+                          <Unlock size={13} /> Unlocked
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold flex items-center gap-1">
+                          <Lock size={13} /> Locked ({completedReelsCount}/5 Reels)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {courseAssignment.instructions}
+                  </p>
+
+                  {/* Progress Checklist */}
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+                    <div className="flex items-center justify-between font-bold text-slate-700">
+                      <span>Reel Completion Requirement:</span>
+                      <span className={isAssignmentUnlocked ? 'text-emerald-600' : 'text-slate-600'}>
+                        {completedReelsCount}/5 Reels Completed
+                      </span>
+                    </div>
+
+                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${
+                          isAssignmentUnlocked ? 'bg-emerald-500' : 'bg-blue-600'
+                        }`}
+                        style={{ width: `${Math.min(100, (completedReelsCount / 5) * 100)}%` }}
+                      />
+                    </div>
+
+                    <div className="text-[11px]">
+                      {isAssignmentUnlocked ? (
+                        <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                          <CheckCircle2 size={13} /> All 5 course reels completed! You can now start and submit this assignment.
+                        </span>
+                      ) : (
+                        <span className="text-slate-600 flex items-center gap-1">
+                          <Lock size={13} className="text-amber-600" /> Complete all 5 required course reels above to unlock this assignment.
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Submission State & Action Button */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+                    <div className="text-xs">
+                      {userSubmission ? (
+                        <span className="font-bold text-slate-800">
+                          Status:{' '}
+                          <span className={userSubmission.status === 'graded' ? 'text-emerald-600' : 'text-amber-600'}>
+                            {userSubmission.status === 'graded'
+                              ? `Graded (${userSubmission.marksAwarded}/${courseAssignment.maxMarks})`
+                              : 'Submitted (Under Review)'}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="text-slate-500">
+                          {isAssignmentUnlocked ? 'Ready for submission' : 'Complete 5/5 reels to unlock'}
+                        </span>
+                      )}
+                    </div>
+
+                    {isAssignmentUnlocked ? (
+                      <button
+                        onClick={() => setIsAssignmentModalOpen(true)}
+                        className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <FileCheck2 size={14} />
+                        <span>{userSubmission ? 'View / Update Submission' : 'Start Assignment'}</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="px-4 py-2 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs border border-slate-200 flex items-center justify-center gap-1.5 cursor-not-allowed"
+                        title="Complete all 5 reels to unlock this assignment"
+                      >
+                        <Lock size={13} />
+                        <span>Complete 5/5 Reels to Unlock</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Assignment Modal */}
+                  <CourseAssignmentModal
+                    assignment={courseAssignment}
+                    course={course}
+                    isOpen={isAssignmentModalOpen}
+                    onClose={() => setIsAssignmentModalOpen(false)}
+                  />
+                </div>
+              );
+            })()}
 
             {/* Review Form */}
             {showFeedbackForm && (

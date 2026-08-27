@@ -23,7 +23,8 @@ import {
   PlatformTimeFilter,
   MentorApplication,
   CourseFeedback,
-  Question
+  Question,
+  AssignmentSubmission
 } from '../types';
 import {
   INITIAL_USERS,
@@ -38,7 +39,9 @@ import {
   INITIAL_BADGE_DEFINITIONS,
   INITIAL_VOUCHERS,
   INITIAL_MENTOR_APPLICATIONS,
-  INITIAL_COURSE_FEEDBACK
+  INITIAL_COURSE_FEEDBACK,
+  INITIAL_QUIZZES,
+  INITIAL_ASSIGNMENTS
 } from '../data/mockData';
 
 interface ToastState {
@@ -155,6 +158,7 @@ interface AppContextType {
   assignments: Assignment[];
   createAssignment: (assData: Omit<Assignment, 'id' | 'submissions'>) => void;
   deleteAssignment: (assId: string) => void;
+  submitAssignment: (assignmentId: string, content: string) => { success: boolean; message: string };
   gradeAssignmentSubmission: (assId: string, subId: string, grade: number, feedback: string) => void;
 
   // Content Approval Pipeline
@@ -270,13 +274,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Quizzes & Assignments
   const [quizzes, setQuizzes] = useState<Quiz[]>(() => {
-    const saved = localStorage.getItem('lms_quizzes_v4');
-    return saved ? JSON.parse(saved) : [];
+    const saved = localStorage.getItem('lms_quizzes_v5');
+    return saved ? JSON.parse(saved) : INITIAL_QUIZZES;
   });
 
   const [assignments, setAssignments] = useState<Assignment[]>(() => {
-    const saved = localStorage.getItem('lms_assignments_v4');
-    return saved ? JSON.parse(saved) : [];
+    const saved = localStorage.getItem('lms_assignments_v5');
+    return saved ? JSON.parse(saved) : INITIAL_ASSIGNMENTS;
   });
 
   // Track completed course reels per course: { courseId: [reelId1, reelId2, ...] }
@@ -405,6 +409,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('lms_courses_v4', JSON.stringify(courses));
   }, [courses]);
+
+  useEffect(() => {
+    localStorage.setItem('lms_quizzes_v5', JSON.stringify(quizzes));
+  }, [quizzes]);
+
+  useEffect(() => {
+    localStorage.setItem('lms_assignments_v5', JSON.stringify(assignments));
+  }, [assignments]);
 
   useEffect(() => {
     localStorage.setItem('lms_completed_course_reels_v4', JSON.stringify(completedCourseReels));
@@ -1621,6 +1633,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Assignment deleted.', 'info');
   };
 
+  const submitAssignment = (assignmentId: string, content: string) => {
+    const target = assignments.find(a => a.id === assignmentId);
+    if (!target) return { success: false, message: 'Assignment not found' };
+
+    const existingSubmission = (target.submissions || []).find(s => s.userId === currentUser.id);
+    const newSubmission: AssignmentSubmission = {
+      id: existingSubmission ? existingSubmission.id : `sub-${Date.now()}`,
+      assignmentId,
+      userId: currentUser.id,
+      userName: currentUser.name,
+      submittedAt: new Date().toISOString(),
+      content,
+      status: 'pending'
+    };
+
+    setAssignments(prev =>
+      prev.map(a => {
+        if (a.id === assignmentId) {
+          const filteredSubs = (a.submissions || []).filter(s => s.userId !== currentUser.id);
+          return {
+            ...a,
+            submissions: [...filteredSubs, newSubmission]
+          };
+        }
+        return a;
+      })
+    );
+
+    showToast(`Assignment "${target.title}" submitted successfully!`, 'success');
+    return { success: true, message: 'Submitted successfully' };
+  };
+
   const gradeAssignmentSubmission = (assId: string, subId: string, grade: number, feedback: string) => {
     setAssignments(prev =>
       prev.map(a => {
@@ -1711,6 +1755,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         assignments,
         createAssignment,
         deleteAssignment,
+        submitAssignment,
         gradeAssignmentSubmission,
         approvalQueue,
         submitContentForApproval,

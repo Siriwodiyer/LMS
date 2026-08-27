@@ -1011,8 +1011,238 @@ export const INITIAL_COURSES: Course[] = [
 ];
 
 export const INITIAL_LESSONS: Lesson[] = [];
-export const INITIAL_QUIZZES: Quiz[] = [];
-export const INITIAL_ASSIGNMENTS: Assignment[] = [];
+
+export const INITIAL_QUIZZES: Quiz[] = [
+  {
+    id: 'quiz-course-1',
+    courseId: 'course-1',
+    courseTitle: 'Full-Stack Modern AI Architecture & Agentic Workflows',
+    moduleId: 'mod-1',
+    moduleTitle: 'Module 1: AI Agent Foundations',
+    title: 'AI Agent Architectures & Vector Indexing Quiz',
+    difficulty: 'Intermediate',
+    totalMarks: 30,
+    passingPercentage: 80,
+    createdAt: '2026-08-20T10:00:00Z',
+    questions: [
+      {
+        id: 'q-ai-1',
+        category: 'AI & Engineering',
+        type: 'mcq',
+        prompt: 'Which vector indexing metric is mathematically invariant to vector magnitude when measuring semantic similarity?',
+        options: [
+          'Euclidean Distance (L2)',
+          'Cosine Similarity',
+          'Manhattan Distance (L1)',
+          'Dot Product without normalization'
+        ],
+        correctIndex: 1,
+        explanation: 'Cosine similarity normalizes vectors by their magnitudes, evaluating strictly the cosine of the angle between them.',
+        marks: 10
+      },
+      {
+        id: 'q-ai-2',
+        category: 'AI & Engineering',
+        type: 'true_false',
+        prompt: 'Constrained decoding with JSON Schema guarantees valid function calling structure at the token sampler level.',
+        options: ['True', 'False'],
+        correctIndex: 0,
+        explanation: 'True! Grammar-guided constrained decoding masks disallowed tokens during logits sampling.',
+        marks: 10
+      },
+      {
+        id: 'q-ai-3',
+        category: 'AI & Engineering',
+        type: 'mcq',
+        prompt: 'What strategy minimizes agentic tool loop latency in multi-turn assistant workflows?',
+        options: [
+          'Polling the LLM synchronously every 500ms',
+          'Semantic response caching and streaming tokens to the client canvas',
+          'Disabling JSON schema validation completely',
+          'Running tools in single-threaded blocking queues'
+        ],
+        correctIndex: 1,
+        explanation: 'Semantic response caching skips redundant model inferences while streaming provides instant visual feedback to users.',
+        marks: 10
+      }
+    ]
+  },
+  {
+    id: 'quiz-course-java',
+    courseId: 'course-java',
+    courseTitle: 'Java Core & Modern Enterprise Architecture',
+    moduleId: 'mod-jv-1',
+    moduleTitle: 'Module 1: Java 21 & Concurrency',
+    title: 'Java 21 Virtual Threads & JVM Memory Quiz',
+    difficulty: 'Intermediate',
+    totalMarks: 30,
+    passingPercentage: 80,
+    createdAt: '2026-08-21T11:00:00Z',
+    questions: [
+      {
+        id: 'q-jv-q1',
+        category: 'Java',
+        type: 'mcq',
+        prompt: 'In Java 21, what happens to a Virtual Thread when it encounters a blocking network socket read?',
+        options: [
+          'It halts the entire JVM process until the packet arrives',
+          'It is unmounted from its carrier platform thread, freeing the carrier to execute other virtual tasks',
+          'It terminates and throws an InterruptedException',
+          'It switches to synchronous OS kernel polling'
+        ],
+        correctIndex: 1,
+        explanation: 'Project Loom unmounts virtual threads upon blocking I/O, allowing a handful of carrier OS threads to multiplex millions of virtual tasks.',
+        marks: 10
+      },
+      {
+        id: 'q-jv-q2',
+        category: 'Java',
+        type: 'true_false',
+        prompt: 'Java 21 Structured Concurrency guarantees that subtasks spawned in a scope are completed or cancelled before the scope block exits.',
+        options: ['True', 'False'],
+        correctIndex: 0,
+        explanation: 'True! StructuredTaskScope enforces syntactic boundaries ensuring no leaked background threads.',
+        marks: 10
+      }
+    ]
+  },
+  {
+    id: 'quiz-course-dsa',
+    courseId: 'course-dsa',
+    courseTitle: 'Data Structures & Algorithms for FAANG Interviews',
+    moduleId: 'mod-dsa-1',
+    moduleTitle: 'Module 1: Graph Primitives',
+    title: 'Graph Traversals & Complexity Quiz',
+    difficulty: 'Advanced',
+    totalMarks: 20,
+    passingPercentage: 80,
+    createdAt: '2026-08-22T09:00:00Z',
+    questions: [
+      {
+        id: 'q-dsa-q1',
+        category: 'DSA',
+        type: 'mcq',
+        prompt: 'Which data structure is optimal for cycle detection in an undirected graph with Disjoint Set Union?',
+        options: ['Trie with prefix arrays', 'DSU with Union by Rank and Path Compression', 'Min-Heap Priority Queue', 'Red-Black BST'],
+        correctIndex: 1,
+        explanation: 'DSU with path compression provides near-constant inverse Ackermann O(α(N)) time per find/union query.',
+        marks: 20
+      }
+    ]
+  }
+];
+
+export const INITIAL_ASSIGNMENTS: Assignment[] = [
+  {
+    id: 'ass-course-1',
+    courseId: 'course-1',
+    courseTitle: 'Full-Stack Modern AI Architecture & Agentic Workflows',
+    moduleId: 'mod-1',
+    moduleTitle: 'Module 1: AI Agent Foundations',
+    title: 'Enterprise AI Agent & RAG Pipeline Capstone Assignment',
+    instructions: 'Build a production-grade multi-agent workflow that integrates Qdrant vector search with JSON Schema output guardrails. Include fallback retry handlers and latency telemetry. Submit your architectural summary, key code snippets, or GitHub repository URL.',
+    dueDate: '2026-09-30T23:59:59Z',
+    maxMarks: 100,
+    submissionType: 'code',
+    submissions: [
+      {
+        id: 'sub-101',
+        assignmentId: 'ass-course-1',
+        userId: 'user-student',
+        userName: 'User 001',
+        submittedAt: '2026-08-25T14:30:00Z',
+        content: 'https://github.com/demo-user001/agentic-rag-pipeline\nImplemented tool-calling agents with fallback validation loops, Qdrant hybrid search, and FastAPI streaming endpoints.',
+        status: 'graded',
+        marksAwarded: 96,
+        feedback: 'Superb architecture! The semantic caching layer reduced P99 latency by 45%.'
+      }
+    ],
+    createdAt: '2026-08-18T10:00:00Z'
+  },
+  {
+    id: 'ass-course-java',
+    courseId: 'course-java',
+    courseTitle: 'Java Core & Modern Enterprise Architecture',
+    moduleId: 'mod-jv-1',
+    moduleTitle: 'Module 1: Java 21 & Concurrency',
+    title: 'Java 21 Virtual Threads & High-Throughput I/O Benchmark Assignment',
+    instructions: 'Design a concurrent processing pipeline using Java 21 Virtual Threads and StructuredTaskScope. Compare memory footprint and throughput against standard fixed thread pools during simulated 10,000 concurrent HTTP requests. Submit your benchmarking code and performance analysis.',
+    dueDate: '2026-09-30T23:59:59Z',
+    maxMarks: 100,
+    submissionType: 'code',
+    submissions: [
+      {
+        id: 'sub-102',
+        assignmentId: 'ass-course-java',
+        userId: 'user-student',
+        userName: 'User 001',
+        submittedAt: '2026-08-24T16:00:00Z',
+        content: 'Benchmark Repo: https://github.com/demo-user001/loom-virtual-threads-bench\nResults: 100,000 concurrent socket connections handled with 180MB RAM vs 1.2GB with platform threads.',
+        status: 'graded',
+        marksAwarded: 98,
+        feedback: 'Outstanding benchmark analysis and clear structured concurrency scopes.'
+      }
+    ],
+    createdAt: '2026-08-19T11:00:00Z'
+  },
+  {
+    id: 'ass-course-dsa',
+    courseId: 'course-dsa',
+    courseTitle: 'Data Structures & Algorithms for FAANG Interviews',
+    moduleId: 'mod-dsa-1',
+    moduleTitle: 'Module 1: Graph Primitives',
+    title: 'FAANG Graph Algorithms & Sliding Window Capstone',
+    instructions: 'Implement Kahn’s algorithm for topological sorting and an optimal variable-size sliding window algorithm. Provide Big-O space and time complexity mathematical proofs and test cases.',
+    dueDate: '2026-09-30T23:59:59Z',
+    maxMarks: 100,
+    submissionType: 'code',
+    submissions: [],
+    createdAt: '2026-08-20T12:00:00Z'
+  },
+  {
+    id: 'ass-course-dbms',
+    courseId: 'course-dbms',
+    courseTitle: 'Relational Database Management & SQL Mastery',
+    moduleId: 'mod-dbms-1',
+    moduleTitle: 'Module 1: Query Engines',
+    title: 'Relational Index Optimization & Lock Contention Analysis',
+    instructions: 'Analyze PostgreSQL explain plans on 5 million records. Configure clustered index keys vs covering non-clustered indexes to eliminate sequential scans.',
+    dueDate: '2026-09-30T23:59:59Z',
+    maxMarks: 100,
+    submissionType: 'text',
+    submissions: [],
+    createdAt: '2026-08-21T13:00:00Z'
+  },
+  {
+    id: 'ass-course-2',
+    courseId: 'course-2',
+    courseTitle: 'Advanced TypeScript & Production Design Patterns',
+    moduleId: 'mod-21',
+    moduleTitle: 'Module 1: Type Systems',
+    title: 'Type-Level State Machine & Generic Builder Assignment',
+    instructions: 'Implement an end-to-end type-safe finite state machine without external libraries. Ensure illegal state transitions trigger compile-time type errors.',
+    dueDate: '2026-09-30T23:59:59Z',
+    maxMarks: 100,
+    submissionType: 'code',
+    submissions: [],
+    createdAt: '2026-08-22T14:00:00Z'
+  },
+  {
+    id: 'ass-course-3',
+    courseId: 'course-3',
+    courseTitle: 'Micro-Interactions & Modern Motion Design with Framer Motion',
+    moduleId: 'mod-31',
+    moduleTitle: 'Module 1: Spring Physics',
+    title: 'Framer Motion Gestural Interaction Sandbox Assignment',
+    instructions: 'Construct a responsive component with drag physics, spring velocity snapping, and layoutId shared morphing in React.',
+    dueDate: '2026-09-30T23:59:59Z',
+    maxMarks: 100,
+    submissionType: 'code',
+    submissions: [],
+    createdAt: '2026-08-23T15:00:00Z'
+  }
+];
+
 export const INITIAL_ARTICLES: ArticleNote[] = [];
 
 export const INITIAL_APPROVAL_QUEUE: ContentApprovalItem[] = [

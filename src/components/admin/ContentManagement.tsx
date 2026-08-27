@@ -27,11 +27,13 @@ import {
 
 interface ContentManagementProps {
   initialSubTab?: 'courses' | 'quizzes' | 'assignments';
+  onSubTabChange?: (tab: 'courses' | 'quizzes' | 'assignments') => void;
   onOpenCreateContent: (type?: 'course' | 'quiz' | 'assignment') => void;
 }
 
 export const ContentManagement: React.FC<ContentManagementProps> = ({
   initialSubTab = 'courses',
+  onSubTabChange,
   onOpenCreateContent,
 }) => {
   const {
@@ -47,6 +49,12 @@ export const ContentManagement: React.FC<ContentManagementProps> = ({
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'courses' | 'quizzes' | 'assignments'>(initialSubTab);
+
+  // Synchronize when initialSubTab changes from sidebar navigation
+  React.useEffect(() => {
+    setActiveTab(initialSubTab);
+  }, [initialSubTab]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'under_review' | 'draft'>('all');
   const [selectedCourseFilter, setSelectedCourseFilter] = useState('all');
@@ -146,6 +154,7 @@ export const ContentManagement: React.FC<ContentManagementProps> = ({
           onClick={() => {
             setActiveTab('courses');
             setSearchQuery('');
+            onSubTabChange?.('courses');
           }}
           className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
             activeTab === 'courses'
@@ -161,6 +170,7 @@ export const ContentManagement: React.FC<ContentManagementProps> = ({
           onClick={() => {
             setActiveTab('quizzes');
             setSearchQuery('');
+            onSubTabChange?.('quizzes');
           }}
           className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
             activeTab === 'quizzes'
@@ -176,6 +186,7 @@ export const ContentManagement: React.FC<ContentManagementProps> = ({
           onClick={() => {
             setActiveTab('assignments');
             setSearchQuery('');
+            onSubTabChange?.('assignments');
           }}
           className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
             activeTab === 'assignments'
