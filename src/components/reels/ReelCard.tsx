@@ -1,3 +1,4 @@
+```tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { Reel } from '../../types';
 import { useApp } from '../../context/AppContext';
@@ -24,9 +25,20 @@ interface ReelCardProps {
   onPrev?: () => void;
 }
 
-export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPrev }) => {
-  const { toggleLikeReel, toggleBookmarkReel, markReelWatched, showToast, currentUser } = useApp();
-  
+export const ReelCard: React.FC<ReelCardProps> = ({
+  reel,
+  isActive,
+  onNext,
+  onPrev
+}) => {
+  const {
+    toggleLikeReel,
+    toggleBookmarkReel,
+    markReelWatched,
+    showToast,
+    currentUser
+  } = useApp();
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
@@ -41,7 +53,9 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
     if (videoRef.current) {
       if (isActive) {
         videoRef.current.currentTime = 0;
+
         const playPromise = videoRef.current.play();
+
         if (playPromise !== undefined) {
           playPromise
             .then(() => setIsPlaying(true))
@@ -59,9 +73,10 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
       const current = videoRef.current.currentTime;
       const total = videoRef.current.duration || 1;
       const pct = (current / total) * 100;
+
       setProgressPercent(pct);
 
-      // Trigger watched completion after 5 seconds or 80%
+      // Trigger watched completion after 5 seconds
       if (current >= 5 && isActive) {
         markReelWatched(reel.id);
       }
@@ -82,9 +97,11 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
 
   const handleDoubleTap = (e: React.MouseEvent) => {
     e.stopPropagation();
+
     if (!reel.isLiked) {
       toggleLikeReel(reel.id);
     }
+
     setShowHeartAnim(true);
     setTimeout(() => setShowHeartAnim(false), 800);
   };
@@ -99,7 +116,8 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
   };
 
   return (
-    <div className="relative w-full h-full max-w-[420px] max-h-[820px] rounded-3xl overflow-hidden bg-slate-950 border border-white/10 shadow-2xl flex flex-col select-none">
+    <div className="relative w-full h-full max-w-[460px] max-h-[850px] rounded-3xl overflow-hidden bg-slate-950 border border-white/10 shadow-2xl flex flex-col select-none">
+
       {/* Top Video Progress Bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 z-30">
         <div
@@ -125,17 +143,20 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
           className="w-full h-full object-cover"
         />
 
-        {/* Floating Gradient Backdrop for readability */}
+        {/* Floating Gradient Backdrop */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/90 pointer-events-none" />
 
-        {/* Heart Burst on Double Tap */}
+        {/* Heart Burst */}
         {showHeartAnim && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
-            <Heart size={90} className="text-pink-500 fill-pink-500 animate-heart-burst drop-shadow-2xl" />
+            <Heart
+              size={90}
+              className="text-pink-500 fill-pink-500 animate-heart-burst drop-shadow-2xl"
+            />
           </div>
         )}
 
-        {/* Play/Pause Overlay Indicator */}
+        {/* Play/Pause Overlay */}
         {!isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none z-20">
             <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
@@ -147,9 +168,15 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
         {/* Top Floating Badges */}
         <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
           <div className="flex items-center gap-2">
-            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border backdrop-blur-md ${categoryColors[reel.category] || 'bg-slate-800 text-white'}`}>
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-xs font-bold border backdrop-blur-md ${
+                categoryColors[reel.category] ||
+                'bg-slate-800 text-white'
+              }`}
+            >
               {reel.category}
             </span>
+
             <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/50 text-slate-300 border border-white/10 backdrop-blur-md">
               {reel.difficulty}
             </span>
@@ -167,8 +194,9 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
           </button>
         </div>
 
-        {/* Right Action Sidebar (Instagram Reels Style) */}
+        {/* Right Action Sidebar */}
         <div className="absolute right-3 bottom-24 flex flex-col items-center gap-4 z-30">
+
           {/* Like */}
           <button
             onClick={(e) => {
@@ -177,11 +205,23 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
             }}
             className="flex flex-col items-center group"
           >
-            <div className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
-              reel.isLiked ? 'bg-pink-500/30 text-pink-400 scale-110' : 'bg-black/50 text-white hover:bg-black/70'
-            } border border-white/15`}>
-              <Heart size={20} className={reel.isLiked ? 'fill-pink-400 text-pink-400' : 'text-white'} />
+            <div
+              className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
+                reel.isLiked
+                  ? 'bg-pink-500/30 text-pink-400 scale-110'
+                  : 'bg-black/50 text-white hover:bg-black/70'
+              } border border-white/15`}
+            >
+              <Heart
+                size={20}
+                className={
+                  reel.isLiked
+                    ? 'fill-pink-400 text-pink-400'
+                    : 'text-white'
+                }
+              />
             </div>
+
             <span className="text-[11px] font-semibold text-white mt-1 shadow-sm drop-shadow">
               {reel.likesCount}
             </span>
@@ -198,6 +238,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
             <div className="w-11 h-11 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md border border-white/15 transition-all">
               <MessageCircle size={20} />
             </div>
+
             <span className="text-[11px] font-semibold text-white mt-1 drop-shadow">
               {reel.commentsCount}
             </span>
@@ -211,11 +252,23 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
             }}
             className="flex flex-col items-center group"
           >
-            <div className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
-              reel.isBookmarked ? 'bg-amber-500/30 text-amber-300' : 'bg-black/50 text-white hover:bg-black/70'
-            } border border-white/15`}>
-              <Bookmark size={20} className={reel.isBookmarked ? 'fill-amber-300 text-amber-300' : 'text-white'} />
+            <div
+              className={`w-11 h-11 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
+                reel.isBookmarked
+                  ? 'bg-amber-500/30 text-amber-300'
+                  : 'bg-black/50 text-white hover:bg-black/70'
+              } border border-white/15`}
+            >
+              <Bookmark
+                size={20}
+                className={
+                  reel.isBookmarked
+                    ? 'fill-amber-300 text-amber-300'
+                    : 'text-white'
+                }
+              />
             </div>
+
             <span className="text-[11px] font-semibold text-white mt-1 drop-shadow">
               Save
             </span>
@@ -232,6 +285,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
             <div className="w-11 h-11 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md border border-white/15 transition-all">
               <Share2 size={20} />
             </div>
+
             <span className="text-[11px] font-semibold text-white mt-1 drop-shadow">
               Share
             </span>
@@ -240,13 +294,23 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
 
         {/* Bottom Content Metadata Overlay */}
         <div className="absolute left-4 right-16 bottom-4 z-20 text-left">
+
           {/* Creator Profile */}
           <div className="flex items-center gap-2.5 mb-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center border border-white/30 shrink-0 shadow-md">
-              {reel.creatorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+              {reel.creatorName
+                .split(' ')
+                .map(n => n[0])
+                .join('')
+                .substring(0, 2)
+                .toUpperCase()}
             </div>
+
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm text-white drop-shadow">{reel.creatorName}</span>
+              <span className="font-bold text-sm text-white drop-shadow">
+                {reel.creatorName}
+              </span>
+
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/40 text-blue-200 border border-blue-400/30">
                 {reel.creatorRole}
               </span>
@@ -269,7 +333,12 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
             }`}
           >
             {reel.description}
-            {!isDescExpanded && <span className="text-blue-400 font-semibold ml-1">...more</span>}
+
+            {!isDescExpanded && (
+              <span className="text-blue-400 font-semibold ml-1">
+                ...more
+              </span>
+            )}
           </p>
         </div>
       </div>
@@ -289,3 +358,20 @@ export const ReelCard: React.FC<ReelCardProps> = ({ reel, isActive, onNext, onPr
     </div>
   );
 };
+```
+
+**The main change is this line:**
+
+```tsx
+max-w-[460px] max-h-[850px]
+```
+
+instead of:
+
+```tsx
+max-w-[420px] max-h-[820px]
+```
+
+The video already uses `w-full h-full object-cover`, so it will fill the Reel automatically.
+
+**Before replacing the file, make a backup or use Git so you can undo the change if needed.**
