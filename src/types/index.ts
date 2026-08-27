@@ -44,6 +44,40 @@ export interface DiscountVoucher {
   isUsed: boolean;
 }
 
+export type MentorApplicationStatus = 'submitted' | 'under_review' | 'changes_requested' | 'approved' | 'rejected';
+
+export interface MentorApplication {
+  id: string;
+  userId: string;
+  applicantName: string;
+  applicantEmail: string;
+  applicantAvatar?: string;
+  expertise: string;
+  skills: string[];
+  experienceYears: number;
+  bio: string;
+  portfolioUrl?: string;
+  assessmentsCompleted: number;
+  averageScore: number;
+  status: MentorApplicationStatus;
+  submissionDate: string;
+  reviewedDate?: string;
+  reviewedBy?: string;
+  adminFeedback?: string;
+}
+
+export interface CourseFeedback {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 export interface Question {
   id: string;
   reelId?: string;
@@ -72,6 +106,7 @@ export interface AssessmentResult {
     points: number;
     badge?: Badge;
     voucher?: DiscountVoucher;
+    goodie?: string;
   };
 }
 
@@ -226,6 +261,22 @@ export interface ContentApprovalItem {
   }[];
 }
 
+export interface CourseReel {
+  id: string;
+  courseId?: string;
+  order: number;
+  title: string;
+  description: string;
+  topic?: string;
+  durationSeconds: number;
+  videoUrl: string;
+  thumbnailUrl: string;
+  likesCount?: number;
+  isLiked?: boolean;
+  isBookmarked?: boolean;
+  isCompleted?: boolean;
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -244,6 +295,7 @@ export interface Course {
   reviewsCount: number;
   studentsCount: number;
   modules: CourseModule[];
+  reels?: CourseReel[];
   learningOutcomes: string[];
   status: ApprovalStatus;
   rejectionFeedback?: string;
@@ -253,6 +305,7 @@ export interface Course {
   progressPercent?: number;
   lastLessonTitle?: string;
   lessonsCount?: number;
+  reelsCount?: number;
   quizzesCount?: number;
   assignmentsCount?: number;
 }
@@ -261,6 +314,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password?: string;
   avatar?: string;
   role: UserRole;
   status: UserStatus;
@@ -269,6 +323,7 @@ export interface User {
   streakDays: number;
   level: number;
   isEligibleForMentor?: boolean;
+  mentorApplicationId?: string;
   bio?: string;
   specialty?: string;
   assignedMentorId?: string;

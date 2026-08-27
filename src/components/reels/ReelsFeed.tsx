@@ -1,54 +1,42 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ReelCard } from './ReelCard';
 import {
   ChevronUp,
   ChevronDown,
+  Sparkles,
   CheckCircle2,
-  PlayCircle,
-  Zap
+  Check,
+  Award,
+  ArrowRight,
+  PlaySquare,
+  Lock,
+  Unlock
 } from 'lucide-react';
 
 interface ReelsFeedProps {
   viewMode?: 'desktop' | 'mobile-sim' | 'tablet-sim';
 }
 
-export const ReelsFeed: React.FC<ReelsFeedProps> = ({
-  viewMode = 'desktop'
-}) => {
+export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
   const {
     reels,
     currentReelIndex,
     setCurrentReelIndex,
-    reelsWatchedCount,
+    watchedLearnReelIds,
+    isAssessmentUnlocked,
     adminSettings,
-    openAssessment,
+    openAssessment
   } = useApp();
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  // Exactly 6 published learn reels
+  const learnReels = reels.filter(r => r.isPublished).slice(0, 6);
+  const totalReels = learnReels.length || 6;
+  const completedCount = watchedLearnReelIds.length;
+  const progressPercent = Math.min(100, Math.round((completedCount / totalReels) * 100));
 
-  const categories = [
-    'All',
-    'Python',
-    'Java',
-    'Web Dev',
-    'AI/ML',
-    'Data Structures'
-  ];
-
-  const touchStartY = React.useRef<number | null>(null);
-
+  const touchStartY = useRef<number | null>(null);
   const SWIPE_THRESHOLD = 50;
-
-  const filteredReels =
-    selectedCategory === 'All'
-      ? reels.filter(r => r.isPublished)
-      : reels.filter(
-          r =>
-            r.isPublished &&
-            (r.category === selectedCategory ||
-              r.subject === selectedCategory)
-        );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -62,12 +50,11 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = ({
     };
 
     window.addEventListener('keydown', handleKeyDown);
-
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentReelIndex, filteredReels.length]);
+  }, [currentReelIndex, learnReels.length]);
 
   const handleNext = () => {
-    if (currentReelIndex < filteredReels.length - 1) {
+    if (currentReelIndex < learnReels.length - 1) {
       setCurrentReelIndex(currentReelIndex + 1);
     }
   };
@@ -84,10 +71,7 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = ({
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartY.current === null) return;
-
-    const deltaY =
-      touchStartY.current - e.changedTouches[0].clientY;
-
+    const deltaY = touchStartY.current - e.changedTouches[0].clientY;
     if (Math.abs(deltaY) > SWIPE_THRESHOLD) {
       if (deltaY > 0) {
         handleNext();
@@ -95,141 +79,144 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = ({
         handlePrev();
       }
     }
-
     touchStartY.current = null;
   };
 
-  const activeReel =
-    filteredReels[currentReelIndex] || filteredReels[0];
-
-  const isFiveCompleted =
-    reelsWatchedCount >= adminSettings.reelsPerAssessment;
+  const activeReel = learnReels[currentReelIndex] || learnReels[0];
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col items-center justify-between pb-12 pt-4 bg-slate-50">
-
-      {/* Top Floating Category Filters & Reel Progress Counter */}
-      <div className="w-full max-w-4xl px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 z-30 mb-2">
-
-        {/* Subject Filter Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1 no-scrollbar">
-          {categories.map(cat => (
+    <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col items-center justify-between pb-8 pt-4 bg-slate-50">
+      {/* Top Header: 6 Learn Reels Progress & Unlocked Assessment Banner */}
+      <div className="w-full max-w-2xl px-4 z-30 mb-3 space-y-3">
+        {/* Unlocked Banner (Only when all 6 reels are completed) */}
+        {isAssessmentUnlocked && (
+          <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 shadow-sm flex items-center justify-between gap-3 animate-in fade-in">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                <Unlock size={16} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-emerald-900">
+                  🎉 All 6 Learn Reels Completed! Assessment Unlocked!
+                </p>
+                <p className="text-[11px] text-emerald-700">
+                  Take the automated 6-question quiz to earn points, vouchers, and qualify for Mentorship.
+                </p>
+              </div>
+            </div>
             <button
-              key={cat}
-              onClick={() => {
-                setSelectedCategory(cat);
-                setCurrentReelIndex(0);
-              }}
-              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                selectedCategory === cat
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
-              }`}
+              onClick={openAssessment}
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
             >
-              {cat}
+              <span>Start Assessment</span>
+              <ArrowRight size={14} />
             </button>
-          ))}
-        </div>
+          </div>
+        )}
 
-        {/* Progress Indicator */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-mono font-bold text-slate-700 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
-            Reel {Math.min(currentReelIndex + 1, filteredReels.length)} of{' '}
-            {filteredReels.length}
-          </span>
+        {/* Progress Bar & Header */}
+        <div className="p-3 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <PlaySquare size={16} className="text-blue-600" />
+              <span className="text-xs font-bold text-slate-900">Learn Dashboard (6 Vertical Reels)</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs font-bold">
+              <span className={isAssessmentUnlocked ? 'text-emerald-600' : 'text-blue-600'}>
+                {completedCount}/6 Completed
+              </span>
+              {isAssessmentUnlocked ? (
+                <CheckCircle2 size={15} className="text-emerald-600" />
+              ) : (
+                <Lock size={14} className="text-amber-500" />
+              )}
+            </div>
+          </div>
 
-          <span className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-            Watched: {reelsWatchedCount}/
-            {adminSettings.reelsPerAssessment}
-          </span>
+          {/* Progress Track */}
+          <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full transition-all duration-300 ${
+                isAssessmentUnlocked ? 'bg-emerald-500' : 'bg-blue-600'
+              }`}
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+
+          {/* 6 Quick Reel Selector Tabs */}
+          <div className="grid grid-cols-6 gap-1.5 pt-1">
+            {learnReels.map((reel, index) => {
+              const isWatched = watchedLearnReelIds.includes(reel.id);
+              const isSelected = currentReelIndex === index;
+              return (
+                <button
+                  key={reel.id}
+                  onClick={() => setCurrentReelIndex(index)}
+                  className={`py-1.5 px-1 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : isWatched
+                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                      : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>R{index + 1}</span>
+                    {isWatched && <Check size={11} className={isSelected ? 'text-white' : 'text-emerald-600'} />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* 5 of 5 Completed Banner Prompt */}
-      {isFiveCompleted && (
-        <div className="w-full max-w-xl mx-4 mb-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 shadow-sm flex items-center justify-between gap-3 animate-in fade-in">
-          <div className="flex items-center gap-2 text-xs text-emerald-900">
-            <CheckCircle2
-              size={18}
-              className="text-emerald-600 shrink-0"
-            />
-
-            <span>
-              <strong>5 of 5 Reels Completed!</strong> You are eligible
-              for your automated assessment.
-            </span>
-          </div>
-
-          <button
-            onClick={openAssessment}
-            className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shrink-0 shadow-sm"
-          >
-            <Zap size={14} />
-            <span>Start Assessment</span>
-          </button>
-        </div>
-      )}
-
-      {/* Main Feed Container */}
+      {/* Center 9:16 Vertical Reel Player */}
       <div
-        className="relative flex-1 w-full flex items-center justify-center touch-pan-x"
+        className="relative w-full flex-1 flex items-center justify-center px-4"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
+        {activeReel ? (
+          <ReelCard
+            reel={activeReel}
+            isActive={true}
+            reelIndex={currentReelIndex}
+            totalReels={totalReels}
+            onNext={handleNext}
+            onPrev={handlePrev}
+          />
+        ) : (
+          <div className="p-8 text-center text-slate-400">No reels found.</div>
+        )}
 
-        {/* Next/Prev Navigation Buttons */}
-        <div className="hidden lg:flex flex-col items-center gap-3 absolute left-[calc(50%+250px)] top-1/2 -translate-y-1/2 z-30">
-
+        {/* Up / Down Navigation Controls for Desktop */}
+        <div className="hidden lg:flex flex-col gap-3 absolute right-8 top-1/2 -translate-y-1/2 z-20">
           <button
             onClick={handlePrev}
             disabled={currentReelIndex === 0}
-            className="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 shadow-sm transition-all"
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+              currentReelIndex === 0
+                ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-50'
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-blue-600 hover:text-white shadow-xs cursor-pointer'
+            }`}
+            title="Previous Reel"
           >
             <ChevronUp size={20} />
           </button>
-
           <button
             onClick={handleNext}
-            disabled={currentReelIndex === filteredReels.length - 1}
-            className="w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-700 flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 shadow-sm transition-all"
+            disabled={currentReelIndex >= learnReels.length - 1}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+              currentReelIndex >= learnReels.length - 1
+                ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-50'
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-blue-600 hover:text-white shadow-xs cursor-pointer'
+            }`}
+            title="Next Reel"
           >
             <ChevronDown size={20} />
           </button>
         </div>
-
-        {/* The Active Reel Card */}
-        {activeReel ? (
-          <div className="h-full max-h-[calc(100vh-100px)] w-full flex items-center justify-center p-1">
-
-            <ReelCard
-              reel={activeReel}
-              isActive={true}
-              onNext={handleNext}
-              onPrev={handlePrev}
-            />
-
-          </div>
-        ) : (
-          <div className="text-center py-20 text-slate-500 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-
-            <PlayCircle
-              size={40}
-              className="mx-auto mb-3 text-slate-300"
-            />
-
-            <p className="text-sm font-semibold">
-              No reels found in this category.
-            </p>
-
-            <button
-              onClick={() => setSelectedCategory('All')}
-              className="mt-3 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm"
-            >
-              Reset Filter
-            </button>
-
-          </div>
-        )}
       </div>
     </div>
   );

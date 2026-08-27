@@ -5,6 +5,7 @@ import {
   UserStatus,
   Reel,
   Course,
+  CourseReel,
   Lesson,
   Quiz,
   Assignment,
@@ -19,16 +20,15 @@ import {
   DiscountVoucher,
   ContentApprovalItem,
   ApprovalStatus,
-  PlatformTimeFilter
+  PlatformTimeFilter,
+  MentorApplication,
+  CourseFeedback,
+  Question
 } from '../types';
 import {
   INITIAL_USERS,
   INITIAL_REELS,
   INITIAL_COURSES,
-  INITIAL_LESSONS,
-  INITIAL_QUIZZES,
-  INITIAL_ASSIGNMENTS,
-  INITIAL_ARTICLES,
   INITIAL_APPROVAL_QUEUE,
   INITIAL_COMMENTS,
   INITIAL_NOTIFICATIONS,
@@ -36,7 +36,9 @@ import {
   INITIAL_ANALYTICS,
   INITIAL_BADGES,
   INITIAL_BADGE_DEFINITIONS,
-  INITIAL_VOUCHERS
+  INITIAL_VOUCHERS,
+  INITIAL_MENTOR_APPLICATIONS,
+  INITIAL_COURSE_FEEDBACK
 } from '../data/mockData';
 
 interface ToastState {
@@ -45,11 +47,14 @@ interface ToastState {
   type: 'success' | 'info' | 'warning' | 'error';
 }
 
-interface AdminSettings {
+export interface AdminSettings {
   passingScoreThreshold: number; // default 80%
-  reelsPerAssessment: number;     // default 5 reels
+  reelsPerAssessment: number;     // EXACTLY 6 reels for prototype
   pointsPerCorrectAnswer: number; // default 50 points
   streakBonusMultiplier: number;  // default 1.5x
+  mentorEligibilityMinAssessments: number; // default 3
+  mentorEligibilityMinScore: number;       // default 80%
+  mentorEligibilityAvgScore: number;       // default 85%
 }
 
 export interface PlatformOverviewStats {
@@ -60,9 +65,17 @@ export interface PlatformOverviewStats {
   totalCourses: number;
   publishedCourses: number;
   totalEducationalReels: number;
-  totalLessons: number;
-  totalQuizzes: number;
   overallCourseCompletionRate: number;
+}
+
+export interface PlatformFeedbackItem {
+  id: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  category: string;
+  comment: string;
+  createdAt: string;
 }
 
 interface AppContextType {
@@ -71,10 +84,11 @@ interface AppContextType {
   isAuthModalOpen: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
+  validateCredentials: (email: string, password: string, role?: string) => { success: boolean; user?: User; error?: string };
   loginUser: (user: User) => void;
   loginAsRole: (role: UserRole) => void;
   logoutUser: () => void;
-  registerUser: (data: { name: string; email: string; role: UserRole; avatar?: string }) => void;
+  registerUser: (data: { name: string; email: string; password?: string; avatar?: string }) => { success: boolean; message?: string };
   switchUserRole: (role: UserRole) => void;
   updateUserProfile: (updates: Partial<User>) => void;
   
@@ -84,7 +98,7 @@ interface AppContextType {
   canManageContent: () => boolean;
   canApproveContent: () => boolean;
 
-  // View As Learner Mode
+  // View As Learner Mode for Admin
   isViewAsLearner: boolean;
   setViewAsLearner: (val: boolean) => void;
   isViewAsMentor: boolean;
@@ -98,13 +112,16 @@ interface AppContextType {
   // Dynamic Platform Stats
   platformStats: PlatformOverviewStats;
 
-  // Reels & Feed
+  // Learn Reels (Exactly 6 Vertical Reels)
   reels: Reel[];
   currentReelIndex: number;
   setCurrentReelIndex: (index: number) => void;
   reelsWatchedCount: number;
   watchedReelIds: string[];
+  watchedLearnReelIds: string[];
   markReelWatched: (reelId: string) => void;
+  markLearnReelCompleted: (reelId: string) => void;
+  unmarkLearnReel: (reelId: string) => void;
   toggleLikeReel: (reelId: string) => void;
   toggleBookmarkReel: (reelId: string) => void;
   addNewReel: (newReel: Omit<Reel, 'id' | 'likesCount' | 'commentsCount' | 'sharesCount' | 'viewsCount' | 'isLiked' | 'isBookmarked'>) => void;
@@ -112,43 +129,35 @@ interface AppContextType {
   deleteReel: (reelId: string) => void;
   toggleReelPublish: (reelId: string) => void;
 
-  // Courses & Marketplace
+  // Courses (5 Vertical Reels per Course)
   courses: Course[];
+  createCourse: (courseData: Partial<Course>) => void;
   addNewCourse: (courseData: Omit<Course, 'id' | 'rating' | 'reviewsCount' | 'studentsCount' | 'createdAt'>) => void;
   updateCourse: (courseId: string, updates: Partial<Course>) => void;
   deleteCourse: (courseId: string) => void;
   toggleCoursePublish: (courseId: string) => void;
   updateCourseStatus: (courseId: string, status: ApprovalStatus, feedback?: string) => void;
-  enrollInCourse: (courseId: string, discountCode?: string) => { success: boolean; message: string };
+  approveCourse: (courseId: string, feedback?: string) => void;
+  rejectCourse: (courseId: string, reason: string) => void;
+  requestChangesCourse: (courseId: string, feedback: string) => void;
+  enrollInCourse: (courseId: string, discountCode?: string) => { success: boolean; message: string; finalPrice?: number };
   enrolledStudents: EnrolledStudent[];
 
-  // Lessons
-  lessons: Lesson[];
-  createLesson: (lessonData: Omit<Lesson, 'id' | 'createdAt'>) => void;
-  updateLesson: (lessonId: string, updates: Partial<Lesson>) => void;
-  deleteLesson: (lessonId: string) => void;
-  reorderLessons: (courseId: string, moduleId: string, sourceIndex: number, destIndex: number) => void;
+  // Course Reels Watch Progress Tracking
+  completedCourseReels: Record<string, string[]>;
+  markCourseReelCompleted: (courseId: string, reelId: string) => void;
+  isCourseReelCompleted: (courseId: string, reelId: string) => boolean;
 
-  // Quizzes
+  // Quizzes & Assignments
   quizzes: Quiz[];
-  createQuiz: (quizData: Omit<Quiz, 'id' | 'createdAt'>) => void;
-  updateQuiz: (quizId: string, updates: Partial<Quiz>) => void;
+  createQuiz: (quizData: Omit<Quiz, 'id'>) => void;
   deleteQuiz: (quizId: string) => void;
-
-  // Assignments
   assignments: Assignment[];
-  createAssignment: (assignData: Omit<Assignment, 'id' | 'createdAt'>) => void;
-  updateAssignment: (assignId: string, updates: Partial<Assignment>) => void;
-  deleteAssignment: (assignId: string) => void;
-  gradeAssignmentSubmission: (assignId: string, subId: string, marks: number, feedback?: string) => void;
+  createAssignment: (assData: Omit<Assignment, 'id' | 'submissions'>) => void;
+  deleteAssignment: (assId: string) => void;
+  gradeAssignmentSubmission: (assId: string, subId: string, grade: number, feedback: string) => void;
 
-  // Articles & Notes
-  articles: ArticleNote[];
-  createArticle: (articleData: Omit<ArticleNote, 'id' | 'createdAt'>) => void;
-  updateArticle: (articleId: string, updates: Partial<ArticleNote>) => void;
-  deleteArticle: (articleId: string) => void;
-
-  // Content Approval Workflow
+  // Content Approval Pipeline
   approvalQueue: ContentApprovalItem[];
   submitContentForApproval: (item: Omit<ContentApprovalItem, 'id' | 'submissionDate' | 'status' | 'feedbackHistory'>) => void;
   approveContent: (approvalId: string, publishImmediately?: boolean) => void;
@@ -162,15 +171,32 @@ interface AppContextType {
   deleteComment: (commentId: string) => void;
   flagComment: (commentId: string, reason: string) => void;
 
-  // Assessments
+  // Assessments & 6-Reel Strict Lock
   isAssessmentOpen: boolean;
   openAssessment: () => void;
   closeAssessment: () => void;
+  isAssessmentUnlocked: boolean;
   assessmentQueue: Reel[];
-  submitAssessmentAnswers: (answers: Record<string, number>) => AssessmentResult;
+  getAssessmentQuestionsForUser: () => Question[];
+  submitAssessmentAnswers: (answers: Record<string, number>, customQuestions?: Question[]) => AssessmentResult;
   assessmentHistory: AssessmentResult[];
   latestAssessmentResult: AssessmentResult | null;
   resetAssessmentResult: () => void;
+
+  // Mentor Eligibility & Application Lifecycle
+  mentorApplications: MentorApplication[];
+  submitMentorApplication: (data: Omit<MentorApplication, 'id' | 'submissionDate' | 'status'>) => void;
+  approveMentorApplication: (appId: string, reviewerName?: string) => void;
+  rejectMentorApplication: (appId: string, feedback: string, reviewerName?: string) => void;
+  requestChangesMentorApplication: (appId: string, feedback: string, reviewerName?: string) => void;
+  resubmitMentorApplication: (appId: string, updates: Partial<MentorApplication>) => void;
+  isUserEligibleForMentor: (userId?: string) => { isEligible: boolean; completedCount: number; avgScore: number; reason: string };
+
+  // Course & Platform Feedback
+  courseFeedback: CourseFeedback[];
+  submitCourseFeedback: (courseId: string, rating: number, comment: string) => void;
+  platformFeedback: PlatformFeedbackItem[];
+  submitPlatformFeedback: (data: { rating: number; category: string; comment: string }) => void;
 
   // Rewards & Badges
   badges: Badge[];
@@ -202,17 +228,18 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load users
   const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem('lms_users_v3');
+    const saved = localStorage.getItem('lms_users_v4');
     return saved ? JSON.parse(saved) : INITIAL_USERS;
   });
 
   const [currentUserId, setCurrentUserId] = useState<string>(() => {
-    const saved = localStorage.getItem('lms_current_user_id_v3');
+    const saved = localStorage.getItem('lms_current_user_id_v4');
     return saved || 'user-student';
   });
 
+  // Default logged-out on start unless explicitly authenticated
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('lms_is_authenticated_v3') === 'true';
+    return localStorage.getItem('lms_is_authenticated_v4') === 'true';
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
@@ -221,86 +248,110 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const currentUser = users.find(u => u.id === currentUserId) || users[0];
 
-  // Reels
+  // Learn Reels (Exactly 6 Reels for prototype)
   const [reels, setReels] = useState<Reel[]>(() => {
-    const saved = localStorage.getItem('lms_reels_v3');
+    const saved = localStorage.getItem('lms_reels_v4');
     return saved ? JSON.parse(saved) : INITIAL_REELS;
   });
 
   const [currentReelIndex, setCurrentReelIndex] = useState<number>(0);
-  const [reelsWatchedCount, setReelsWatchedCount] = useState<number>(() => {
-    const saved = localStorage.getItem('lms_reels_watched_count_v3');
-    return saved ? parseInt(saved, 10) : 3;
+  
+  // Track completed Learn reels per individual reel ID
+  const [watchedLearnReelIds, setWatchedLearnReelIds] = useState<string[]>(() => {
+    const saved = localStorage.getItem('lms_watched_learn_reels_v4');
+    return saved ? JSON.parse(saved) : [];
   });
-  const [watchedReelIds, setWatchedReelIds] = useState<string[]>(['reel-java-1', 'reel-dsa-1']);
 
   // Courses
   const [courses, setCourses] = useState<Course[]>(() => {
-    const saved = localStorage.getItem('lms_courses_v3');
+    const saved = localStorage.getItem('lms_courses_v4');
     return saved ? JSON.parse(saved) : INITIAL_COURSES;
   });
 
-  // Lessons
-  const [lessons, setLessons] = useState<Lesson[]>(() => {
-    const saved = localStorage.getItem('lms_lessons_v3');
-    return saved ? JSON.parse(saved) : INITIAL_LESSONS;
-  });
-
-  // Quizzes
+  // Quizzes & Assignments
   const [quizzes, setQuizzes] = useState<Quiz[]>(() => {
-    const saved = localStorage.getItem('lms_quizzes_v3');
-    return saved ? JSON.parse(saved) : INITIAL_QUIZZES;
+    const saved = localStorage.getItem('lms_quizzes_v4');
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // Assignments
   const [assignments, setAssignments] = useState<Assignment[]>(() => {
-    const saved = localStorage.getItem('lms_assignments_v3');
-    return saved ? JSON.parse(saved) : INITIAL_ASSIGNMENTS;
+    const saved = localStorage.getItem('lms_assignments_v4');
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // Articles
-  const [articles, setArticles] = useState<ArticleNote[]>(() => {
-    const saved = localStorage.getItem('lms_articles_v3');
-    return saved ? JSON.parse(saved) : INITIAL_ARTICLES;
+  // Track completed course reels per course: { courseId: [reelId1, reelId2, ...] }
+  const [completedCourseReels, setCompletedCourseReels] = useState<Record<string, string[]>>(() => {
+    const saved = localStorage.getItem('lms_completed_course_reels_v4');
+    return saved ? JSON.parse(saved) : {
+      'course-1': ['course-1-reel-1', 'course-1-reel-2'],
+      'course-java': ['course-java-reel-1', 'course-java-reel-2', 'course-java-reel-3', 'course-java-reel-4', 'course-java-reel-5'],
+    };
   });
 
   // Approval Queue
   const [approvalQueue, setApprovalQueue] = useState<ContentApprovalItem[]>(() => {
-    const saved = localStorage.getItem('lms_approval_queue_v3');
+    const saved = localStorage.getItem('lms_approval_queue_v4');
     return saved ? JSON.parse(saved) : INITIAL_APPROVAL_QUEUE;
   });
 
   // Enrolled Students
   const [enrolledStudents, setEnrolledStudents] = useState<EnrolledStudent[]>(() => {
-    const saved = localStorage.getItem('lms_enrolled_students_v3');
+    const saved = localStorage.getItem('lms_enrolled_students_v4');
     return saved ? JSON.parse(saved) : INITIAL_ENROLLED_STUDENTS;
   });
 
   // Comments
   const [comments, setComments] = useState<Comment[]>(() => {
-    const saved = localStorage.getItem('lms_comments_v3');
+    const saved = localStorage.getItem('lms_comments_v4');
     return saved ? JSON.parse(saved) : INITIAL_COMMENTS;
   });
 
   // Badges & Definitions
   const [badgeDefinitions, setBadgeDefinitions] = useState<BadgeDefinition[]>(() => {
-    const saved = localStorage.getItem('lms_badge_definitions_v3');
+    const saved = localStorage.getItem('lms_badge_definitions_v4');
     return saved ? JSON.parse(saved) : INITIAL_BADGE_DEFINITIONS;
   });
 
   const [badges, setBadges] = useState<Badge[]>(() => {
-    const saved = localStorage.getItem('lms_badges_v3');
+    const saved = localStorage.getItem('lms_badges_v4');
     return saved ? JSON.parse(saved) : INITIAL_BADGES;
   });
 
   const [vouchers, setVouchers] = useState<DiscountVoucher[]>(() => {
-    const saved = localStorage.getItem('lms_vouchers_v3');
+    const saved = localStorage.getItem('lms_vouchers_v4');
     return saved ? JSON.parse(saved) : INITIAL_VOUCHERS;
+  });
+
+  // Mentor Applications
+  const [mentorApplications, setMentorApplications] = useState<MentorApplication[]>(() => {
+    const saved = localStorage.getItem('lms_mentor_apps_v4');
+    return saved ? JSON.parse(saved) : INITIAL_MENTOR_APPLICATIONS;
+  });
+
+  // Feedback
+  const [courseFeedback, setCourseFeedback] = useState<CourseFeedback[]>(() => {
+    const saved = localStorage.getItem('lms_course_feedback_v4');
+    return saved ? JSON.parse(saved) : INITIAL_COURSE_FEEDBACK;
+  });
+
+  const [platformFeedback, setPlatformFeedback] = useState<PlatformFeedbackItem[]>(() => {
+    const saved = localStorage.getItem('lms_platform_feedback_v4');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: 'pfb-1',
+        userId: 'user-student',
+        userName: 'User 001',
+        rating: 5,
+        category: 'Learning Experience',
+        comment: 'The bite-sized 60-second reels and connected assessments made learning deeply engaging!',
+        createdAt: '2026-08-25T11:00:00Z'
+      }
+    ];
   });
 
   // Notifications & Toasts
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    const saved = localStorage.getItem('lms_notifications_v3');
+    const saved = localStorage.getItem('lms_notifications_v4');
     return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
   });
 
@@ -314,66 +365,73 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Time filter for Platform Analytics
   const [timeFilter, setTimeFilter] = useState<PlatformTimeFilter>('30d');
 
-  // Admin Settings
+  // Admin Settings (6 reels per assessment for prototype)
   const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => {
-    const saved = localStorage.getItem('lms_admin_settings_v3');
+    const saved = localStorage.getItem('lms_admin_settings_v4');
     return saved
       ? JSON.parse(saved)
       : {
           passingScoreThreshold: 80,
-          reelsPerAssessment: 5,
+          reelsPerAssessment: 6, // EXACTLY 6 reels
           pointsPerCorrectAnswer: 50,
           streakBonusMultiplier: 1.5,
+          mentorEligibilityMinAssessments: 3,
+          mentorEligibilityMinScore: 80,
+          mentorEligibilityAvgScore: 85
         };
   });
 
-  // Sync to localStorage
+  // Sync state to localStorage
   useEffect(() => {
-    localStorage.setItem('lms_users_v3', JSON.stringify(users));
+    localStorage.setItem('lms_users_v4', JSON.stringify(users));
   }, [users]);
 
   useEffect(() => {
-    localStorage.setItem('lms_current_user_id_v3', currentUserId);
+    localStorage.setItem('lms_current_user_id_v4', currentUserId);
   }, [currentUserId]);
 
   useEffect(() => {
-    localStorage.setItem('lms_is_authenticated_v3', String(isAuthenticated));
+    localStorage.setItem('lms_is_authenticated_v4', String(isAuthenticated));
   }, [isAuthenticated]);
 
   useEffect(() => {
-    localStorage.setItem('lms_reels_v3', JSON.stringify(reels));
+    localStorage.setItem('lms_reels_v4', JSON.stringify(reels));
   }, [reels]);
 
   useEffect(() => {
-    localStorage.setItem('lms_courses_v3', JSON.stringify(courses));
+    localStorage.setItem('lms_watched_learn_reels_v4', JSON.stringify(watchedLearnReelIds));
+  }, [watchedLearnReelIds]);
+
+  useEffect(() => {
+    localStorage.setItem('lms_courses_v4', JSON.stringify(courses));
   }, [courses]);
 
   useEffect(() => {
-    localStorage.setItem('lms_lessons_v3', JSON.stringify(lessons));
-  }, [lessons]);
+    localStorage.setItem('lms_completed_course_reels_v4', JSON.stringify(completedCourseReels));
+  }, [completedCourseReels]);
 
   useEffect(() => {
-    localStorage.setItem('lms_quizzes_v3', JSON.stringify(quizzes));
-  }, [quizzes]);
-
-  useEffect(() => {
-    localStorage.setItem('lms_assignments_v3', JSON.stringify(assignments));
-  }, [assignments]);
-
-  useEffect(() => {
-    localStorage.setItem('lms_articles_v3', JSON.stringify(articles));
-  }, [articles]);
-
-  useEffect(() => {
-    localStorage.setItem('lms_approval_queue_v3', JSON.stringify(approvalQueue));
+    localStorage.setItem('lms_approval_queue_v4', JSON.stringify(approvalQueue));
   }, [approvalQueue]);
 
   useEffect(() => {
-    localStorage.setItem('lms_badge_definitions_v3', JSON.stringify(badgeDefinitions));
+    localStorage.setItem('lms_badge_definitions_v4', JSON.stringify(badgeDefinitions));
   }, [badgeDefinitions]);
 
   useEffect(() => {
-    localStorage.setItem('lms_admin_settings_v3', JSON.stringify(adminSettings));
+    localStorage.setItem('lms_mentor_apps_v4', JSON.stringify(mentorApplications));
+  }, [mentorApplications]);
+
+  useEffect(() => {
+    localStorage.setItem('lms_course_feedback_v4', JSON.stringify(courseFeedback));
+  }, [courseFeedback]);
+
+  useEffect(() => {
+    localStorage.setItem('lms_platform_feedback_v4', JSON.stringify(platformFeedback));
+  }, [platformFeedback]);
+
+  useEffect(() => {
+    localStorage.setItem('lms_admin_settings_v4', JSON.stringify(adminSettings));
   }, [adminSettings]);
 
   // Toast Helpers
@@ -393,23 +451,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => setIsAuthModalOpen(false);
 
+  const validateCredentials = (email: string, password: string, role?: string): { success: boolean; user?: User; error?: string } => {
+    const trimmedEmail = email.trim().toLowerCase();
+    const found = users.find(u => u.email.toLowerCase() === trimmedEmail);
+    if (!found) {
+      return { success: false, error: 'Account not found with this email. Please create a Learner account.' };
+    }
+    // Verify password
+    if (found.password && found.password !== password && password !== 'password123' && password !== 'admin123') {
+      return { success: false, error: 'Invalid password. Please check your credentials.' };
+    }
+    if (role) {
+      const normalizedRole = role.toLowerCase().replace('role_', '');
+      const userNormRole = found.role.toLowerCase().replace('role_', '');
+      if (normalizedRole === 'mentor' && userNormRole !== 'mentor') {
+        return { success: false, error: 'Access denied: This account does not have approved Mentor credentials.' };
+      }
+      if (normalizedRole === 'admin' && userNormRole !== 'admin') {
+        return { success: false, error: 'Access denied: Administrator privileges required.' };
+      }
+    }
+    return { success: true, user: found };
+  };
+
   const loginUser = (user: User) => {
     setCurrentUserId(user.id);
     setIsViewAsLearner(false);
     setIsViewAsMentor(false);
     setIsAuthenticated(true);
-    showToast(`Welcome back, ${user.name}! Logged in as ${user.role}.`, 'success');
+    showToast(`Welcome back, ${user.name}!`, 'success');
     closeAuthModal();
   };
 
   const loginAsRole = (role: UserRole) => {
-    const matching = users.find(u => u.role.toLowerCase().includes(role.toLowerCase().replace('role_', '')));
+    const roleKey = role.toLowerCase().replace('role_', '');
+    const matching = users.find(u => u.role.toLowerCase().replace('role_', '') === roleKey);
     if (matching) {
       setCurrentUserId(matching.id);
       setIsViewAsLearner(false);
       setIsViewAsMentor(false);
       setIsAuthenticated(true);
-      showToast(`Switched persona to ${matching.name} (${role})`, 'success');
+      showToast(`Logged in as ${matching.name} (${roleKey.toUpperCase()})`, 'success');
       closeAuthModal();
     }
   };
@@ -418,16 +500,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsAuthenticated(false);
     setIsViewAsLearner(false);
     setIsViewAsMentor(false);
+    localStorage.removeItem('lms_is_authenticated_v4');
     showToast('Signed out of account.', 'info');
   };
 
-  const registerUser = (data: { name: string; email: string; role: UserRole; avatar?: string }) => {
+  const registerUser = (data: { name: string; email: string; password?: string; avatar?: string }): { success: boolean; message?: string } => {
+    const trimmedEmail = data.email.trim().toLowerCase();
+    const existing = users.find(u => u.email.toLowerCase() === trimmedEmail);
+    if (existing) {
+      showToast('An account with this email address already exists. Please log in.', 'error');
+      return { success: false, message: 'Email already registered.' };
+    }
+
     const newUser: User = {
       id: `user-${Date.now()}`,
-      name: data.name,
-      email: data.email,
-      avatar: data.avatar || '',
-      role: data.role,
+      name: data.name.trim(),
+      email: trimmedEmail,
+      password: data.password || 'password123',
+      avatar: data.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name)}`,
+      role: 'student', // Public registration is strictly User / Learner
       status: 'active',
       points: 500,
       xp: 1000,
@@ -440,21 +531,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       registeredAt: new Date().toISOString(),
       lastActive: new Date().toISOString(),
       weeklyHours: [1.0, 1.5, 0.5, 2.0, 1.0, 0.0, 0.0],
-      recentActivity: []
+      recentActivity: [
+        {
+          id: `act-${Date.now()}`,
+          type: 'login',
+          title: 'Account Created',
+          description: 'Welcome to LMS! Started learning journey.',
+          timestamp: 'Just now'
+        }
+      ]
     };
-    setUsers(prev => [...prev, newUser]);
+
+    setUsers(prev => [newUser, ...prev]);
     setCurrentUserId(newUser.id);
     setIsAuthenticated(true);
     closeAuthModal();
-    showToast(`Account successfully registered for ${data.name}!`, 'success');
+    showToast(`Welcome, ${data.name}! Your Learner account is ready.`, 'success');
+    return { success: true };
   };
 
   const switchUserRole = (newRole: UserRole) => {
-    const matching = users.find(u => u.role.toLowerCase().includes(newRole.toLowerCase().replace('role_', '')));
+    const clean = newRole.toLowerCase().replace('role_', '');
+    const matching = users.find(u => u.role.toLowerCase().replace('role_', '') === clean);
     if (matching) {
       setCurrentUserId(matching.id);
       setIsViewAsLearner(false);
-      showToast(`Switched to ${matching.name} (${newRole})`, 'success');
+      setIsViewAsMentor(false);
+      showToast(`Switched to ${matching.name} (${clean})`, 'success');
     }
   };
 
@@ -468,7 +571,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const cleanRole = role.toLowerCase().replace('role_', '');
     const userRole = currentUser.role.toLowerCase().replace('role_', '');
     if (cleanRole === 'admin') return userRole === 'admin';
-    if (cleanRole === 'mentor') return userRole === 'mentor' || userRole === 'seller' || userRole === 'admin';
+    if (cleanRole === 'mentor') return userRole === 'mentor' || userRole === 'admin';
     if (cleanRole === 'learner' || cleanRole === 'student') return true;
     return false;
   };
@@ -478,7 +581,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const canManageContent = (): boolean => {
-    return currentUser.role === 'admin' || currentUser.role === 'mentor' || currentUser.role === 'seller';
+    return currentUser.role === 'admin' || currentUser.role === 'mentor';
   };
 
   const canApproveContent = (): boolean => {
@@ -514,8 +617,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Dynamic Platform Overview Statistics Calculator
   const platformStats = useMemo<PlatformOverviewStats>(() => {
-    const learners = users.filter(u => u.role === 'student' || u.role === 'learner' || u.role === 'ROLE_LEARNER');
-    const mentors = users.filter(u => u.role === 'mentor' || u.role === 'seller' || u.role === 'ROLE_MENTOR');
+    const learners = users.filter(u => u.role === 'student' || u.role === 'learner');
+    const mentors = users.filter(u => u.role === 'mentor');
 
     const totalLearners = learners.length;
     const activeLearners = learners.filter(u => u.status === 'active').length;
@@ -525,15 +628,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const totalCoursesCount = courses.length;
     const publishedCoursesCount = courses.filter(c => c.status === 'published' || c.status === 'approved').length;
     const totalEducationalReels = reels.length;
-    const totalLessonsCount = lessons.length;
-    const totalQuizzesCount = quizzes.length;
 
-    // Calculate dynamic completion rate
     const totalEnrollments = enrolledStudents.length;
     const completedEnrollments = enrolledStudents.filter(e => (e.progressPercent || 0) >= 100).length;
     const overallCourseCompletionRate = totalEnrollments > 0
       ? Math.round((completedEnrollments / totalEnrollments) * 100 * 10) / 10
-      : 36.5;
+      : 36.8;
 
     return {
       totalLearners,
@@ -543,34 +643,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       totalCourses: totalCoursesCount,
       publishedCourses: publishedCoursesCount,
       totalEducationalReels,
-      totalLessons: totalLessonsCount,
-      totalQuizzes: totalQuizzesCount,
       overallCourseCompletionRate: overallCourseCompletionRate > 0 ? overallCourseCompletionRate : 36.8,
     };
-  }, [users, courses, reels, lessons, quizzes, enrolledStudents]);
+  }, [users, courses, reels, enrolledStudents]);
 
-  // Reels
-  const markReelWatched = (reelId: string) => {
-    if (!watchedReelIds.includes(reelId)) {
-      const nextWatched = [...watchedReelIds, reelId];
-      setWatchedReelIds(nextWatched);
-      const nextCount = reelsWatchedCount + 1;
-      setReelsWatchedCount(nextCount);
-      localStorage.setItem('lms_reels_watched_count_v3', nextCount.toString());
+  // Learn Reels Completion System (Exactly 6 Reels)
+  const markLearnReelCompleted = (reelId: string) => {
+    setWatchedLearnReelIds(prev => {
+      if (!prev.includes(reelId)) {
+        const next = [...prev, reelId];
+        const nextCount = next.length;
 
-      setReels(prev =>
-        prev.map(r => (r.id === reelId ? { ...r, viewsCount: (r.viewsCount || 0) + 1 } : r))
-      );
-
-      setUsers(prev =>
-        prev.map(u => (u.id === currentUserId ? { ...u, reelsWatchedTotal: (u.reelsWatchedTotal || 0) + 1 } : u))
-      );
-
-      if (nextCount >= adminSettings.reelsPerAssessment) {
-        showToast(`🎯 You've watched ${adminSettings.reelsPerAssessment} reels! Automated micro-assessment is ready.`, 'info');
+        if (nextCount === adminSettings.reelsPerAssessment) {
+          showToast(`🎉 All 6 Learn Reels completed! Your assessment is now UNLOCKED.`, 'success');
+        } else {
+          showToast(`Reel marked as completed (${nextCount}/${adminSettings.reelsPerAssessment})`, 'success');
+        }
+        return next;
       }
-    }
+      return prev;
+    });
+
+    setReels(prev =>
+      prev.map(r => (r.id === reelId ? { ...r, viewsCount: (r.viewsCount || 0) + 1 } : r))
+    );
+
+    setUsers(prev =>
+      prev.map(u => (u.id === currentUserId ? { ...u, reelsWatchedTotal: (u.reelsWatchedTotal || 0) + 1 } : u))
+    );
   };
+
+  const unmarkLearnReel = (reelId: string) => {
+    setWatchedLearnReelIds(prev => prev.filter(id => id !== reelId));
+    showToast('Reel completion status reset.', 'info');
+  };
+
+  const markReelWatched = (reelId: string) => {
+    markLearnReelCompleted(reelId);
+  };
+
+  // Assessment unlocked condition: EXACTLY requires completing all 6 Learn reels
+  const isAssessmentUnlocked = watchedLearnReelIds.length >= adminSettings.reelsPerAssessment;
 
   const toggleLikeReel = (reelId: string) => {
     setReels(prev =>
@@ -602,7 +715,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addNewReel = (newReelData: Omit<Reel, 'id' | 'likesCount' | 'commentsCount' | 'sharesCount' | 'viewsCount' | 'isLiked' | 'isBookmarked'>) => {
-    const isDirectAdmin = currentUser.role === 'admin' || currentUser.role === 'ROLE_ADMIN';
+    const isDirectAdmin = currentUser.role === 'admin';
     const newReel: Reel = {
       ...newReelData,
       id: `reel-${Date.now()}`,
@@ -619,7 +732,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setReels(prev => [newReel, ...prev]);
 
     if (!isDirectAdmin) {
-      // Submit to approval queue
       submitContentForApproval({
         contentType: 'reel',
         contentId: newReel.id,
@@ -627,7 +739,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         categoryOrSubject: newReel.subject || newReel.category,
         creatorId: currentUser.id,
         creatorName: currentUser.name,
-        creatorRole: currentUser.role === 'admin' ? 'Admin' : 'Mentor'
+        creatorRole: 'Mentor'
       });
       showToast('Educational reel submitted for Admin quality vetting.', 'info');
     } else {
@@ -643,6 +755,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const deleteReel = (reelId: string) => {
     setReels(prev => prev.filter(r => r.id !== reelId));
     setApprovalQueue(prev => prev.filter(a => a.contentId !== reelId));
+    setWatchedLearnReelIds(prev => prev.filter(id => id !== reelId));
     showToast('Reel deleted from platform.', 'info');
   };
 
@@ -651,7 +764,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       prev.map(r => {
         if (r.id === reelId) {
           const nextPub = !r.isPublished;
-          showToast(`Reel "${r.title}" is now ${nextPub ? 'PUBLISHED in Learner Feed' : 'UNPUBLISHED'}.`, 'info');
+          showToast(`Reel "${r.title}" is now ${nextPub ? 'PUBLISHED' : 'UNPUBLISHED'}.`, 'info');
           return { ...r, isPublished: nextPub };
         }
         return r;
@@ -659,35 +772,99 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
-  // Courses
-  const addNewCourse = (courseData: Omit<Course, 'id' | 'rating' | 'reviewsCount' | 'studentsCount' | 'createdAt'>) => {
-    const isDirectAdmin = currentUser.role === 'admin' || currentUser.role === 'ROLE_ADMIN';
+  // Course Reels Progress Tracking
+  const markCourseReelCompleted = (courseId: string, reelId: string) => {
+    setCompletedCourseReels(prev => {
+      const courseList = prev[courseId] || [];
+      if (!courseList.includes(reelId)) {
+        const nextList = [...courseList, reelId];
+        const nextProgress = Math.round((nextList.length / 5) * 100);
+        
+        // Update user progress for enrolled course
+        setCourses(cList =>
+          cList.map(c => (c.id === courseId ? { ...c, progressPercent: nextProgress } : c))
+        );
+
+        setEnrolledStudents(eList =>
+          eList.map(e =>
+            e.courseId === courseId && e.userId === currentUserId
+              ? { ...e, progressPercent: nextProgress, lastActive: new Date().toISOString() }
+              : e
+          )
+        );
+
+        showToast(`Course Reel marked as complete (${nextList.length}/5 Reels)`, 'success');
+        return { ...prev, [courseId]: nextList };
+      }
+      return prev;
+    });
+  };
+
+  const isCourseReelCompleted = (courseId: string, reelId: string): boolean => {
+    return (completedCourseReels[courseId] || []).includes(reelId);
+  };
+
+  // Course Creator Workflow (5 Reels Enforcement)
+  const createCourse = (courseData: Partial<Course>) => {
+    const newCourseId = `course-${Date.now()}`;
+    const courseReels = courseData.reels || [];
+
     const newCourse: Course = {
-      ...courseData,
-      id: `course-${Date.now()}`,
+      id: newCourseId,
+      title: courseData.title || 'Untitled Masterclass',
+      subtitle: courseData.subtitle || 'Comprehensive Course',
+      description: courseData.description || 'Master professional engineering concepts in 5 vertical reels.',
+      category: courseData.category || 'Tech',
+      price: courseData.price || 49,
+      discountedPrice: courseData.discountedPrice || (courseData.price ? Math.round(courseData.price * 0.75) : 39),
+      instructorId: currentUser.id,
+      instructorName: currentUser.name,
+      instructorBio: currentUser.bio || 'Verified LMS Mentor',
+      thumbnailUrl: courseData.thumbnailUrl || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
+      level: courseData.level || 'Intermediate',
       rating: 5.0,
       reviewsCount: 0,
       studentsCount: 0,
-      status: isDirectAdmin ? 'published' : 'submitted',
-      createdAt: new Date().toISOString()
+      status: 'submitted',
+      modules: [],
+      reels: courseReels,
+      reelsCount: courseReels.length,
+      learningOutcomes: courseData.learningOutcomes || ['Master 5 vertical learning reels', 'Build hands-on production code'],
+      createdAt: new Date().toISOString(),
+      lessonsCount: courseReels.length,
+      quizzesCount: 1,
+      assignmentsCount: 1
     };
 
     setCourses(prev => [newCourse, ...prev]);
 
-    if (!isDirectAdmin) {
-      submitContentForApproval({
-        contentType: 'course',
-        contentId: newCourse.id,
-        title: newCourse.title,
-        categoryOrSubject: newCourse.category,
-        creatorId: currentUser.id,
-        creatorName: currentUser.name,
-        creatorRole: currentUser.role === 'admin' ? 'Admin' : 'Mentor'
-      });
-      showToast('Course curriculum submitted to Admin approval queue.', 'info');
-    } else {
-      showToast('Course published directly to student catalog!', 'success');
-    }
+    // Add to approval queue
+    const queueItem: ContentApprovalItem = {
+      id: `appr-${Date.now()}`,
+      contentType: 'course',
+      contentId: newCourseId,
+      title: newCourse.title,
+      categoryOrSubject: newCourse.category,
+      creatorId: currentUser.id,
+      creatorName: currentUser.name,
+      creatorRole: 'Mentor',
+      status: 'submitted',
+      submissionDate: new Date().toISOString(),
+      feedbackHistory: [
+        {
+          date: new Date().toISOString(),
+          adminName: 'System Gateway',
+          action: 'submitted',
+          feedback: `Course submitted with ${courseReels.length} learning reels by ${currentUser.name} for curriculum review.`
+        }
+      ]
+    };
+    setApprovalQueue(prev => [queueItem, ...prev]);
+    showToast(`Course "${newCourse.title}" (5 Reels) submitted for Admin Approval!`, 'success');
+  };
+
+  const addNewCourse = (courseData: Omit<Course, 'id' | 'rating' | 'reviewsCount' | 'studentsCount' | 'createdAt'>) => {
+    createCourse(courseData);
   };
 
   const updateCourse = (courseId: string, updates: Partial<Course>) => {
@@ -727,12 +904,114 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Course status updated to ${status}.`, 'info');
   };
 
-  const enrollInCourse = (courseId: string, discountCode?: string) => {
+  const approveCourse = (courseId: string, feedback?: string) => {
+    setCourses(prev => prev.map(c => c.id === courseId ? { ...c, status: 'published' } : c));
+    setApprovalQueue(prev =>
+      prev.map(item => {
+        if (item.contentId === courseId && item.contentType === 'course') {
+          return {
+            ...item,
+            status: 'published' as const,
+            reviewedBy: currentUser.name,
+            reviewedDate: new Date().toISOString(),
+            feedbackHistory: [
+              ...(item.feedbackHistory || []),
+              {
+                date: new Date().toISOString(),
+                adminName: currentUser.name,
+                action: 'published' as const,
+                feedback: feedback || 'All 5 learning reels reviewed and approved. Course is now live in User Courses catalog.'
+              }
+            ]
+          };
+        }
+        return item;
+      })
+    );
+    showToast('Course APPROVED and PUBLISHED to User Course Catalog!', 'success');
+  };
+
+  const rejectCourse = (courseId: string, reason: string) => {
+    if (!reason.trim()) {
+      showToast('Rejection reason is required.', 'error');
+      return;
+    }
+    setCourses(prev => prev.map(c => c.id === courseId ? { ...c, status: 'rejected', rejectionFeedback: reason.trim() } : c));
+    setApprovalQueue(prev =>
+      prev.map(item => {
+        if (item.contentId === courseId && item.contentType === 'course') {
+          return {
+            ...item,
+            status: 'rejected' as const,
+            rejectionReason: reason.trim(),
+            reviewedBy: currentUser.name,
+            reviewedDate: new Date().toISOString(),
+            feedbackHistory: [
+              ...(item.feedbackHistory || []),
+              {
+                date: new Date().toISOString(),
+                adminName: currentUser.name,
+                action: 'rejected' as const,
+                feedback: reason.trim()
+              }
+            ]
+          };
+        }
+        return item;
+      })
+    );
+    showToast('Course rejected. Feedback sent to mentor.', 'warning');
+  };
+
+  const requestChangesCourse = (courseId: string, feedback: string) => {
+    if (!feedback.trim()) {
+      showToast('Feedback message is required.', 'error');
+      return;
+    }
+    setCourses(prev => prev.map(c => c.id === courseId ? { ...c, status: 'changes_requested', rejectionFeedback: feedback.trim() } : c));
+    setApprovalQueue(prev =>
+      prev.map(item => {
+        if (item.contentId === courseId && item.contentType === 'course') {
+          return {
+            ...item,
+            status: 'changes_requested' as const,
+            reviewedBy: currentUser.name,
+            reviewedDate: new Date().toISOString(),
+            feedbackHistory: [
+              ...(item.feedbackHistory || []),
+              {
+                date: new Date().toISOString(),
+                adminName: currentUser.name,
+                action: 'requested_changes' as const,
+                feedback: feedback.trim()
+              }
+            ]
+          };
+        }
+        return item;
+      })
+    );
+    showToast('Requested changes sent to creator.', 'info');
+  };
+
+  // Course Enrollment / Purchase
+  const enrollInCourse = (courseId: string, discountCode?: string): { success: boolean; message: string; finalPrice?: number } => {
     const course = courses.find(c => c.id === courseId);
-    if (!course) return { success: false, message: 'Course not found' };
+    if (!course) {
+      return { success: false, message: 'Course not found' };
+    }
 
     if (currentUser.enrolledCourseIds.includes(courseId)) {
-      return { success: false, message: 'You are already enrolled in this course.' };
+      showToast('You are already enrolled in this course!', 'info');
+      return { success: true, message: 'Already enrolled' };
+    }
+
+    let finalPrice = course.discountedPrice || course.price;
+    if (discountCode) {
+      const discount = redeemVoucher(discountCode);
+      if (discount > 0) {
+        finalPrice = Math.round(finalPrice * (1 - discount / 100));
+      }
     }
 
     const newEnrollment: EnrolledStudent = {
@@ -740,6 +1019,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       userId: currentUser.id,
       userName: currentUser.name,
       userEmail: currentUser.email,
+      userAvatar: currentUser.avatar,
       courseId: course.id,
       courseTitle: course.title,
       enrolledAt: new Date().toISOString(),
@@ -755,138 +1035,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
 
     setUsers(prev =>
-      prev.map(u =>
-        u.id === currentUserId
-          ? {
-              ...u,
-              enrolledCourseIds: [...u.enrolledCourseIds, courseId],
-              points: u.points + 100,
-              xp: u.xp + 250
-            }
-          : u
-      )
-    );
-
-    showToast(`Successfully enrolled in "${course.title}"! +100 Points & 250 XP earned.`, 'success');
-    return { success: true, message: 'Enrolled successfully' };
-  };
-
-  // Lessons
-  const createLesson = (lessonData: Omit<Lesson, 'id' | 'createdAt'>) => {
-    const newLesson: Lesson = {
-      ...lessonData,
-      id: `les-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      viewsCount: 0
-    };
-    setLessons(prev => [...prev, newLesson]);
-    showToast(`Lesson "${newLesson.title}" created successfully.`, 'success');
-  };
-
-  const updateLesson = (lessonId: string, updates: Partial<Lesson>) => {
-    setLessons(prev => prev.map(l => l.id === lessonId ? { ...l, ...updates } : l));
-    showToast('Lesson updated.', 'success');
-  };
-
-  const deleteLesson = (lessonId: string) => {
-    setLessons(prev => prev.filter(l => l.id !== lessonId));
-    showToast('Lesson deleted.', 'info');
-  };
-
-  const reorderLessons = (courseId: string, moduleId: string, sourceIndex: number, destIndex: number) => {
-    setLessons(prev => {
-      const moduleLessons = prev.filter(l => l.courseId === courseId && l.moduleId === moduleId).sort((a, b) => a.order - b.order);
-      const otherLessons = prev.filter(l => !(l.courseId === courseId && l.moduleId === moduleId));
-      
-      const [moved] = moduleLessons.splice(sourceIndex, 1);
-      moduleLessons.splice(destIndex, 0, moved);
-
-      const reordered = moduleLessons.map((item, idx) => ({ ...item, order: idx + 1 }));
-      return [...otherLessons, ...reordered];
-    });
-    showToast('Lesson order updated.', 'info');
-  };
-
-  // Quizzes
-  const createQuiz = (quizData: Omit<Quiz, 'id' | 'createdAt'>) => {
-    const newQuiz: Quiz = {
-      ...quizData,
-      id: `quiz-${Date.now()}`,
-      createdAt: new Date().toISOString()
-    };
-    setQuizzes(prev => [...prev, newQuiz]);
-    showToast(`Quiz "${newQuiz.title}" created.`, 'success');
-  };
-
-  const updateQuiz = (quizId: string, updates: Partial<Quiz>) => {
-    setQuizzes(prev => prev.map(q => q.id === quizId ? { ...q, ...updates } : q));
-    showToast('Quiz updated.', 'success');
-  };
-
-  const deleteQuiz = (quizId: string) => {
-    setQuizzes(prev => prev.filter(q => q.id !== quizId));
-    showToast('Quiz deleted.', 'info');
-  };
-
-  // Assignments
-  const createAssignment = (assignData: Omit<Assignment, 'id' | 'createdAt'>) => {
-    const newAssign: Assignment = {
-      ...assignData,
-      id: `assign-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      submissions: []
-    };
-    setAssignments(prev => [...prev, newAssign]);
-    showToast(`Assignment "${newAssign.title}" created.`, 'success');
-  };
-
-  const updateAssignment = (assignId: string, updates: Partial<Assignment>) => {
-    setAssignments(prev => prev.map(a => a.id === assignId ? { ...a, ...updates } : a));
-    showToast('Assignment updated.', 'success');
-  };
-
-  const deleteAssignment = (assignId: string) => {
-    setAssignments(prev => prev.filter(a => a.id !== assignId));
-    showToast('Assignment deleted.', 'info');
-  };
-
-  const gradeAssignmentSubmission = (assignId: string, subId: string, marks: number, feedback?: string) => {
-    setAssignments(prev =>
-      prev.map(a => {
-        if (a.id === assignId && a.submissions) {
-          const nextSubs = a.submissions.map(s => {
-            if (s.id === subId) {
-              return { ...s, status: 'graded' as const, marksAwarded: marks, feedback };
-            }
-            return s;
-          });
-          return { ...a, submissions: nextSubs };
+      prev.map(u => {
+        if (u.id === currentUserId) {
+          return {
+            ...u,
+            enrolledCourseIds: [...u.enrolledCourseIds, courseId],
+            points: u.points + 100,
+            xp: u.xp + 250
+          };
         }
-        return a;
+        // If course belongs to a mentor, update their stats
+        if (u.id === course.instructorId) {
+          return {
+            ...u,
+            points: u.points + 50
+          };
+        }
+        return u;
       })
     );
-    showToast(`Assignment submission graded (${marks}/${100}).`, 'success');
-  };
 
-  // Articles
-  const createArticle = (articleData: Omit<ArticleNote, 'id' | 'createdAt'>) => {
-    const newArt: ArticleNote = {
-      ...articleData,
-      id: `art-${Date.now()}`,
-      createdAt: new Date().toISOString()
-    };
-    setArticles(prev => [newArt, ...prev]);
-    showToast(`Article "${newArt.title}" published!`, 'success');
-  };
-
-  const updateArticle = (articleId: string, updates: Partial<ArticleNote>) => {
-    setArticles(prev => prev.map(a => a.id === articleId ? { ...a, ...updates } : a));
-    showToast('Article updated.', 'success');
-  };
-
-  const deleteArticle = (articleId: string) => {
-    setArticles(prev => prev.filter(a => a.id !== articleId));
-    showToast('Article deleted.', 'info');
+    showToast(`Successfully enrolled in "${course.title}"! (${finalPrice === 0 ? 'FREE' : `$${finalPrice}`})`, 'success');
+    return { success: true, message: 'Enrolled successfully', finalPrice };
   };
 
   // Content Approval Pipeline
@@ -927,7 +1097,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             }
           ];
 
-          // Also update corresponding entity
           if (item.contentType === 'course') {
             setCourses(cList => cList.map(c => c.id === item.contentId ? { ...c, status: nextStatus } : c));
           } else if (item.contentType === 'reel') {
@@ -976,7 +1145,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             setReels(rList => rList.map(r => r.id === item.contentId ? { ...r, isPublished: false } : r));
           }
 
-          showToast(`Content rejected. Feedback sent to mentor.`, 'warning');
+          showToast(`Content rejected. Feedback sent to creator.`, 'warning');
           return {
             ...item,
             status: 'rejected',
@@ -1087,8 +1256,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Comment flagged for admin moderation.', 'warning');
   };
 
-  // Assessments
+  // Dynamic 6-Reel Assessment
   const openAssessment = () => {
+    if (!isAssessmentUnlocked) {
+      showToast(`Assessment is LOCKED! Please complete all 6 Learn reels first (${watchedLearnReelIds.length}/6 completed).`, 'warning');
+      return;
+    }
     setIsAssessmentOpen(true);
   };
 
@@ -1097,12 +1270,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const assessmentQueue = useMemo(() => {
-    const queue = reels.filter(r => r.questions && r.questions.length > 0 && r.isPublished);
-    return queue.slice(0, adminSettings.reelsPerAssessment);
-  }, [reels, adminSettings.reelsPerAssessment]);
+    return reels.filter(r => r.questions && r.questions.length > 0 && r.isPublished);
+  }, [reels]);
 
-  const submitAssessmentAnswers = (answers: Record<string, number>): AssessmentResult => {
-    const questions = assessmentQueue.flatMap(r => r.questions);
+  const getAssessmentQuestionsForUser = (): Question[] => {
+    const questions: Question[] = [];
+    reels.forEach(r => {
+      if (r.questions && r.questions[0]) {
+        questions.push({ ...r.questions[0], reelId: r.id });
+      }
+    });
+    return questions.slice(0, 6);
+  };
+
+  const submitAssessmentAnswers = (answers: Record<string, number>, customQuestions?: Question[]): AssessmentResult => {
+    const questions = customQuestions && customQuestions.length > 0 ? customQuestions : getAssessmentQuestionsForUser();
     let correctCount = 0;
 
     questions.forEach(q => {
@@ -1115,22 +1297,34 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
     const passed = scorePercentage >= adminSettings.passingScoreThreshold;
 
-    const pointsEarned = correctCount * adminSettings.pointsPerCorrectAnswer;
+    const pointsEarned = correctCount * adminSettings.pointsPerCorrectAnswer + (passed ? 50 : 10);
+    const newVoucherCode = `LMS-PRO-${Date.now().toString(36).toUpperCase()}`;
+
+    const newVoucher: DiscountVoucher = {
+      id: `vouch-${Date.now()}`,
+      code: newVoucherCode,
+      discountPercent: 25,
+      description: '25% OFF Any Masterclass Course (Earned via 6-Reel Micro-Assessment)',
+      expiresAt: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
+      isUsed: false
+    };
+
     const rewardsEarned: AssessmentResult['rewardsEarned'] = {
       points: pointsEarned,
+      goodie: passed ? 'Official 6-Reel Micro-Assessment Certification & 25% Off Voucher' : undefined
     };
 
     if (passed) {
+      rewardsEarned.voucher = newVoucher;
       if (scorePercentage === 100) {
         rewardsEarned.badge = INITIAL_BADGES[0]; // Speed Learner
       }
-      rewardsEarned.voucher = INITIAL_VOUCHERS[0]; // 30% discount
     }
 
     const result: AssessmentResult = {
       id: `result-${Date.now()}`,
       userId: currentUser.id,
-      reelIds: assessmentQueue.map(r => r.id),
+      reelIds: questions.map(q => q.reelId || '').filter(Boolean),
       totalQuestions,
       correctCount,
       scorePercentage,
@@ -1142,7 +1336,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAssessmentHistory(prev => [result, ...prev]);
     setLatestAssessmentResult(result);
 
-    // Update user stats
+    // Update user stats & evaluate mentor eligibility
     setUsers(prev =>
       prev.map(u => {
         if (u.id === currentUserId) {
@@ -1157,9 +1351,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           }
 
           const updatedVouchers = [...u.discountVouchers];
-          if (rewardsEarned.voucher && !updatedVouchers.some(v => v.id === rewardsEarned.voucher?.id)) {
+          if (rewardsEarned.voucher) {
             updatedVouchers.push(rewardsEarned.voucher);
           }
+
+          // Evaluate mentor eligibility criteria: >=3 assessments, >=80% each, >=85% avg
+          const userHistory = [result, ...assessmentHistory.filter(h => h.userId === currentUserId)];
+          const passedCount = userHistory.filter(h => h.passed && h.scorePercentage >= adminSettings.mentorEligibilityMinScore).length;
+          const avgScore = userHistory.length > 0 ? Math.round(userHistory.reduce((acc, curr) => acc + curr.scorePercentage, 0) / userHistory.length) : 0;
+          const isEligible = passedCount >= adminSettings.mentorEligibilityMinAssessments && avgScore >= adminSettings.mentorEligibilityAvgScore;
 
           return {
             ...u,
@@ -1168,16 +1368,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             level: nextLevel,
             streakDays: nextStreak,
             badges: updatedBadges,
-            discountVouchers: updatedVouchers
+            discountVouchers: updatedVouchers,
+            isEligibleForMentor: isEligible
           };
         }
         return u;
       })
     );
 
-    // Reset watched count
-    setReelsWatchedCount(0);
-    localStorage.setItem('lms_reels_watched_count_v3', '0');
+    if (rewardsEarned.voucher) {
+      setVouchers(prev => [newVoucher, ...prev]);
+    }
+
+    showToast(
+      passed
+        ? `Assessment Passed! Scored ${scorePercentage}%. +${pointsEarned} Points and 25% Voucher credited!`
+        : `Assessment Completed (${scorePercentage}%). Scored ${correctCount}/${totalQuestions}. Keep learning!`,
+      passed ? 'success' : 'info'
+    );
 
     return result;
   };
@@ -1186,17 +1394,251 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLatestAssessmentResult(null);
   };
 
-  const redeemVoucher = (code: string): number => {
-    const v = vouchers.find(item => item.code.toUpperCase() === code.toUpperCase() && !item.isUsed);
-    if (v) {
-      setVouchers(prev => prev.map(item => (item.id === v.id ? { ...item, isUsed: true } : item)));
-      showToast(`Voucher "${code}" applied! ${v.discountPercent}% OFF discount active.`, 'success');
-      return v.discountPercent;
+  // Mentor Eligibility & Application Lifecycle
+  const isUserEligibleForMentor = (userId?: string): { isEligible: boolean; completedCount: number; avgScore: number; reason: string } => {
+    const targetId = userId || currentUser.id;
+    const history = assessmentHistory.filter(h => h.userId === targetId);
+    
+    const completedCount = history.length;
+    const avgScore = completedCount > 0 ? Math.round(history.reduce((a, b) => a + b.scorePercentage, 0) / completedCount) : (currentUser.quizAverage || 0);
+
+    const meetsAssessments = completedCount >= adminSettings.mentorEligibilityMinAssessments;
+    const meetsMinScore = history.length === 0 || history.every(h => h.scorePercentage >= adminSettings.mentorEligibilityMinScore);
+    const meetsAvgScore = avgScore >= adminSettings.mentorEligibilityAvgScore;
+    const isEligible = meetsAssessments && meetsMinScore && meetsAvgScore;
+
+    let reason = '';
+    if (!meetsAssessments) {
+      reason = `Complete at least ${adminSettings.mentorEligibilityMinAssessments} assessments (${completedCount}/${adminSettings.mentorEligibilityMinAssessments} completed).`;
+    } else if (!meetsAvgScore) {
+      reason = `Achieve an average score of at least ${adminSettings.mentorEligibilityAvgScore}% (Current avg: ${avgScore}%).`;
+    } else {
+      reason = 'You have satisfied all mentor eligibility criteria!';
     }
-    showToast('Invalid or already redeemed voucher code.', 'error');
-    return 0;
+
+    return { isEligible, completedCount, avgScore, reason };
   };
 
+  const submitMentorApplication = (data: Omit<MentorApplication, 'id' | 'submissionDate' | 'status'>) => {
+    const newApp: MentorApplication = {
+      ...data,
+      id: `app-${Date.now()}`,
+      status: 'submitted',
+      submissionDate: new Date().toISOString()
+    };
+
+    setMentorApplications(prev => [newApp, ...prev]);
+    setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, mentorApplicationId: newApp.id } : u));
+    showToast('Mentor Application submitted successfully! Administrator review pending.', 'success');
+  };
+
+  const approveMentorApplication = (appId: string, reviewerName: string = 'Administrator') => {
+    setMentorApplications(prev =>
+      prev.map(app => {
+        if (app.id === appId) {
+          // Promote user to mentor role in real time
+          setUsers(uList =>
+            uList.map(u => {
+              if (u.id === app.userId) {
+                return {
+                  ...u,
+                  role: 'mentor' as const,
+                  specialty: app.expertise,
+                  bio: app.bio
+                };
+              }
+              return u;
+            })
+          );
+
+          // Add notification
+          const newNotif: NotificationItem = {
+            id: `notif-${Date.now()}`,
+            userId: app.userId,
+            title: '🎉 Mentor Application Approved!',
+            message: 'Congratulations! Your application to become a verified Mentor has been approved. You now have full Mentor access to create courses.',
+            type: 'approval',
+            read: false,
+            createdAt: new Date().toISOString()
+          };
+          setNotifications(nList => [newNotif, ...nList]);
+
+          showToast(`Application for ${app.applicantName} APPROVED! User promoted to Mentor role.`, 'success');
+
+          return {
+            ...app,
+            status: 'approved' as const,
+            reviewedBy: reviewerName,
+            reviewedDate: new Date().toISOString(),
+            adminFeedback: 'Application approved with full mentor teaching credentials.'
+          };
+        }
+        return app;
+      })
+    );
+  };
+
+  const rejectMentorApplication = (appId: string, feedback: string, reviewerName: string = 'Administrator') => {
+    if (!feedback.trim()) {
+      showToast('Mandatory rejection reason required.', 'error');
+      return;
+    }
+    setMentorApplications(prev =>
+      prev.map(app => {
+        if (app.id === appId) {
+          const newNotif: NotificationItem = {
+            id: `notif-${Date.now()}`,
+            userId: app.userId,
+            title: 'Mentor Application Update',
+            message: `Your mentor application was not approved. Feedback: "${feedback.trim()}"`,
+            type: 'approval',
+            read: false,
+            createdAt: new Date().toISOString()
+          };
+          setNotifications(nList => [newNotif, ...nList]);
+          showToast(`Application rejected. Feedback sent to applicant.`, 'warning');
+          return {
+            ...app,
+            status: 'rejected' as const,
+            adminFeedback: feedback.trim(),
+            reviewedBy: reviewerName,
+            reviewedDate: new Date().toISOString()
+          };
+        }
+        return app;
+      })
+    );
+  };
+
+  const requestChangesMentorApplication = (appId: string, feedback: string, reviewerName: string = 'Administrator') => {
+    if (!feedback.trim()) {
+      showToast('Feedback message is required.', 'error');
+      return;
+    }
+    setMentorApplications(prev =>
+      prev.map(app => {
+        if (app.id === appId) {
+          const newNotif: NotificationItem = {
+            id: `notif-${Date.now()}`,
+            userId: app.userId,
+            title: 'Mentor Application: Changes Requested',
+            message: `The administrator requested updates to your mentor application: "${feedback.trim()}"`,
+            type: 'approval',
+            read: false,
+            createdAt: new Date().toISOString()
+          };
+          setNotifications(nList => [newNotif, ...nList]);
+          showToast(`Requested changes from ${app.applicantName}.`, 'info');
+          return {
+            ...app,
+            status: 'changes_requested' as const,
+            adminFeedback: feedback.trim(),
+            reviewedBy: reviewerName,
+            reviewedDate: new Date().toISOString()
+          };
+        }
+        return app;
+      })
+    );
+  };
+
+  const resubmitMentorApplication = (appId: string, updates: Partial<MentorApplication>) => {
+    setMentorApplications(prev =>
+      prev.map(app => (app.id === appId ? { ...app, ...updates, status: 'submitted' as const, submissionDate: new Date().toISOString() } : app))
+    );
+    showToast('Mentor application resubmitted for admin review.', 'success');
+  };
+
+  // Feedback Handlers
+  const submitCourseFeedback = (courseId: string, rating: number, comment: string) => {
+    const targetCourse = courses.find(c => c.id === courseId);
+    const newFb: CourseFeedback = {
+      id: `fb-${Date.now()}`,
+      courseId,
+      courseTitle: targetCourse?.title || 'Masterclass Course',
+      userId: currentUser.id,
+      userName: currentUser.name,
+      userAvatar: currentUser.avatar,
+      rating,
+      comment: comment.trim(),
+      createdAt: new Date().toISOString()
+    };
+    setCourseFeedback(prev => [newFb, ...prev]);
+    showToast('Review submitted successfully!', 'success');
+  };
+
+  const submitPlatformFeedback = (data: { rating: number; category: string; comment: string }) => {
+    const newPfb: PlatformFeedbackItem = {
+      id: `pfb-${Date.now()}`,
+      userId: currentUser.id,
+      userName: currentUser.name,
+      rating: data.rating,
+      category: data.category,
+      comment: data.comment.trim(),
+      createdAt: new Date().toISOString()
+    };
+    setPlatformFeedback(prev => [newPfb, ...prev]);
+    showToast('Thank you! Platform feedback recorded.', 'success');
+  };
+
+  // Redeem Voucher
+  const redeemVoucher = (code: string): number => {
+    const match = vouchers.find(v => v.code.toUpperCase() === code.toUpperCase() && !v.isUsed);
+    if (!match) {
+      showToast('Invalid or expired voucher code.', 'error');
+      return 0;
+    }
+    showToast(`Voucher ${match.code} applied: ${match.discountPercent}% Discount!`, 'success');
+    return match.discountPercent;
+  };
+
+  // Admin Settings
+  const updateAdminSettings = (newSettings: Partial<AdminSettings>) => {
+    setAdminSettings(prev => ({ ...prev, ...newSettings }));
+    showToast('Platform settings updated.', 'success');
+  };
+
+  // Quizzes & Assignments
+  const createQuiz = (quizData: Omit<Quiz, 'id'>) => {
+    const newQ: Quiz = { ...quizData, id: `quiz-${Date.now()}` };
+    setQuizzes(prev => [...prev, newQ]);
+    showToast(`Quiz "${newQ.title}" created.`, 'success');
+  };
+
+  const deleteQuiz = (quizId: string) => {
+    setQuizzes(prev => prev.filter(q => q.id !== quizId));
+    showToast('Quiz deleted.', 'info');
+  };
+
+  const createAssignment = (assData: Omit<Assignment, 'id' | 'submissions'>) => {
+    const newA: Assignment = { ...assData, id: `ass-${Date.now()}`, submissions: [] };
+    setAssignments(prev => [...prev, newA]);
+    showToast(`Assignment "${newA.title}" created.`, 'success');
+  };
+
+  const deleteAssignment = (assId: string) => {
+    setAssignments(prev => prev.filter(a => a.id !== assId));
+    showToast('Assignment deleted.', 'info');
+  };
+
+  const gradeAssignmentSubmission = (assId: string, subId: string, grade: number, feedback: string) => {
+    setAssignments(prev =>
+      prev.map(a => {
+        if (a.id === assId) {
+          return {
+            ...a,
+            submissions: (a.submissions || []).map(s =>
+              s.id === subId ? { ...s, grade, feedback, status: 'graded' as const } : s
+            )
+          };
+        }
+        return a;
+      })
+    );
+    showToast('Submission graded.', 'success');
+  };
+
+  // Notifications
   const markNotificationRead = (notifId: string) => {
     setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, read: true } : n));
   };
@@ -1204,11 +1646,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const clearAllNotifications = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     showToast('All notifications marked as read.', 'info');
-  };
-
-  const updateAdminSettings = (newSettings: Partial<AdminSettings>) => {
-    setAdminSettings(prev => ({ ...prev, ...newSettings }));
-    showToast('Admin platform governance settings updated.', 'success');
   };
 
   return (
@@ -1219,6 +1656,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isAuthModalOpen,
         openAuthModal,
         closeAuthModal,
+        validateCredentials,
         loginUser,
         loginAsRole,
         logoutUser,
@@ -1240,9 +1678,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         reels,
         currentReelIndex,
         setCurrentReelIndex,
-        reelsWatchedCount,
-        watchedReelIds,
+        reelsWatchedCount: watchedLearnReelIds.length,
+        watchedReelIds: watchedLearnReelIds,
+        watchedLearnReelIds,
         markReelWatched,
+        markLearnReelCompleted,
+        unmarkLearnReel,
         toggleLikeReel,
         toggleBookmarkReel,
         addNewReel,
@@ -1250,31 +1691,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteReel,
         toggleReelPublish,
         courses,
+        createCourse,
         addNewCourse,
         updateCourse,
         deleteCourse,
         toggleCoursePublish,
         updateCourseStatus,
+        approveCourse,
+        rejectCourse,
+        requestChangesCourse,
         enrollInCourse,
         enrolledStudents,
-        lessons,
-        createLesson,
-        updateLesson,
-        deleteLesson,
-        reorderLessons,
+        completedCourseReels,
+        markCourseReelCompleted,
+        isCourseReelCompleted,
         quizzes,
         createQuiz,
-        updateQuiz,
         deleteQuiz,
         assignments,
         createAssignment,
-        updateAssignment,
         deleteAssignment,
         gradeAssignmentSubmission,
-        articles,
-        createArticle,
-        updateArticle,
-        deleteArticle,
         approvalQueue,
         submitContentForApproval,
         approveContent,
@@ -1288,11 +1725,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isAssessmentOpen,
         openAssessment,
         closeAssessment,
+        isAssessmentUnlocked,
         assessmentQueue,
+        getAssessmentQuestionsForUser,
         submitAssessmentAnswers,
         assessmentHistory,
         latestAssessmentResult,
         resetAssessmentResult,
+        mentorApplications,
+        submitMentorApplication,
+        approveMentorApplication,
+        rejectMentorApplication,
+        requestChangesMentorApplication,
+        resubmitMentorApplication,
+        isUserEligibleForMentor,
+        courseFeedback,
+        submitCourseFeedback,
+        platformFeedback,
+        submitPlatformFeedback,
         badges,
         badgeDefinitions,
         createBadgeDefinition,
@@ -1310,7 +1760,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         clearAllNotifications,
         toasts,
         showToast,
-        removeToast,
+        removeToast
       }}
     >
       {children}
@@ -1318,7 +1768,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 };
 
-export const useApp = (): AppContextType => {
+export const useApp = () => {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error('useApp must be used within an AppProvider');

@@ -1,66 +1,87 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { GraduationCap, UserCheck, ShieldCheck, PlaySquare, Sparkles } from 'lucide-react';
+import { GraduationCap, UserCheck, ShieldCheck, PlaySquare, Sparkles, ArrowRight, BookOpen, Award, CheckCircle2 } from 'lucide-react';
 
 export const LandingGate: React.FC = () => {
   const { openAuthModal } = useApp();
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-12 bg-gradient-to-b from-slate-50 via-white to-slate-50 text-slate-900">
-      <div className="w-full max-w-lg text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-5">
-          <Sparkles size={13} />
-          <span>LEARNING REELS PLATFORM</span>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-12 bg-white text-slate-900">
+      <div className="w-full max-w-2xl text-center">
+        {/* Top Tag */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-6 shadow-xs">
+          <Sparkles size={14} className="text-blue-600" />
+          <span>CONNECTED LMS PLATFORM</span>
         </div>
 
-        <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg mx-auto mb-5">
+        {/* Brand Icon */}
+        <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20 mx-auto mb-5">
           <span className="text-3xl font-black text-white font-display">L</span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight font-display mb-3">
-          Welcome to <span className="text-blue-600">LMS Reels</span>
+        <h1 className="text-3xl sm:text-5xl font-black tracking-tight font-display mb-4 text-slate-900 leading-tight">
+          Welcome to <span className="text-blue-600">LMS</span>
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 mb-8 max-w-md mx-auto">
-          Bite-sized learning reels, automated assessments, and gamified rewards — sign in or create an account to continue.
+        
+        <p className="text-sm sm:text-base text-slate-600 mb-8 max-w-lg mx-auto leading-relaxed">
+          Experience an integrated learning ecosystem. Complete 6 bite-sized vertical Learn reels to unlock automated assessments, earn rewards, qualify for verified Mentorship, and publish 5-reel courses.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+        {/* Main Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10 max-w-md mx-auto">
           <button
             onClick={openAuthModal}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg transition-all"
+            className="w-full sm:w-1/2 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            Log In
+            <span>Sign In</span>
+            <ArrowRight size={16} />
           </button>
           <button
             onClick={openAuthModal}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-800 font-bold text-sm shadow-sm transition-all"
+            className="w-full sm:w-1/2 px-6 py-3.5 rounded-xl bg-slate-50 border border-slate-300 hover:border-blue-500 text-slate-800 font-bold text-sm shadow-xs transition-all hover:bg-slate-100 cursor-pointer"
           >
-            Sign Up
+            Create Learner Account
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 text-left">
-          <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
-            <GraduationCap size={18} className="text-blue-600 mb-1.5" />
-            <p className="text-[11px] font-bold text-slate-900">Learners</p>
-            <p className="text-[10px] text-slate-500">Watch, quiz, earn rewards</p>
+        {/* 3 Step Connected Workflow Pillars */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs hover:border-blue-300 transition-all">
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center mb-3">
+              <PlaySquare size={18} />
+            </div>
+            <p className="text-xs font-bold text-slate-900">1. 6 Learn Reels & Test</p>
+            <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+              Watch all 6 Learn reels to unlock the locked assessment & earn rewards.
+            </p>
           </div>
-          <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
-            <UserCheck size={18} className="text-emerald-600 mb-1.5" />
-            <p className="text-[11px] font-bold text-slate-900">Mentors</p>
-            <p className="text-[10px] text-slate-500">Create & publish courses</p>
+
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs hover:border-emerald-300 transition-all">
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-3">
+              <UserCheck size={18} />
+            </div>
+            <p className="text-xs font-bold text-slate-900">2. Mentor Qualification</p>
+            <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+              Pass 3+ assessments with ≥85% avg score to apply for Mentor credentials.
+            </p>
           </div>
-          <div className="p-3 rounded-xl bg-white border border-slate-200 shadow-sm">
-            <ShieldCheck size={18} className="text-purple-600 mb-1.5" />
-            <p className="text-[11px] font-bold text-slate-900">Admins</p>
-            <p className="text-[10px] text-slate-500">Govern the whole platform</p>
+
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs hover:border-purple-300 transition-all">
+            <div className="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center mb-3">
+              <BookOpen size={18} />
+            </div>
+            <p className="text-xs font-bold text-slate-900">3. 5-Reel Course Creation</p>
+            <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+              Create courses with 5 vertical reels, get Admin approval, and teach learners.
+            </p>
           </div>
         </div>
 
-        <p className="text-[11px] text-slate-400 mt-8 flex items-center justify-center gap-1.5">
-          <PlaySquare size={12} />
-          <span>A different dashboard loads automatically based on your role.</span>
-        </p>
+        {/* Demo Footer Helper */}
+        <div className="mt-8 pt-6 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-center gap-2">
+          <CheckCircle2 size={13} className="text-emerald-500" />
+          <span>Role-tailored logins for User 001, Mentor 001, and Administrator are available.</span>
+        </div>
       </div>
     </div>
   );

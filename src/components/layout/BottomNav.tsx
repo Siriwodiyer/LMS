@@ -3,10 +3,10 @@ import { useApp } from '../../context/AppContext';
 import {
   LayoutDashboard,
   PlaySquare,
-  BarChart2,
   BookOpen,
   Award,
-  BrainCircuit,
+  CheckSquare,
+  Lock,
   PlusCircle,
   Users,
   Bell,
@@ -19,7 +19,7 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
-  const { reelsWatchedCount, adminSettings, currentUser, isViewAsLearner, notifications } = useApp();
+  const { watchedLearnReelIds, adminSettings, isAssessmentUnlocked, currentUser, isViewAsLearner, notifications } = useApp();
 
   // If Admin is in native Admin experience, bottom nav is not needed (sidebar handles admin navigation)
   if (currentUser.role === 'admin' && !isViewAsLearner) {
@@ -27,8 +27,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
   }
 
   const currentRole = currentUser.role.toLowerCase().replace('role_', '');
-  const isMentor = (currentRole === 'mentor' || currentRole === 'seller') && !isViewAsLearner;
+  const isMentor = currentRole === 'mentor' && !isViewAsLearner;
   const unreadNotifs = notifications.filter(n => !n.read).length;
+  const completedLearnCount = watchedLearnReelIds.length;
 
   if (isMentor) {
     return (
@@ -36,7 +37,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
         {/* 1. Dashboard */}
         <button
           onClick={() => setActiveTab('mentor-dashboard')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
             activeTab === 'mentor-dashboard' ? 'text-emerald-600 font-bold' : 'text-slate-500'
           }`}
         >
@@ -47,7 +48,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
         {/* 2. My Courses */}
         <button
           onClick={() => setActiveTab('mentor-courses')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
             activeTab === 'mentor-courses' ? 'text-emerald-600 font-bold' : 'text-slate-500'
           }`}
         >
@@ -58,18 +59,18 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
         {/* 3. Create Course */}
         <button
           onClick={() => setActiveTab('mentor-create-course')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
             activeTab === 'mentor-create-course' ? 'text-emerald-600 font-bold' : 'text-slate-500'
           }`}
         >
           <PlusCircle size={18} />
-          <span className="text-[9px]">Create</span>
+          <span className="text-[9px]">Create (5 Reels)</span>
         </button>
 
         {/* 4. Students */}
         <button
           onClick={() => setActiveTab('mentor-students')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
             activeTab === 'mentor-students' ? 'text-emerald-600 font-bold' : 'text-slate-500'
           }`}
         >
@@ -80,7 +81,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
         {/* 5. Notifications */}
         <button
           onClick={() => setActiveTab('mentor-notifications')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all relative ${
+          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all relative cursor-pointer ${
             activeTab === 'mentor-notifications' ? 'text-emerald-600 font-bold' : 'text-slate-500'
           }`}
         >
@@ -98,7 +99,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
         {/* 6. Profile */}
         <button
           onClick={() => setActiveTab('mentor-profile')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
             activeTab === 'mentor-profile' ? 'text-emerald-600 font-bold' : 'text-slate-500'
           }`}
         >
@@ -114,7 +115,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
       {/* 1. Dashboard */}
       <button
         onClick={() => setActiveTab('home')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
           activeTab === 'home' || activeTab === 'dashboard' ? 'text-blue-600 font-bold' : 'text-slate-500'
         }`}
       >
@@ -122,28 +123,26 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
         <span className="text-[9px]">Home</span>
       </button>
 
-      {/* 2. Reels Feed */}
+      {/* 2. Learn Reels */}
       <button
         onClick={() => setActiveTab('learn')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all relative ${
+        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all relative cursor-pointer ${
           activeTab === 'learn' || activeTab === 'reels' ? 'text-blue-600 font-bold' : 'text-slate-500'
         }`}
       >
         <div className="relative">
           <PlaySquare size={18} />
-          {reelsWatchedCount > 0 && (
-            <span className="absolute -top-1 -right-2 bg-blue-600 text-white text-[8px] font-bold px-1 rounded-full">
-              {reelsWatchedCount}/{adminSettings.reelsPerAssessment}
-            </span>
-          )}
+          <span className="absolute -top-1 -right-2 bg-blue-600 text-white text-[8px] font-bold px-1 rounded-full">
+            {completedLearnCount}/6
+          </span>
         </div>
-        <span className="text-[9px]">Learn</span>
+        <span className="text-[9px]">Learn (6)</span>
       </button>
 
       {/* 3. Courses */}
       <button
         onClick={() => setActiveTab('courses')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
           activeTab === 'courses' ? 'text-blue-600 font-bold' : 'text-slate-500'
         }`}
       >
@@ -154,19 +153,19 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
       {/* 4. Assessments */}
       <button
         onClick={() => setActiveTab('assessments')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
           activeTab === 'assessments' ? 'text-blue-600 font-bold' : 'text-slate-500'
         }`}
       >
-        <Award size={18} />
-        <span className="text-[9px]">Assessments</span>
+        {isAssessmentUnlocked ? <CheckSquare size={18} /> : <Lock size={18} className="text-amber-500" />}
+        <span className="text-[9px]">Assess</span>
       </button>
 
-      {/* 5. Rewards & Badges */}
+      {/* 5. Rewards */}
       <button
         onClick={() => setActiveTab('rewards')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
-          activeTab === 'rewards' ? 'text-amber-500 font-bold' : 'text-slate-500'
+        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+          activeTab === 'rewards' ? 'text-blue-600 font-bold' : 'text-slate-500'
         }`}
       >
         <Award size={18} />
@@ -176,7 +175,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
       {/* 6. Profile */}
       <button
         onClick={() => setActiveTab('profile')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all ${
+        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
           activeTab === 'profile' ? 'text-blue-600 font-bold' : 'text-slate-500'
         }`}
       >
@@ -186,4 +185,3 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab })
     </nav>
   );
 };
-

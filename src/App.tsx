@@ -82,7 +82,7 @@ const MainContent: React.FC = () => {
       case 'courses':
         return <CourseBrowse />;
       case 'assessments':
-        return <AssessmentsView />;
+        return <AssessmentsView setActiveTab={setActiveTab} />;
       case 'rewards':
         return <RewardsDashboard onNavigateToCourses={() => setActiveTab('courses')} />;
       case 'profile':

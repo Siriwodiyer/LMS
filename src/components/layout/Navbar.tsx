@@ -1,31 +1,26 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { UserRole } from '../../types';
 import {
-  Sparkles,
-  Flame,
-  Award,
   Bell,
   CheckCircle,
   ShieldCheck,
   UserCheck,
   GraduationCap,
-  ChevronDown,
   LayoutDashboard,
   LogOut,
   User,
-  Zap,
   PlaySquare,
   BookOpen,
   BarChart2,
   Eye,
   ArrowLeft,
-  FileCheck,
   Users,
   MessageSquare,
-  Compass,
   PlusCircle,
-  CheckSquare
+  CheckSquare,
+  Lock,
+  Award,
+  Zap
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -42,7 +37,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
     notifications,
     markNotificationRead,
     clearAllNotifications,
-    reelsWatchedCount,
+    watchedLearnReelIds,
+    isAssessmentUnlocked,
     adminSettings,
     openAssessment,
     isViewAsLearner,
@@ -56,47 +52,37 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const unreadCount = notifications.filter(n => !n.read).length;
-
   const currentRole = currentUser.role.toLowerCase().replace('role_', '');
   const isLearner = currentRole === 'student' || currentRole === 'learner';
-  const isMentor = currentRole === 'mentor' || currentRole === 'seller';
+  const isMentor = currentRole === 'mentor';
   const isAdmin = currentRole === 'admin';
 
-  const roleLabels: Record<string, { label: string; icon: React.ReactNode; color: string; badge: string }> = {
-    student: { label: 'Learner', icon: <GraduationCap size={15} />, color: 'bg-blue-50 text-blue-700 border-blue-200', badge: 'Learner' },
-    learner: { label: 'Learner', icon: <GraduationCap size={15} />, color: 'bg-blue-50 text-blue-700 border-blue-200', badge: 'Learner' },
-    mentor: { label: 'Mentor', icon: <UserCheck size={15} />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200', badge: 'Mentor' },
-    seller: { label: 'Mentor', icon: <UserCheck size={15} />, color: 'bg-emerald-50 text-emerald-700 border-emerald-200', badge: 'Mentor' },
-    admin: { label: 'Admin', icon: <ShieldCheck size={15} />, color: 'bg-purple-50 text-purple-700 border-purple-200', badge: 'Admin' },
-  };
-
-  const currentRoleConfig = roleLabels[currentRole] || roleLabels.student;
   const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  const learnReelCount = watchedLearnReelIds.length;
 
-  // Helper for active tab button class
   const getTabClass = (tabName: string) => {
     const isActive = activeTab === tabName;
-    return `px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+    return `px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
       isActive
-        ? 'bg-blue-600 text-white shadow-sm'
+        ? 'bg-blue-600 text-white shadow-xs'
         : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
     }`;
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200 shadow-sm">
+    <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200 shadow-xs">
       {/* "View as Learner" Alert Banner for Admin */}
       {isViewAsLearner && canAccessAdminPortal() && (
         <div className="w-full bg-blue-50 px-4 py-2 flex items-center justify-between text-xs text-blue-900 border-b border-blue-200">
           <div className="flex items-center gap-2">
             <Eye size={15} className="text-blue-600 animate-pulse" />
             <span>
-              <strong className="font-bold">Viewing as Learner Mode</strong> — Previewing student interface.
+              <strong className="font-bold">Viewing as Learner Mode</strong> — Previewing User interface.
             </span>
           </div>
           <button
             onClick={() => setViewAsLearner(false)}
-            className="px-3 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-all"
+            className="px-3 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs transition-all cursor-pointer"
           >
             <ArrowLeft size={13} />
             <span>Return to Admin Portal</span>
@@ -110,12 +96,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
           <div className="flex items-center gap-2">
             <Eye size={15} className="text-emerald-600 animate-pulse" />
             <span>
-              <strong className="font-bold">Viewing as Mentor Mode</strong> — Previewing mentor interface.
+              <strong className="font-bold">Viewing as Mentor Mode</strong> — Previewing Mentor interface.
             </span>
           </div>
           <button
             onClick={() => setViewAsMentor(false)}
-            className="px-3 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-all"
+            className="px-3 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs transition-all cursor-pointer"
           >
             <ArrowLeft size={13} />
             <span>Return to Admin Portal</span>
@@ -131,23 +117,23 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
             onClick={() => setActiveTab(isMentor ? 'mentor-dashboard' : isAdmin ? 'admin-dashboard' : 'home')}
             className="flex items-center gap-2 cursor-pointer group"
           >
-            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center shadow-sm group-hover:bg-blue-700 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-xs group-hover:bg-blue-700 transition-colors">
               <span className="text-lg font-black text-white font-display">L</span>
             </div>
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-black text-lg tracking-tight text-slate-900 font-display">LMS</span>
                 <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                  {isAdmin ? 'ADMIN' : isMentor ? 'MENTOR' : 'LEARNER'}
+                  {isAdmin ? 'ADMIN' : isMentor ? 'MENTOR' : 'USER'}
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Dynamic Center Navigation Tabs Based on Logged-in User Role */}
+        {/* Center Navigation Tabs (Role-tailored only) */}
         <nav className="hidden md:flex items-center gap-1 lg:gap-1.5">
-          {/* 1. USER / LEARNER ROLE NAV */}
+          {/* 1. USER ROLE NAV */}
           {(isLearner || (isViewAsLearner && isAdmin)) && (
             <>
               <button onClick={() => setActiveTab('home')} className={getTabClass('home')}>
@@ -156,15 +142,20 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
               </button>
               <button onClick={() => setActiveTab('learn')} className={getTabClass('learn')}>
                 <PlaySquare size={14} />
-                <span>Learn</span>
+                <span>Learn (6 Reels)</span>
               </button>
               <button onClick={() => setActiveTab('courses')} className={getTabClass('courses')}>
                 <BookOpen size={14} />
                 <span>Courses</span>
               </button>
               <button onClick={() => setActiveTab('assessments')} className={getTabClass('assessments')}>
-                <CheckSquare size={14} />
+                {isAssessmentUnlocked ? <CheckSquare size={14} /> : <Lock size={14} className="text-amber-500" />}
                 <span>Assessments</span>
+                {!isAssessmentUnlocked && (
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-mono">
+                    {learnReelCount}/6
+                  </span>
+                )}
               </button>
               <button onClick={() => setActiveTab('rewards')} className={getTabClass('rewards')}>
                 <Award size={14} />
@@ -190,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
               </button>
               <button onClick={() => setActiveTab('mentor-create-course')} className={getTabClass('mentor-create-course')}>
                 <PlusCircle size={14} />
-                <span>Create Course</span>
+                <span>Create Course (5 Reels)</span>
               </button>
               <button onClick={() => setActiveTab('mentor-students')} className={getTabClass('mentor-students')}>
                 <Users size={14} />
@@ -224,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
               </button>
               <button onClick={() => setActiveTab('admin-content')} className={getTabClass('admin-content')}>
                 <PlaySquare size={14} />
-                <span>Content</span>
+                <span>Content (6 Reels)</span>
               </button>
               <button onClick={() => setActiveTab('admin-assessments')} className={getTabClass('admin-assessments')}>
                 <CheckSquare size={14} />
@@ -250,19 +241,34 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
           )}
         </nav>
 
-        {/* Right Section: Reel Counter, Notifications & Profile Menu */}
+        {/* Right Section: Learn Progress Indicator, Notifications, Profile Dropdown */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Reel Watch Counter (Learners only) */}
+          {/* Learn Reels Completion Indicator for User */}
           {(isLearner || isViewAsLearner) && (
             <div
-              onClick={openAssessment}
-              title="Click to launch assessment quiz"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 hover:border-blue-300 cursor-pointer transition-all text-xs text-slate-700"
+              onClick={() => {
+                if (isAssessmentUnlocked) {
+                  openAssessment();
+                } else {
+                  setActiveTab('learn');
+                }
+              }}
+              title={isAssessmentUnlocked ? 'Assessment Unlocked! Click to start' : 'Complete all 6 Learn reels to unlock assessment'}
+              className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold cursor-pointer transition-all ${
+                isAssessmentUnlocked
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100 shadow-xs'
+                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-blue-300'
+              }`}
             >
-              <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+              <div className={`w-2 h-2 rounded-full ${isAssessmentUnlocked ? 'bg-emerald-500 animate-ping' : 'bg-blue-600'}`} />
               <span>
-                Watched: <strong className="text-slate-900 font-mono">{reelsWatchedCount}/{adminSettings.reelsPerAssessment}</strong>
+                Learn Reels: <strong className="font-mono">{learnReelCount}/6</strong>
               </span>
+              {isAssessmentUnlocked && (
+                <span className="text-[10px] bg-emerald-600 text-white px-1.5 py-0.2 rounded font-bold">
+                  UNLOCKED
+                </span>
+              )}
             </div>
           )}
 
@@ -270,7 +276,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
           <div className="relative">
             <button
               onClick={() => setIsNotifOpen(!isNotifOpen)}
-              className="relative p-2 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 transition-all"
+              className="relative p-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 transition-all cursor-pointer"
             >
               <Bell size={17} />
               {unreadCount > 0 && (
@@ -281,7 +287,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
             </button>
 
             {isNotifOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-white shadow-xl p-4 z-50 border border-slate-200 animate-in fade-in slide-in-from-top-2">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white shadow-xl p-4 z-50 border border-slate-200 animate-in fade-in">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
                   <div className="flex items-center gap-2">
                     <Bell size={16} className="text-blue-600" />
@@ -290,7 +296,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
                   {unreadCount > 0 && (
                     <button
                       onClick={clearAllNotifications}
-                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium cursor-pointer"
                     >
                       Mark all read
                     </button>
@@ -299,21 +305,21 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
 
                 <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
                   {notifications.length === 0 ? (
-                    <p className="text-xs text-slate-500 text-center py-6">No notifications.</p>
+                    <p className="text-xs text-slate-400 text-center py-6">No notifications</p>
                   ) : (
-                    notifications.map(notif => (
+                    notifications.map(n => (
                       <div
-                        key={notif.id}
-                        onClick={() => markNotificationRead(notif.id)}
-                        className={`p-2.5 rounded-lg border text-xs cursor-pointer transition-all ${
-                          notif.read ? 'bg-slate-50 border-slate-100 opacity-70' : 'bg-blue-50/60 border-blue-200'
+                        key={n.id}
+                        onClick={() => markNotificationRead(n.id)}
+                        className={`p-3 rounded-xl border text-xs transition-all cursor-pointer ${
+                          n.read ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-blue-50/60 border-blue-200 text-slate-900 font-medium'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
-                          <strong className="text-slate-900 font-semibold">{notif.title}</strong>
-                          {!notif.read && <span className="w-2 h-2 rounded-full bg-blue-600 flex-shrink-0 mt-1" />}
+                          <strong className="text-xs font-bold text-slate-900">{n.title}</strong>
+                          {!n.read && <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-1" />}
                         </div>
-                        <p className="text-slate-600 mt-1 text-[11px] leading-relaxed">{notif.message}</p>
+                        <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">{n.message}</p>
                       </div>
                     ))
                   )}
@@ -322,112 +328,49 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
             )}
           </div>
 
-          {/* Profile Dropdown with Persona Switcher */}
+          {/* User Profile Menu */}
           <div className="relative">
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${currentRoleConfig.color} hover:bg-slate-100 shadow-sm`}
+              className="flex items-center gap-2 p-1.5 pr-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
             >
-              <div className="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">
+              <div className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
                 {initials}
               </div>
-              <span className="hidden sm:inline font-bold text-slate-900">{currentUser.name.split(' ')[0]}</span>
-              <span className="px-1.5 py-0.5 rounded bg-white text-slate-700 border border-slate-200 text-[10px] font-bold uppercase">
-                {currentRoleConfig.badge}
-              </span>
-              <ChevronDown size={14} className="text-slate-500" />
+              <span className="text-xs font-bold text-slate-900 hidden sm:inline">{currentUser.name}</span>
             </button>
 
             {isProfileMenuOpen && (
-              <div className="absolute right-0 mt-2 w-72 rounded-xl bg-white shadow-xl p-4 z-50 border border-slate-200 animate-in fade-in slide-in-from-top-2 space-y-3">
-                {/* User Info Header */}
-                <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-                  <div className="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center font-black text-sm">
-                    {initials}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-900">{currentUser.name}</h4>
-                    <p className="text-[11px] text-slate-500">{currentUser.email}</p>
-                    <span className="inline-block mt-0.5 px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-semibold border border-blue-200">
-                      Role: {currentRoleConfig.badge}
-                    </span>
-                  </div>
+              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white shadow-xl p-2 z-50 border border-slate-200 animate-in fade-in">
+                <div className="p-3 border-b border-slate-100 mb-1">
+                  <p className="text-xs font-bold text-slate-900">{currentUser.name}</p>
+                  <p className="text-[11px] text-slate-500 mt-0.5">{currentUser.email}</p>
+                  <span className="inline-block mt-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+                    {isAdmin ? 'Administrator' : isMentor ? 'Verified Mentor' : 'User (Learner)'}
+                  </span>
                 </div>
 
-                {/* View Mode Switcher (Admin only — admins can preview any dashboard) */}
-                {isAdmin && (
-                  <div>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1.5">
-                      View As
-                    </span>
-                    <div className="space-y-1">
-                      <button
-                        onClick={() => {
-                          setViewAsLearner(false);
-                          setViewAsMentor(false);
-                          setActiveTab('admin-dashboard');
-                          setIsProfileMenuOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-all ${
-                          !isViewAsLearner && !isViewAsMentor ? 'bg-purple-600 text-white font-bold' : 'hover:bg-slate-100 text-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck size={15} />
-                          <span>Admin Dashboard</span>
-                        </div>
-                      </button>
+                <button
+                  onClick={() => {
+                    setIsProfileMenuOpen(false);
+                    setActiveTab(isMentor ? 'mentor-profile' : 'profile');
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                >
+                  <User size={14} />
+                  <span>My Profile</span>
+                </button>
 
-                      <button
-                        onClick={() => {
-                          setViewAsLearner(true);
-                          setViewAsMentor(false);
-                          setActiveTab('home');
-                          setIsProfileMenuOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-all ${
-                          isViewAsLearner ? 'bg-blue-600 text-white font-bold' : 'hover:bg-slate-100 text-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <GraduationCap size={15} />
-                          <span>Learner Dashboard</span>
-                        </div>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setViewAsMentor(true);
-                          setViewAsLearner(false);
-                          setActiveTab('mentor-dashboard');
-                          setIsProfileMenuOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left text-xs transition-all ${
-                          isViewAsMentor ? 'bg-emerald-600 text-white font-bold' : 'hover:bg-slate-100 text-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <UserCheck size={15} />
-                          <span>Mentor Dashboard</span>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Profile & Logout */}
-                <div className="pt-2 border-t border-slate-100 space-y-1">
-                  <button
-                    onClick={() => {
-                      setIsProfileMenuOpen(false);
-                      logoutUser();
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 transition-all"
-                  >
-                    <LogOut size={14} />
-                    <span>Sign Out</span>
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    setIsProfileMenuOpen(false);
+                    logoutUser();
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                >
+                  <LogOut size={14} />
+                  <span>Sign Out</span>
+                </button>
               </div>
             )}
           </div>
@@ -436,4 +379,3 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, viewMod
     </header>
   );
 };
-
