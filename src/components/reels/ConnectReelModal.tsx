@@ -383,7 +383,7 @@ export const ConnectReelModal: React.FC<ConnectReelModalProps> = ({
               <div className="flex items-center gap-2">
                 <HelpCircle size={16} className="text-blue-500" />
                 <span className="text-xs font-bold text-slate-900 dark:text-white">
-                  Attach Micro-Assessment Question
+                  Attach Assessment Question
                 </span>
               </div>
               <label className="flex items-center gap-2 cursor-pointer">

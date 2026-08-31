@@ -36,7 +36,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
   reel,
   isActive,
   reelIndex = 0,
-  totalReels = 6,
+  totalReels = 5,
   onNext,
   onPrev
 }) => {
@@ -362,7 +362,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
           {/* Connected Assessment Tag */}
           <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-blue-200">
             <Award size={12} className="text-blue-400" />
-            <span>Includes 1 Question in the 6-Reel Assessment</span>
+            <span>Includes 1 Question in the 5-Reel Assessment</span>
           </div>
         </div>
       </div>

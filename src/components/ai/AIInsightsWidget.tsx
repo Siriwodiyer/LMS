@@ -64,7 +64,7 @@ export const AIInsightsWidget: React.FC<AIInsightsWidgetProps> = ({ onNavigateTo
             </h1>
 
             <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
-              Our continuous assessment engine analyzes your response latency, quiz mistakes, and reel watch patterns to pinpoint knowledge gaps and recommend tailored micro-learning.
+              Our continuous assessment engine analyzes your response latency, quiz mistakes, and reel watch patterns to pinpoint knowledge gaps and recommend tailored learning.
             </p>
           </div>
         </div>

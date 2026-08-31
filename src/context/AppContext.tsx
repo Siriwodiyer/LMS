@@ -25,7 +25,8 @@ import {
   MentorApplication,
   CourseFeedback,
   Question,
-  AssignmentSubmission
+  AssignmentSubmission,
+  UserActivity
 } from '../types';
 import {
   INITIAL_USERS,
@@ -211,6 +212,7 @@ interface AppContextType {
   // Rewards & Badges
   badges: Badge[];
   badgeDefinitions: BadgeDefinition[];
+  awardCourseBadge: (badge: Badge, courseId?: string) => void;
   createBadgeDefinition: (badge: Omit<BadgeDefinition, 'id' | 'earnedCount' | 'createdAt'>) => void;
   updateBadgeDefinition: (id: string, updates: Partial<BadgeDefinition>) => void;
   toggleBadgeActive: (id: string) => void;
@@ -288,23 +290,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const currentUser = users.find(u => u.id === currentUserId) || users[0];
 
-  // Learn Reels (12 High-Impact Vertical Reels & Shorts)
+  // Learn Reels (100% YouTube Shorts & Instagram Reels)
   const [reels, setReels] = useState<Reel[]>(() => {
-    const saved = localStorage.getItem('lms_reels_v11');
+    const saved = localStorage.getItem('lms_reels_v13');
     return saved ? JSON.parse(saved) : INITIAL_REELS;
   });
 
   const [currentReelIndex, setCurrentReelIndex] = useState<number>(0);
   
-  // Track completed Learn reels per individual reel ID
+  // Track completed Learn reels per individual reel ID (Starts at 0/5 watched - LOCKED)
   const [watchedLearnReelIds, setWatchedLearnReelIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('lms_watched_learn_reels_v7');
+    const saved = localStorage.getItem('lms_watched_learn_reels_v9');
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Courses (Multi-Platform Courses: YouTube, Udemy, Coursera, edX, LMS)
+  // Courses (Multi-Platform Courses: YouTube, Udemy, Coursera, edX)
   const [courses, setCourses] = useState<Course[]>(() => {
-    const saved = localStorage.getItem('lms_courses_v9');
+    const saved = localStorage.getItem('lms_courses_v10');
     return saved ? JSON.parse(saved) : INITIAL_COURSES;
   });
 
@@ -321,7 +323,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Track completed course reels per course: { courseId: [reelId1, reelId2, ...] }
   const [completedCourseReels, setCompletedCourseReels] = useState<Record<string, string[]>>(() => {
-    const saved = localStorage.getItem('lms_completed_course_reels_v7');
+    const saved = localStorage.getItem('lms_completed_course_reels_v8');
     return saved ? JSON.parse(saved) : {};
   });
 
@@ -392,14 +394,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Time filter for Platform Analytics
   const [timeFilter, setTimeFilter] = useState<PlatformTimeFilter>('30d');
 
-  // Admin Settings (6 reels per assessment for prototype)
+  // Admin Settings (5 reels per assessment)
   const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => {
-    const saved = localStorage.getItem('lms_admin_settings_v7');
+    const saved = localStorage.getItem('lms_admin_settings_v9');
     return saved
       ? JSON.parse(saved)
       : {
           passingScoreThreshold: 80,
-          reelsPerAssessment: 6, // EXACTLY 6 reels
+          reelsPerAssessment: 5, // EXACTLY 5 reels
           pointsPerCorrectAnswer: 50,
           streakBonusMultiplier: 1.5,
           mentorEligibilityMinAssessments: 3,
@@ -422,15 +424,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [isAuthenticated]);
 
   useEffect(() => {
-    localStorage.setItem('lms_reels_v11', JSON.stringify(reels));
+    localStorage.setItem('lms_reels_v13', JSON.stringify(reels));
   }, [reels]);
 
   useEffect(() => {
-    localStorage.setItem('lms_watched_learn_reels_v7', JSON.stringify(watchedLearnReelIds));
+    localStorage.setItem('lms_watched_learn_reels_v9', JSON.stringify(watchedLearnReelIds));
   }, [watchedLearnReelIds]);
 
   useEffect(() => {
-    localStorage.setItem('lms_courses_v9', JSON.stringify(courses));
+    localStorage.setItem('lms_courses_v10', JSON.stringify(courses));
   }, [courses]);
 
   useEffect(() => {
@@ -442,7 +444,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [assignments]);
 
   useEffect(() => {
-    localStorage.setItem('lms_completed_course_reels_v7', JSON.stringify(completedCourseReels));
+    localStorage.setItem('lms_completed_course_reels_v8', JSON.stringify(completedCourseReels));
   }, [completedCourseReels]);
 
   useEffect(() => {
@@ -466,7 +468,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [platformFeedback]);
 
   useEffect(() => {
-    localStorage.setItem('lms_admin_settings_v7', JSON.stringify(adminSettings));
+    localStorage.setItem('lms_admin_settings_v8', JSON.stringify(adminSettings));
   }, [adminSettings]);
 
   // Toast Helpers
@@ -932,7 +934,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
   }, [users, courses, reels, enrolledStudents]);
 
-  // Learn Reels Completion System (Exactly 6 Reels)
+  // Learn Reels Completion System (Exactly 5 Reels)
   const markLearnReelCompleted = (reelId: string) => {
     setWatchedLearnReelIds(prev => {
       if (!prev.includes(reelId)) {
@@ -940,7 +942,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const nextCount = next.length;
 
         if (nextCount === adminSettings.reelsPerAssessment) {
-          showToast(`🎉 All 6 Learn Reels completed! Your assessment is now UNLOCKED.`, 'success');
+          showToast(`🎉 All 5 Learn Reels completed! Your assessment is now UNLOCKED.`, 'success');
         } else {
           showToast(`Reel marked as completed (${nextCount}/${adminSettings.reelsPerAssessment})`, 'success');
         }
@@ -967,7 +969,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     markLearnReelCompleted(reelId);
   };
 
-  // Assessment unlocked condition: EXACTLY requires completing all 6 Learn reels
+  // Assessment unlocked condition: EXACTLY requires completing all 5 Learn reels
   const isAssessmentUnlocked = watchedLearnReelIds.length >= adminSettings.reelsPerAssessment;
 
   const toggleLikeReel = (reelId: string) => {
@@ -1497,6 +1499,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Badge rule updated.', 'success');
   };
 
+  const awardCourseBadge = (badge: Badge, courseId?: string) => {
+    setUsers(prev =>
+      prev.map(u => {
+        if (u.id === currentUserId) {
+          const updatedBadges = [...u.badges];
+          if (!updatedBadges.some(b => b.id === badge.id || b.title === badge.title)) {
+            updatedBadges.push(badge);
+          }
+          const updatedCompletedCourses = [...u.completedCourseIds];
+          if (courseId && !updatedCompletedCourses.includes(courseId)) {
+            updatedCompletedCourses.push(courseId);
+          }
+          const newActivity: UserActivity = {
+            id: `act-${Date.now()}`,
+            type: 'badge',
+            title: `Badge Unlocked: ${badge.title}`,
+            description: badge.description,
+            timestamp: 'Just now'
+          };
+          return {
+            ...u,
+            badges: updatedBadges,
+            completedCourseIds: updatedCompletedCourses,
+            points: u.points + 100,
+            xp: u.xp + 250,
+            recentActivity: [newActivity, ...u.recentActivity]
+          };
+        }
+        return u;
+      })
+    );
+    showToast(`🏆 Milestone Badge Awarded: "${badge.title}" credited to your profile!`, 'success');
+  };
+
   const toggleBadgeActive = (id: string) => {
     setBadgeDefinitions(prev =>
       prev.map(b => {
@@ -1541,10 +1577,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Comment flagged for admin moderation.', 'warning');
   };
 
-  // Dynamic 6-Reel Assessment
+  // Dynamic 5-Reel Assessment
   const openAssessment = () => {
     if (!isAssessmentUnlocked) {
-      showToast(`Assessment is LOCKED! Please complete all 6 Learn reels first (${watchedLearnReelIds.length}/6 completed).`, 'warning');
+      showToast(`Assessment is LOCKED! Please complete all 5 Learn reels first (${watchedLearnReelIds.length}/5 completed).`, 'warning');
       return;
     }
     setIsAssessmentOpen(true);
@@ -1565,7 +1601,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         questions.push({ ...r.questions[0], reelId: r.id });
       }
     });
-    return questions.slice(0, 6);
+    return questions.slice(0, 5);
   };
 
   const submitAssessmentAnswers = (answers: Record<string, number>, customQuestions?: Question[]): AssessmentResult => {
@@ -1589,20 +1625,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `vouch-${Date.now()}`,
       code: newVoucherCode,
       discountPercent: 25,
-      description: '25% OFF Any Masterclass Course (Earned via 6-Reel Micro-Assessment)',
+      description: '25% OFF Any Masterclass Course (Earned via Assessment)',
       expiresAt: new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0],
       isUsed: false
     };
 
     const rewardsEarned: AssessmentResult['rewardsEarned'] = {
       points: pointsEarned,
-      goodie: passed ? 'Official 6-Reel Micro-Assessment Certification & 25% Off Voucher' : undefined
+      goodie: passed ? 'Official Assessment Certification & 25% Off Voucher' : undefined
     };
 
     if (passed) {
       rewardsEarned.voucher = newVoucher;
       if (scorePercentage === 100) {
-        rewardsEarned.badge = INITIAL_BADGES[0]; // Speed Learner
+        rewardsEarned.badge = {
+          id: `badge-quiz-champion-${Date.now()}`,
+          title: 'Quiz Champion',
+          description: 'Achieved a perfect 100% score on the 5-Reel Assessment.',
+          icon: '🏆',
+          unlockedAt: new Date().toISOString(),
+          rarity: 'legendary'
+        };
       }
     }
 
@@ -1631,7 +1674,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const nextStreak = passed ? u.streakDays + 1 : u.streakDays;
 
           const updatedBadges = [...u.badges];
-          if (rewardsEarned.badge && !updatedBadges.some(b => b.id === rewardsEarned.badge?.id)) {
+          if (rewardsEarned.badge && !updatedBadges.some(b => b.id === rewardsEarned.badge?.id || b.title === rewardsEarned.badge?.title)) {
             updatedBadges.push(rewardsEarned.badge);
           }
 
@@ -2068,6 +2111,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         submitPlatformFeedback,
         badges,
         badgeDefinitions,
+        awardCourseBadge,
         createBadgeDefinition,
         updateBadgeDefinition,
         toggleBadgeActive,

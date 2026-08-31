@@ -164,7 +164,7 @@ const MainContent: React.FC = () => {
       {/* Mobile Bottom Navigation Bar */}
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Automated Micro-Assessment Modal */}
+      {/* Automated Assessment Modal */}
       <AssessmentModal />
 
       {/* Multi-Role Authentication Modal */}

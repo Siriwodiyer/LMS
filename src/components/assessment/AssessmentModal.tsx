@@ -133,7 +133,7 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
                 Automated Evaluation
               </span>
               <h1 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
-                6-Reel Micro-Assessment
+                5-Reel Assessment
               </h1>
             </div>
           </div>

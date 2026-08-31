@@ -150,7 +150,7 @@ export const MentorCoursesView: React.FC<MentorCoursesViewProps> = ({
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display mt-1">My Courses Management</h1>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-xl">
-            Create, manage, and inspect your micro-courses. All published courses feature 5 short vertical reels.
+            Create, manage, and inspect your courses. All published courses feature 5 short vertical reels.
           </p>
         </div>
 

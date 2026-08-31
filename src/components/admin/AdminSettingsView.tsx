@@ -49,7 +49,7 @@ export const AdminSettingsView: React.FC = () => {
             <Zap size={18} className="text-blue-600 dark:text-blue-400" />
             <div>
               <h3 className="font-bold text-sm text-slate-900 dark:text-white">Assessment Evaluation Parameters</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Controls passing thresholds and micro-assessment triggers</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Controls passing thresholds and assessment triggers</p>
             </div>
           </div>
 
@@ -85,7 +85,7 @@ export const AdminSettingsView: React.FC = () => {
                 className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono"
               />
               <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
-                Number of foundational reels required to unlock the micro-assessment.
+                Number of foundational reels required to unlock the assessment.
               </span>
             </div>
           </div>

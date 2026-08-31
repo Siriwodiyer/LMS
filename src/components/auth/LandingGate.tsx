@@ -573,7 +573,7 @@ export const LandingGate: React.FC = () => {
         <div className="max-w-5xl mx-auto space-y-12">
           <div className="text-center space-y-3 max-w-2xl mx-auto">
             <span className="text-xs font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-              Micro-Learning Experience
+              Short-Form Learning Experience
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white font-display tracking-tight">
               LEARN IN SHORT, ENGAGING SESSIONS

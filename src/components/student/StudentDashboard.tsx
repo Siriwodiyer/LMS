@@ -107,16 +107,16 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
           <h2 className="text-lg sm:text-xl font-black font-display">
             {!isAssessmentUnlocked
-              ? `Watch Educational Reel ${completedLearnCount + 1} of 6`
+              ? `Watch Educational Reel ${completedLearnCount + 1} of 5`
               : !isCourseFinished
               ? `Continue ${currentCourse?.title || 'Course'}`
               : `Submit Your Capstone Assignment & Claim Certificate`}
           </h2>
           <p className="text-xs text-blue-100/80 leading-relaxed">
             {!isAssessmentUnlocked
-              ? `You have completed ${completedLearnCount} out of 6 short-video reels. Complete the remaining ${6 - completedLearnCount} reels to unlock your micro-assessment.`
+              ? `You have completed ${completedLearnCount} out of 5 short-video reels. Complete the remaining ${5 - completedLearnCount} reels to unlock your assessment.`
               : !isCourseFinished
-              ? `Your micro-assessment is unlocked! Continue your enrolled masterclass course to finish all 5 reels and unlock the final assignment.`
+              ? `Your assessment is unlocked! Continue your enrolled masterclass course to finish all 5 reels and unlock the final assignment.`
               : `You have completed all course reels! Submit your benchmark capstone assignment to qualify for verified certificate generation.`}
           </p>
         </div>
@@ -137,7 +137,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               className="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md flex items-center gap-2 cursor-pointer transition-all"
             >
               <Zap size={16} />
-              <span>Start Micro-Assessment</span>
+              <span>Start Assessment</span>
               <ArrowRight size={14} />
             </button>
           ) : (
@@ -275,7 +275,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CheckSquare size={18} className="text-blue-600 dark:text-blue-400" />
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Micro-Assessment Status</h2>
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Assessment Status</h2>
               </div>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                 isAssessmentUnlocked ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
@@ -286,8 +286,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
               {isAssessmentUnlocked
-                ? 'Automated 6-question micro-assessment is unlocked! Test your knowledge across all 6 vertical reels.'
-                : `Watch all 6 Learn reels to unlock the automated assessment. Currently: ${completedLearnCount}/6.`}
+                ? 'Automated assessment is unlocked! Test your knowledge across the 5 vertical reels.'
+                : `Watch all 5 Learn reels to unlock the automated assessment. Currently: ${completedLearnCount}/5.`}
             </p>
 
             <div className="pt-2">
@@ -297,7 +297,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
                   <Zap size={14} />
-                  <span>Start Micro-Assessment</span>
+                  <span>Start Assessment</span>
                 </button>
               ) : (
                 <button
@@ -305,7 +305,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
                   <PlaySquare size={14} />
-                  <span>Watch Learn Reels ({completedLearnCount}/6)</span>
+                  <span>Watch Learn Reels ({completedLearnCount}/5)</span>
                 </button>
               )}
             </div>

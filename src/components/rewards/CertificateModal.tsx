@@ -68,7 +68,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
             {currentUser.name}
           </h2>
           <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-            has demonstrated exceptional mastery across micro-assessments and completed the specialized curriculum for
+            has demonstrated exceptional mastery across assessments and completed the specialized curriculum for
           </p>
 
           <div className="my-4 p-3 rounded-xl bg-blue-950/60 border border-blue-500/30 max-w-md mx-auto">

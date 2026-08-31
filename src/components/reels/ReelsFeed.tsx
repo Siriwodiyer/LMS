@@ -27,12 +27,11 @@ interface ReelsFeedProps {
 
 const CATEGORY_TABS = [
   'All Topics',
+  'AI & ML',
   'Python',
   'Web Dev',
-  'System Design',
   'Data Structures',
-  'DBMS',
-  'AI & ML'
+  'System Design'
 ];
 
 export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
@@ -45,7 +44,7 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
     openAssessment
   } = useApp();
 
-  const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'youtube' | 'instagram' | 'direct'>('all');
+  const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'youtube' | 'instagram'>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('All Topics');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -60,10 +59,6 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
     return publishedReels.filter(r => r.source === 'instagram' || r.videoUrl.includes('instagram')).length;
   }, [publishedReels]);
 
-  const lmsCount = useMemo(() => {
-    return publishedReels.filter(r => r.source === 'direct' || (!r.videoUrl.includes('youtube') && !r.videoUrl.includes('youtu.be') && !r.videoUrl.includes('instagram'))).length;
-  }, [publishedReels]);
-
   // Filter reels based on platform and category
   const filteredReels = useMemo(() => {
     return publishedReels
@@ -71,7 +66,6 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
         if (selectedPlatform === 'all') return true;
         if (selectedPlatform === 'youtube') return r.source === 'youtube' || r.videoUrl.includes('youtube') || r.videoUrl.includes('youtu.be');
         if (selectedPlatform === 'instagram') return r.source === 'instagram' || r.videoUrl.includes('instagram');
-        if (selectedPlatform === 'direct') return r.source === 'direct' || (!r.videoUrl.includes('youtube') && !r.videoUrl.includes('youtu.be') && !r.videoUrl.includes('instagram'));
         return true;
       })
       .filter(r => {
@@ -82,13 +76,13 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
 
   const activeReelsList = filteredReels;
   const completedCount = watchedLearnReelIds.length;
-  const progressPercent = Math.min(100, Math.round((completedCount / 6) * 100));
+  const progressPercent = Math.min(100, Math.round((completedCount / 5) * 100));
 
   const touchStartY = useRef<number | null>(null);
   const SWIPE_THRESHOLD = 50;
 
   // Reset index when filter changes
-  const handleSelectPlatform = (platform: 'all' | 'youtube' | 'instagram' | 'direct') => {
+  const handleSelectPlatform = (platform: 'all' | 'youtube' | 'instagram') => {
     setSelectedPlatform(platform);
     setCurrentReelIndex(0);
     setIsMobileSidebarOpen(false);
@@ -149,7 +143,7 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
   // Reusable Sidebar Content
   const renderSidebarContent = () => (
     <div className="flex flex-col gap-5 p-4 sm:p-5 h-full overflow-y-auto custom-scrollbar">
-      {/* 1. Milestone Quiz Card */}
+      {/* 1. Milestone Assessment Card */}
       {isAssessmentUnlocked ? (
         <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-emerald-600/10 to-teal-500/10 border border-emerald-400/40 dark:border-emerald-500/30 shadow-md space-y-3">
           <div className="flex items-center gap-2.5">
@@ -158,10 +152,10 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
             </div>
             <div>
               <h3 className="text-xs font-bold text-emerald-950 dark:text-emerald-200">
-                🎉 Quiz Unlocked!
+                🎉 Assessment Unlocked!
               </h3>
               <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
-                6/6 Educational Reels completed
+                5/5 Educational Reels completed
               </p>
             </div>
           </div>
@@ -169,7 +163,7 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
             onClick={openAssessment}
             className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
-            <span>Take Verified Quiz</span>
+            <span>Take Verified Assessment</span>
             <ArrowRight size={14} />
           </button>
         </div>
@@ -185,13 +179,13 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
               </span>
             </div>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-              {completedCount} / 6 Watched
+              {completedCount} / 5 Watched
             </span>
           </div>
 
           <div className="space-y-1">
             <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-              <span>Quiz Milestone</span>
+              <span>Assessment Milestone</span>
               <span className="font-bold">{progressPercent}%</span>
             </div>
             <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -203,7 +197,7 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
           </div>
 
           <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-            Watch all 6 short lessons to unlock the verified micro-assessment quiz and certificate!
+            Watch 5 short lessons to unlock the verified assessment and certificate!
           </p>
         </div>
       )}
@@ -262,23 +256,6 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
             </div>
             <span className="text-[11px] font-mono px-1.5 py-0.2 rounded-md bg-black/10 dark:bg-white/10">
               {igCount}
-            </span>
-          </button>
-
-          <button
-            onClick={() => handleSelectPlatform('direct')}
-            className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
-              selectedPlatform === 'direct'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <Video size={15} />
-              <span>Verified LMS</span>
-            </div>
-            <span className="text-[11px] font-mono px-1.5 py-0.2 rounded-md bg-black/10 dark:bg-white/10">
-              {lmsCount}
             </span>
           </button>
         </div>

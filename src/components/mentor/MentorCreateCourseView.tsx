@@ -142,7 +142,7 @@ export const MentorCreateCourseView: React.FC<MentorCreateCourseViewProps> = ({
               5 Vertical Reels
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display mt-1">Create Micro-Course</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display mt-1">Create Course</h1>
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-xl">
             Design an intensive 5-reel masterclass curriculum. Upon creation, courses undergo admin quality assurance before going live.
           </p>

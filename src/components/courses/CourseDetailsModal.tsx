@@ -499,7 +499,7 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
                     prompt: `Mastering the 5 vertical reels for ${course.title} provides end-to-end certification readiness for technical interviews.`,
                     options: ['True', 'False'],
                     correctIndex: 0,
-                    explanation: 'True! The 5-reel micro-learning syllabus covers fundamentals, deep dive, advanced patterns, and production telemetry.',
+                    explanation: 'True! The 5-reel curriculum syllabus covers fundamentals, deep dive, advanced patterns, and production telemetry.',
                     marks: 10
                   },
                   {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Quiz, Course, Question, AssessmentResult } from '../../types';
+import { Quiz, Course, Question, AssessmentResult, Badge } from '../../types';
 import { useApp } from '../../context/AppContext';
 import {
   HelpCircle,
@@ -16,7 +16,8 @@ import {
   X,
   ArrowLeft,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  UserCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -35,6 +36,7 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
 }) => {
   const {
     currentUser,
+    awardCourseBadge,
     submitAssessmentAnswers,
     showToast,
     adminSettings
@@ -45,6 +47,7 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
   const [timeLeft, setTimeLeft] = useState(120);
   const [showResult, setShowResult] = useState(false);
   const [resultData, setResultData] = useState<AssessmentResult | null>(null);
+  const [awardedBadge, setAwardedBadge] = useState<Badge | null>(null);
 
   const questions: Question[] = quiz.questions || [];
 
@@ -56,6 +59,7 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
       setTimeLeft(120);
       setShowResult(false);
       setResultData(null);
+      setAwardedBadge(null);
     }
   }, [isOpen, quiz.id]);
 
@@ -97,6 +101,188 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
     }
   };
 
+  const getBadgeForCourseOrQuiz = (): Badge => {
+    if (course.id === 'course-yt-cs50') {
+      return {
+        id: 'badge-cs50-master',
+        title: 'CS50x Computer Science Master',
+        description: 'Passed the Harvard CS50x mastery assessment with distinction.',
+        icon: '🎓',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (course.id === 'course-java') {
+      return {
+        id: 'badge-java-specialist',
+        title: 'Java 21 Enterprise Specialist',
+        description: 'Mastered JVM bytecode, virtual threads & high-concurrency systems.',
+        icon: '☕',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (course.id === 'course-yt-fullstack') {
+      return {
+        id: 'badge-fullstack-master',
+        title: 'Full Stack Master 2026',
+        description: 'Completed full stack React 19 & Node.js architecture certification.',
+        icon: '💻',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'epic'
+      };
+    }
+    if (course.id === 'course-yt-ml') {
+      return {
+        id: 'badge-ai-ml-specialist',
+        title: 'Machine Learning Specialist',
+        description: 'Mastered gradient descent, neural networks and regularization.',
+        icon: '🤖',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (course.id === 'course-udemy-web') {
+      return {
+        id: 'badge-web-bootcamp',
+        title: 'Web Development Bootcamp Master',
+        description: 'Completed the Complete 2026 Web Development curriculum.',
+        icon: '🌐',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'epic'
+      };
+    }
+    if (course.id === 'course-udemy-aws') {
+      return {
+        id: 'badge-aws-solutions',
+        title: 'AWS Solutions Architect Associate',
+        description: 'Certified in resilient AWS cloud infrastructure design.',
+        icon: '☁️',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (course.id === 'course-udemy-dsa') {
+      return {
+        id: 'badge-dsa-master',
+        title: 'DSA & Algorithms Master',
+        description: 'Mastered advanced data structures & algorithms.',
+        icon: '⚡',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (course.id === 'course-coursera-dl') {
+      return {
+        id: 'badge-deep-learning',
+        title: 'Deep Learning Pioneer',
+        description: 'Deep Learning Specialization certified.',
+        icon: '🧠',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (course.id === 'course-coursera-gcp') {
+      return {
+        id: 'badge-gcp-architect',
+        title: 'Google Cloud Certified Architect',
+        description: 'Enterprise Google Cloud solutions certified.',
+        icon: '🛡️',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (course.id === 'course-coursera-meta') {
+      return {
+        id: 'badge-meta-frontend',
+        title: 'Meta Front-End Certified Specialist',
+        description: 'Official Meta Front-End curriculum verified.',
+        icon: '🚀',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (course.id === 'course-edx-mit') {
+      return {
+        id: 'badge-mit-python',
+        title: 'MIT Python Specialist',
+        description: 'Completed MIT 6.00.1x computational programming.',
+        icon: '🐍',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (quiz.id === 'quiz-google-swe' || quiz.company === 'Google') {
+      return {
+        id: 'badge-google-ready',
+        title: 'Google Interview Ready',
+        description: 'Passed Google SWE technical engineering round.',
+        icon: '🏆',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (quiz.id === 'quiz-amazon-sde' || quiz.company === 'Amazon') {
+      return {
+        id: 'badge-amazon-ready',
+        title: 'Amazon AWS Interview Ready',
+        description: 'Passed Amazon SDE & Cloud Systems technical round.',
+        icon: '📦',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (quiz.id === 'quiz-microsoft-swe' || quiz.company === 'Microsoft') {
+      return {
+        id: 'badge-microsoft-ready',
+        title: 'Microsoft Interview Ready',
+        description: 'Passed Microsoft OOP & Concurrency assessment.',
+        icon: '🪟',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (quiz.id === 'quiz-meta-fe' || quiz.company === 'Meta') {
+      return {
+        id: 'badge-meta-fe-master',
+        title: 'Meta Front-End Master',
+        description: 'Passed Meta UI & React 19 architecture round.',
+        icon: '♾️',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'legendary'
+      };
+    }
+    if (quiz.id === 'quiz-quant-aptitude' || quiz.category === 'Quantitative Aptitude') {
+      return {
+        id: 'badge-quant-champion',
+        title: 'Quantitative Aptitude Champion',
+        description: 'Scored top marks in speed math & numerical reasoning.',
+        icon: '🎯',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'epic'
+      };
+    }
+    if (quiz.id === 'quiz-logical-reasoning' || quiz.category === 'Logical Reasoning') {
+      return {
+        id: 'badge-logic-expert',
+        title: 'Logical Reasoning Expert',
+        description: 'Mastered critical thinking & placement deductions.',
+        icon: '💡',
+        unlockedAt: new Date().toISOString(),
+        rarity: 'epic'
+      };
+    }
+
+    return {
+      id: `badge-${quiz.id || course.id}-${Date.now()}`,
+      title: `${course.title || quiz.title} Mastery Badge`,
+      description: `Demonstrated mastery in ${course.title || quiz.title}.`,
+      icon: '🏅',
+      unlockedAt: new Date().toISOString(),
+      rarity: 'epic'
+    };
+  };
+
   const handleSubmitQuiz = () => {
     if (questions.length === 0) return;
 
@@ -115,6 +301,13 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
     const passingThreshold = adminSettings.passingScoreThreshold || 70;
     const isPassed = scorePercentage >= passingThreshold;
 
+    let badgeEarned: Badge | null = null;
+    if (isPassed) {
+      badgeEarned = getBadgeForCourseOrQuiz();
+      awardCourseBadge(badgeEarned, course.id);
+      setAwardedBadge(badgeEarned);
+    }
+
     const result: AssessmentResult = {
       id: `result-${Date.now()}`,
       userId: currentUser.id,
@@ -125,7 +318,8 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
       correctCount,
       completedAt: new Date().toISOString(),
       rewardsEarned: {
-        points: scorePercentage
+        points: scorePercentage,
+        badge: badgeEarned || undefined
       }
     };
 
@@ -140,7 +334,7 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
           origin: { y: 0.6 }
         });
       } catch {}
-      showToast(`Quiz Passed! Score: ${scorePercentage}%`, 'success');
+      showToast(`Quiz Passed! Score: ${scorePercentage}% • Badge Awarded: "${badgeEarned?.title}"`, 'success');
     } else {
       showToast(`Quiz Score: ${scorePercentage}%. Minimum required is ${passingThreshold}%.`, 'error');
     }
@@ -225,6 +419,23 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
                 </div>
               </div>
 
+              {/* Milestone Badge Award Banner (Matches Image 2) */}
+              {resultData.passed && awardedBadge && (
+                <div className="p-4 rounded-2xl bg-amber-500/10 dark:bg-amber-950/30 border border-amber-500/30 flex items-center gap-3.5 text-left max-w-md mx-auto animate-in zoom-in-95 duration-200">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center text-2xl shrink-0">
+                    {awardedBadge.icon}
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-500 block flex items-center gap-1.5">
+                      <Award size={14} /> Milestone Badge Awarded: {awardedBadge.title}
+                    </span>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
+                      {awardedBadge.description} Your verified badge has been credited to your profile and achievements gallery.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Actions */}
               <div className="flex items-center justify-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <button
@@ -234,6 +445,7 @@ export const CourseQuizModal: React.FC<CourseQuizModalProps> = ({
                     setTimeLeft(120);
                     setShowResult(false);
                     setResultData(null);
+                    setAwardedBadge(null);
                   }}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-all cursor-pointer"
                 >
