@@ -188,19 +188,19 @@ export const UserManagement: React.FC<UserManagementProps> = ({
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-slate-800/40 p-3 rounded-xl border border-white/5">
                     <div>
                       <span className="text-[10px] text-slate-400 block">Enrolled Courses</span>
-                      <strong className="text-white font-mono font-bold">{user.enrolledCourseIds.length} Courses</strong>
+                      <strong className="text-white font-mono font-bold">{user.enrolledCourseIds?.length || 0} Courses</strong>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 block">Quiz Accuracy</span>
-                      <strong className="text-emerald-400 font-mono font-bold">{user.quizAverage || 88}%</strong>
+                      <strong className="text-emerald-400 font-mono font-bold">{user.quizAverage ?? 0}%</strong>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 block">Study Time</span>
-                      <strong className="text-sky-400 font-mono font-bold">{user.totalLearningHours || 32} hrs</strong>
+                      <strong className="text-sky-400 font-mono font-bold">{user.totalLearningHours ?? 0} hrs</strong>
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-400 block">Badges Earned</span>
-                      <strong className="text-amber-400 font-mono font-bold">{user.badges.length} Badges</strong>
+                      <strong className="text-amber-400 font-mono font-bold">{user.badges?.length || 0} Badges</strong>
                     </div>
                   </div>
                 ) : (

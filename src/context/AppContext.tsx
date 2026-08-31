@@ -99,6 +99,8 @@ interface AppContextType {
   loginAsRole: (role: UserRole) => void;
   logoutUser: () => void;
   registerUser: (data: { name: string; email: string; password?: string; avatar?: string }) => { success: boolean; message?: string };
+  registerLearnerByAdmin: (data: { name: string; email: string; password?: string }) => Promise<User>;
+  refreshUsers: () => Promise<void>;
   switchUserRole: (role: UserRole) => void;
   updateUserProfile: (updates: Partial<User>) => void;
   
@@ -259,7 +261,62 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isViewAsLearner, setIsViewAsLearner] = useState<boolean>(false);
   const [isViewAsMentor, setIsViewAsMentor] = useState<boolean>(false);
 
-  // Auto-verify session with backend on mount
+  // Sync users with backend API and merge with persistent local records
+  const syncUsersWithBackend = async () => {
+    try {
+      const res = await api.getUsers();
+      if (res && res.success && Array.isArray(res.users)) {
+        setUsers(prev => {
+          const merged = [...prev];
+          res.users.forEach((bu: User) => {
+            const idx = merged.findIndex(
+              u => u.id === bu.id || (bu.email && u.email.toLowerCase() === bu.email.toLowerCase())
+            );
+            if (idx >= 0) {
+              merged[idx] = { ...merged[idx], ...bu };
+            } else {
+              merged.push(bu);
+            }
+          });
+          localStorage.setItem('lms_users_v7', JSON.stringify(merged));
+          return merged;
+        });
+      }
+    } catch {
+      // Backend offline or unreachable - local state preserved
+    }
+  };
+
+  const refreshUsers = async () => {
+    await syncUsersWithBackend();
+    // Reload local storage users if updated in another tab/process
+    const saved = localStorage.getItem('lms_users_v7');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setUsers(prev => {
+            const merged = [...prev];
+            parsed.forEach((lu: User) => {
+              const idx = merged.findIndex(
+                u => u.id === lu.id || (lu.email && u.email.toLowerCase() === lu.email.toLowerCase())
+              );
+              if (idx >= 0) {
+                merged[idx] = { ...merged[idx], ...lu };
+              } else {
+                merged.push(lu);
+              }
+            });
+            return merged;
+          });
+        }
+      } catch (err) {
+        console.error('Failed to parse local users:', err);
+      }
+    }
+  };
+
+  // Auto-verify session with backend on mount & subscribe to live roster sync
   useEffect(() => {
     const token = localStorage.getItem('lms_auth_token');
     if (token) {
@@ -286,6 +343,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           localStorage.removeItem('lms_is_authenticated_v7');
         });
     }
+
+    // Pull full user list from backend
+    syncUsersWithBackend();
+
+    // Cross-tab and global event listeners for instant roster updates
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'lms_users_v7' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) {
+            setUsers(parsed);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    const handleCustomRosterSync = () => {
+      const saved = localStorage.getItem('lms_users_v7');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            setUsers(parsed);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('lms:users_updated', handleCustomRosterSync);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('lms:users_updated', handleCustomRosterSync);
+    };
   }, []);
 
   const currentUser = users.find(u => u.id === currentUserId) || users[0];
@@ -516,6 +612,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         localStorage.setItem('lms_current_user_id_v7', loggedUser.id);
         closeAuthModal();
         showToast(`Welcome back, ${loggedUser.name}!`, 'success');
+        syncUsersWithBackend();
         return loggedUser;
       }
     } catch (err: any) {
@@ -543,6 +640,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('lms_current_user_id_v7', localUser.id);
       closeAuthModal();
       showToast(`Welcome back, ${localUser.name}!`, 'success');
+      syncUsersWithBackend();
       return localUser;
     }
 
@@ -553,32 +651,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const authRegisterLearner = async (data: { name: string; email: string; password: string }): Promise<User> => {
     const trimmedEmail = data.email.trim().toLowerCase();
-    
-    // 1. Attempt Backend API Registration
-    try {
-      const res = await api.register({
-        name: data.name.trim(),
-        email: trimmedEmail,
-        password: data.password
-      });
-      if (res && res.success && res.user) {
-        const newUser = res.user;
-        setUsers(prev => [newUser, ...prev]);
-        setCurrentUserId(newUser.id);
-        setIsAuthenticated(true);
-        setIsViewAsLearner(false);
-        setIsViewAsMentor(false);
-        localStorage.setItem('lms_is_authenticated_v7', 'true');
-        localStorage.setItem('lms_current_user_id_v7', newUser.id);
-        closeAuthModal();
-        showToast(`Welcome, ${newUser.name}! Your Learner account is ready.`, 'success');
-        return newUser;
-      }
-    } catch (err: any) {
-      console.warn('Backend register request failed or server offline, using local registration fallback:', err);
-    }
+    const trimmedName = data.name.trim();
 
-    // 2. Local Fallback Registration
+    // Check existing
     const existing = users.find(u => u.email.toLowerCase() === trimmedEmail);
     if (existing) {
       const msg = 'An account with this email already exists. Please sign in.';
@@ -586,12 +661,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       throw new Error(msg);
     }
 
-    const newUser: User = {
-      id: `user-${Date.now()}`,
-      name: data.name.trim(),
+    let newUser: User = {
+      id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      name: trimmedName,
       email: trimmedEmail,
       password: data.password,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name.trim())}`,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(trimmedName)}`,
       role: 'student',
       status: 'active',
       points: 0,
@@ -621,7 +696,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ]
     };
 
-    setUsers(prev => [newUser, ...prev]);
+    // 1. Attempt Backend API Registration
+    try {
+      const res = await api.register({
+        name: trimmedName,
+        email: trimmedEmail,
+        password: data.password
+      });
+      if (res && res.success && res.user) {
+        newUser = { ...res.user, password: data.password };
+      }
+    } catch (err: any) {
+      console.warn('Backend register request failed or server offline, using local registration fallback:', err);
+    }
+
+    // 2. Immediate local & storage persistence
+    setUsers(prev => {
+      const filtered = prev.filter(u => u.email.toLowerCase() !== trimmedEmail);
+      const updated = [newUser, ...filtered];
+      localStorage.setItem('lms_users_v7', JSON.stringify(updated));
+      return updated;
+    });
+
     setCurrentUserId(newUser.id);
     setIsAuthenticated(true);
     setIsViewAsLearner(false);
@@ -629,8 +725,82 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('lms_is_authenticated_v7', 'true');
     localStorage.setItem('lms_current_user_id_v7', newUser.id);
     closeAuthModal();
+
+    window.dispatchEvent(new CustomEvent('lms:users_updated'));
     showToast(`Welcome, ${newUser.name}! Your Learner account is ready.`, 'success');
     return newUser;
+  };
+
+  const registerLearnerByAdmin = async (data: { name: string; email: string; password?: string }): Promise<User> => {
+    const trimmedEmail = data.email.trim().toLowerCase();
+    const trimmedName = data.name.trim();
+
+    const existing = users.find(u => u.email.toLowerCase() === trimmedEmail);
+    if (existing) {
+      const msg = 'An account with this email already exists in the roster.';
+      showToast(msg, 'error');
+      throw new Error(msg);
+    }
+
+    const defaultPwd = data.password || 'password123';
+    let newLearner: User = {
+      id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+      name: trimmedName,
+      email: trimmedEmail,
+      password: defaultPwd,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(trimmedName)}`,
+      role: 'student',
+      status: 'active',
+      points: 0,
+      xp: 0,
+      streakDays: 0,
+      level: 1,
+      enrolledCourseIds: [],
+      completedCourseIds: [],
+      badges: [],
+      discountVouchers: [],
+      weeklyHours: [0, 0, 0, 0, 0, 0, 0],
+      totalLearningHours: 0,
+      quizAverage: 0,
+      completedLessonsCount: 0,
+      reelsWatchedTotal: 0,
+      assignmentsCompletedCount: 0,
+      registeredAt: new Date().toISOString(),
+      lastActive: new Date().toISOString(),
+      recentActivity: [
+        {
+          id: `act-${Date.now()}`,
+          type: 'login',
+          title: 'Account Provisioned by Admin',
+          description: 'Enrolled into learner directory.',
+          timestamp: 'Just now'
+        }
+      ]
+    };
+
+    try {
+      const res = await api.register({
+        name: trimmedName,
+        email: trimmedEmail,
+        password: defaultPwd
+      });
+      if (res && res.success && res.user) {
+        newLearner = { ...res.user, password: defaultPwd };
+      }
+    } catch {
+      // Backend offline fallback
+    }
+
+    setUsers(prev => {
+      const filtered = prev.filter(u => u.email.toLowerCase() !== trimmedEmail);
+      const updated = [newLearner, ...filtered];
+      localStorage.setItem('lms_users_v7', JSON.stringify(updated));
+      return updated;
+    });
+
+    window.dispatchEvent(new CustomEvent('lms:users_updated'));
+    showToast(`Learner account for ${trimmedName} successfully created.`, 'success');
+    return newLearner;
   };
 
   const authMentorApply = async (data: {
@@ -829,10 +999,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ]
     };
 
-    setUsers(prev => [newUser, ...prev]);
+    setUsers(prev => {
+      const filtered = prev.filter(u => u.email.toLowerCase() !== trimmedEmail);
+      const updated = [newUser, ...filtered];
+      localStorage.setItem('lms_users_v7', JSON.stringify(updated));
+      return updated;
+    });
     setCurrentUserId(newUser.id);
     setIsAuthenticated(true);
     closeAuthModal();
+    window.dispatchEvent(new CustomEvent('lms:users_updated'));
     showToast(`Welcome, ${data.name}! Your Learner account is ready.`, 'success');
     return { success: true };
   };
@@ -845,6 +1021,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsViewAsLearner(false);
       setIsViewAsMentor(false);
       showToast(`Switched to ${matching.name} (${clean})`, 'success');
+      syncUsersWithBackend();
     }
   };
 
@@ -2026,6 +2203,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         loginAsRole,
         logoutUser,
         registerUser,
+        registerLearnerByAdmin,
+        refreshUsers,
         switchUserRole,
         updateUserProfile,
         hasRole,
