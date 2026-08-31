@@ -1,6 +1,6 @@
 export type UserRole = 'student' | 'mentor' | 'admin' | 'learner' | 'seller' | 'ROLE_ADMIN' | 'ROLE_MENTOR' | 'ROLE_LEARNER';
 
-export type UserStatus = 'active' | 'inactive';
+export type UserStatus = 'active' | 'inactive' | 'pending' | 'suspended';
 
 export interface UserActivity {
   id: string;
@@ -134,6 +134,10 @@ export interface Reel {
   courseTitle?: string;
   videoUrl: string;
   thumbnailUrl: string;
+  source?: 'youtube' | 'instagram' | 'direct';
+  platformEmbedId?: string;
+  externalUrl?: string;
+  channelName?: string;
   creatorId: string;
   creatorName: string;
   creatorAvatar?: string;
@@ -182,14 +186,20 @@ export interface CourseModule {
 
 export interface Quiz {
   id: string;
-  courseId: string;
+  courseId?: string;
   courseTitle?: string;
-  moduleId: string;
+  moduleId?: string;
   moduleTitle?: string;
   title: string;
+  description?: string;
+  category?: string;
+  company?: string;
+  targetRole?: string;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  durationMinutes?: number;
   totalMarks: number;
   passingPercentage: number;
+  rewardXp?: number;
   questions: Question[];
   createdAt?: string;
 }
@@ -271,6 +281,9 @@ export interface CourseReel {
   durationSeconds: number;
   videoUrl: string;
   thumbnailUrl: string;
+  source?: 'youtube' | 'instagram' | 'direct';
+  platformEmbedId?: string;
+  externalUrl?: string;
   likesCount?: number;
   isLiked?: boolean;
   isBookmarked?: boolean;
@@ -283,6 +296,9 @@ export interface Course {
   subtitle: string;
   description: string;
   category: string;
+  platform?: 'youtube' | 'udemy' | 'coursera' | 'edx' | 'lms';
+  platformUrl?: string;
+  certificateIncluded?: boolean;
   price: number;
   discountedPrice?: number;
   instructorId: string;

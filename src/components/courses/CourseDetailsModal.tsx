@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Course, CourseReel, Assignment } from '../../types';
+import { Course, CourseReel, Assignment, Quiz } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { CourseAssignmentModal } from './CourseAssignmentModal';
+import { CourseQuizModal } from './CourseQuizModal';
 import {
   BookOpen,
   PlayCircle,
@@ -24,7 +25,12 @@ import {
   FileCheck2,
   Lock,
   Unlock,
-  ArrowRight
+  ArrowRight,
+  HelpCircle,
+  Zap,
+  RotateCcw,
+  Youtube,
+  ExternalLink
 } from 'lucide-react';
 
 interface CourseDetailsModalProps {
@@ -44,6 +50,7 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
     markCourseReelCompleted,
     isCourseReelCompleted,
     assignments,
+    quizzes,
     showToast
   } = useApp();
 
@@ -52,8 +59,9 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
   const [discountPercent, setDiscountPercent] = useState(0);
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
 
-  // Assignment Modal State
+  // Quiz & Assignment Modal State
   const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
 
   // Feedback State
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
@@ -183,21 +191,64 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
+          {/* Platform Banner & Launch Header */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center shadow-xs shrink-0">
+                {course.platform === 'youtube' ? <Youtube size={20} className="fill-white" /> : course.platform === 'udemy' ? 'U' : course.platform === 'coursera' ? 'C' : course.platform === 'edx' ? 'e' : <ShieldCheck size={20} />}
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-slate-900 dark:text-white capitalize">
+                    {course.platform === 'youtube' ? 'YouTube Masterclass' : course.platform === 'udemy' ? 'Udemy Bestseller' : course.platform === 'coursera' ? 'Coursera Specialization' : course.platform === 'edx' ? 'edX Verified' : 'Verified LMS Masterclass'}
+                  </span>
+                  <span className="text-[10px] px-2 py-0.2 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-bold">
+                    {course.category}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {course.instructorName} • {course.durationHours || 10} Hours • {course.level} Level
+                </p>
+              </div>
+            </div>
+
+            {course.platformUrl && (
+              <a
+                href={course.platformUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer"
+              >
+                <span>Open on {course.platform ? course.platform.toUpperCase() : 'Platform'}</span>
+                <ExternalLink size={13} />
+              </a>
+            )}
+          </div>
+
           {/* Main Grid: Player on left, 5 Reels list on right */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             {/* Player Container (Left: 7 cols) */}
             <div className="md:col-span-7 space-y-3">
-              <div className="relative rounded-2xl overflow-hidden bg-slate-950 aspect-[9/14] max-h-[420px] mx-auto border border-slate-200 shadow-md flex items-center justify-center">
-                <video
-                  key={activeReel.id}
-                  src={activeReel.videoUrl}
-                  controls
-                  className="w-full h-full object-contain"
-                  poster={activeReel.thumbnailUrl || course.thumbnailUrl}
-                />
-                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-[11px] font-bold text-white flex items-center gap-1.5 border border-white/10 shadow-xs">
+              <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-md">
+                {course.platform === 'youtube' && course.platformUrl ? (
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${course.platformUrl.includes('v=') ? course.platformUrl.split('v=')[1]?.split('&')[0] : '8mAITcNt710'}?autoplay=0&controls=1&rel=0&modestbranding=1`}
+                    title={course.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                ) : (
+                  <video
+                    src={activeReel.videoUrl}
+                    controls
+                    className="w-full h-full object-contain"
+                    poster={activeReel.thumbnailUrl || course.thumbnailUrl}
+                  />
+                )}
+                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-[11px] font-bold text-white flex items-center gap-1.5 border border-white/10 shadow-xs pointer-events-none">
                   <PlaySquare size={13} className="text-blue-400" />
-                  <span>Reel {activeReelIndex + 1} of 5: {activeReel.title}</span>
+                  <span>Curriculum: {activeReel.title}</span>
                 </div>
               </div>
 
@@ -368,6 +419,260 @@ export const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, 
                 </button>
               </div>
             )}
+
+            {/* Course Completion Banner */}
+            {(() => {
+              const completedReelsForCourse = completedCourseReels[course.id] || [];
+              const completedReelsCount = completedReelsForCourse.length;
+              const isCourseFinished = completedReelsCount >= 5;
+
+              if (!isCourseFinished) return null;
+
+              return (
+                <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg space-y-3 animate-in fade-in">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl shrink-0 shadow-inner">
+                        🎓
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-400 text-slate-950 font-black text-[10px] uppercase tracking-wider">
+                            Course Completed ✓
+                          </span>
+                          <span className="text-xs text-blue-100 font-semibold">5 of 5 Reels Watched</span>
+                        </div>
+                        <h2 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                          You are ready to take the Course Quiz & Capstone!
+                        </h2>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => setIsQuizModalOpen(true)}
+                        className="px-4 py-2 rounded-xl bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <HelpCircle size={15} className="text-blue-600" />
+                        <span>Attend Course Quiz (5 Qs)</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Course Quiz Section */}
+            {(() => {
+              const defaultQuiz: Quiz = {
+                id: `quiz-${course.id}`,
+                courseId: course.id,
+                courseTitle: course.title,
+                moduleId: 'mod-1',
+                moduleTitle: 'Module 1: Comprehensive Mastery',
+                title: `${course.title} - Mastery Assessment Quiz`,
+                difficulty: course.level === 'Advanced' ? 'Advanced' : 'Intermediate',
+                totalMarks: 50,
+                passingPercentage: 80,
+                createdAt: '2026-08-25T00:00:00Z',
+                questions: [
+                  {
+                    id: `q-${course.id}-1`,
+                    category: course.category,
+                    type: 'mcq',
+                    prompt: `What core architectural paradigm is demonstrated across the 5 reels of ${course.title}?`,
+                    options: [
+                      'Monolithic procedural single-threaded execution',
+                      'High-throughput scalable architecture with structured patterns and memory optimization',
+                      'Unvalidated synchronous blocking client queries',
+                      'Direct hardware assembly mapping'
+                    ],
+                    correctIndex: 1,
+                    explanation: `The course emphasizes production-grade architecture, resilience patterns, and optimal memory management for ${course.category}.`,
+                    marks: 10
+                  },
+                  {
+                    id: `q-${course.id}-2`,
+                    category: course.category,
+                    type: 'true_false',
+                    prompt: `Mastering the 5 vertical reels for ${course.title} provides end-to-end certification readiness for technical interviews.`,
+                    options: ['True', 'False'],
+                    correctIndex: 0,
+                    explanation: 'True! The 5-reel micro-learning syllabus covers fundamentals, deep dive, advanced patterns, and production telemetry.',
+                    marks: 10
+                  },
+                  {
+                    id: `q-${course.id}-3`,
+                    category: course.category,
+                    type: 'mcq',
+                    prompt: `Which optimization technique was covered in Reel 4 for ${course.title}?`,
+                    options: [
+                      'Disabling caching completely',
+                      'Performance profiling, memory leak elimination, and latency reduction',
+                      'Deleting all database indexes',
+                      'Hardcoding credentials into source files'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Reel 4 focuses on performance tuning, profiling bottlenecks, and optimizing resource utilization.',
+                    marks: 10
+                  },
+                  {
+                    id: `q-${course.id}-4`,
+                    category: course.category,
+                    type: 'true_false',
+                    prompt: `Scoring ≥ 80% on this course quiz awards +150 XP and certifies verified mastery in ${course.category}.`,
+                    options: ['True', 'False'],
+                    correctIndex: 0,
+                    explanation: 'True! Achieving 80% passes the mastery criteria.',
+                    marks: 10
+                  },
+                  {
+                    id: `q-${course.id}-5`,
+                    category: course.category,
+                    type: 'mcq',
+                    prompt: `What is the primary production takeaway from Reel 5 of ${course.title}?`,
+                    options: [
+                      'Deploying without monitoring or alerts',
+                      'Production telemetry, error resiliency, and architectural best practices',
+                      'Skipping unit and integration test validation',
+                      'Running untyped scripts in staging'
+                    ],
+                    correctIndex: 1,
+                    explanation: 'Production readiness requires comprehensive observability, structured exception handlers, and deployment safety.',
+                    marks: 10
+                  }
+                ]
+              };
+
+              const courseQuiz: Quiz = quizzes.find(q => q.courseId === course.id) || defaultQuiz;
+              const completedReelsForCourse = completedCourseReels[course.id] || [];
+              const completedReelsCount = completedReelsForCourse.length;
+              const isQuizUnlocked = completedReelsCount >= 5;
+
+              return (
+                <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 flex items-center justify-center shrink-0">
+                        <HelpCircle size={18} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                          Course Quiz (5 Questions)
+                        </span>
+                        <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">{courseQuiz.title}</h3>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      {isQuizUnlocked ? (
+                        <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold flex items-center gap-1">
+                          <Unlock size={13} /> Unlocked
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700 text-xs font-bold flex items-center gap-1">
+                          <Lock size={13} /> Locked ({completedReelsCount}/5 Reels)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Test your knowledge on the core architectural concepts covered across all 5 vertical reels of this masterclass. Pass with ≥ 80% to earn +150 XP and course certification.
+                  </p>
+
+                  {/* Quiz Reel Requirement Checklist */}
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2 text-xs">
+                    <div className="flex items-center justify-between font-bold text-slate-700 dark:text-slate-300">
+                      <span>Course Reel Completion Requirement:</span>
+                      <span className={isQuizUnlocked ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-600 dark:text-slate-400'}>
+                        {completedReelsCount} / 5 Reels Watched
+                      </span>
+                    </div>
+
+                    <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${
+                          isQuizUnlocked ? 'bg-emerald-500' : 'bg-blue-600'
+                        }`}
+                        style={{ width: `${Math.min(100, (completedReelsCount / 5) * 100)}%` }}
+                      />
+                    </div>
+
+                    <div className="text-[11px]">
+                      {isQuizUnlocked ? (
+                        <span className="text-emerald-700 dark:text-emerald-300 font-semibold flex items-center gap-1">
+                          <CheckCircle2 size={13} /> All 5 course reels completed! You are now eligible to take this quiz.
+                        </span>
+                      ) : (
+                        <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                          <Lock size={13} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                          <span>Watch all 5 required course reels in the curriculum above to unlock this quiz.</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Quiz Details Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Questions</span>
+                      <span className="text-xs font-bold text-slate-800 dark:text-white">{courseQuiz.questions?.length || 5} Qs</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Passing Score</span>
+                      <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">80% (4/5)</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Total Marks</span>
+                      <span className="text-xs font-bold text-slate-800 dark:text-white">{courseQuiz.totalMarks || 50} pts</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Reward</span>
+                      <span className="text-xs font-bold text-purple-700 dark:text-purple-300">+150 XP</span>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      {isQuizUnlocked
+                        ? '✨ Ready to attempt — 2-minute timed assessment'
+                        : `Complete all 5 course reels to unlock this quiz (${completedReelsCount}/5 completed)`}
+                    </div>
+
+                    {isQuizUnlocked ? (
+                      <button
+                        onClick={() => setIsQuizModalOpen(true)}
+                        className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <Zap size={14} />
+                        <span>Take Course Quiz</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 font-bold text-xs border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5 cursor-not-allowed"
+                        title="Watch all 5 course reels to unlock this quiz"
+                      >
+                        <Lock size={13} />
+                        <span>Complete 5/5 Reels to Unlock Quiz</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Course Quiz Modal */}
+                  <CourseQuizModal
+                    quiz={courseQuiz}
+                    course={course}
+                    isOpen={isQuizModalOpen}
+                    onClose={() => setIsQuizModalOpen(false)}
+                  />
+                </div>
+              );
+            })()}
 
             {/* Course Assignment Section */}
             {(() => {

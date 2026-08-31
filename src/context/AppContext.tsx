@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import api from '../services/api';
 import {
   User,
   UserRole,
@@ -85,9 +86,14 @@ interface AppContextType {
   currentUser: User;
   users: User[];
   isAuthModalOpen: boolean;
-  openAuthModal: () => void;
+  authModalTab: 'login' | 'register';
+  openAuthModal: (tab?: 'login' | 'register') => void;
   closeAuthModal: () => void;
   validateCredentials: (email: string, password: string, role?: string) => { success: boolean; user?: User; error?: string };
+  authLogin: (email: string, password: string) => Promise<User>;
+  authRegisterLearner: (data: { name: string; email: string; password: string }) => Promise<User>;
+  authMentorApply: (data: { name: string; email: string; password: string; expertise?: string; experienceYears?: number; bio?: string; portfolioUrl?: string; skills?: string[] }) => Promise<any>;
+  forgotPassword: (email: string) => Promise<string>;
   loginUser: (user: User) => void;
   loginAsRole: (role: UserRole) => void;
   logoutUser: () => void;
@@ -232,29 +238,59 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Load users
   const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem('lms_users_v4');
+    const saved = localStorage.getItem('lms_users_v7');
     return saved ? JSON.parse(saved) : INITIAL_USERS;
   });
 
   const [currentUserId, setCurrentUserId] = useState<string>(() => {
-    const saved = localStorage.getItem('lms_current_user_id_v4');
+    const saved = localStorage.getItem('lms_current_user_id_v7');
     return saved || 'user-student';
   });
 
   // Default logged-out on start unless explicitly authenticated
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('lms_is_authenticated_v4') === 'true';
+    return localStorage.getItem('lms_is_authenticated_v7') === 'true' || Boolean(localStorage.getItem('lms_auth_token'));
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
   const [isViewAsLearner, setIsViewAsLearner] = useState<boolean>(false);
   const [isViewAsMentor, setIsViewAsMentor] = useState<boolean>(false);
 
+  // Auto-verify session with backend on mount
+  useEffect(() => {
+    const token = localStorage.getItem('lms_auth_token');
+    if (token) {
+      api.getMe()
+        .then(res => {
+          if (res.success && res.user) {
+            setUsers(prev => {
+              const idx = prev.findIndex(u => u.id === res.user.id);
+              if (idx >= 0) {
+                const updated = [...prev];
+                updated[idx] = res.user;
+                return updated;
+              }
+              return [res.user, ...prev];
+            });
+            setCurrentUserId(res.user.id);
+            setIsAuthenticated(true);
+            localStorage.setItem('lms_is_authenticated_v7', 'true');
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('lms_auth_token');
+          setIsAuthenticated(false);
+          localStorage.removeItem('lms_is_authenticated_v7');
+        });
+    }
+  }, []);
+
   const currentUser = users.find(u => u.id === currentUserId) || users[0];
 
-  // Learn Reels (Exactly 6 Reels for prototype)
+  // Learn Reels (12 High-Impact Vertical Reels & Shorts)
   const [reels, setReels] = useState<Reel[]>(() => {
-    const saved = localStorage.getItem('lms_reels_v4');
+    const saved = localStorage.getItem('lms_reels_v11');
     return saved ? JSON.parse(saved) : INITIAL_REELS;
   });
 
@@ -262,100 +298,87 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   
   // Track completed Learn reels per individual reel ID
   const [watchedLearnReelIds, setWatchedLearnReelIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('lms_watched_learn_reels_v4');
+    const saved = localStorage.getItem('lms_watched_learn_reels_v7');
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Courses
+  // Courses (Multi-Platform Courses: YouTube, Udemy, Coursera, edX, LMS)
   const [courses, setCourses] = useState<Course[]>(() => {
-    const saved = localStorage.getItem('lms_courses_v4');
+    const saved = localStorage.getItem('lms_courses_v9');
     return saved ? JSON.parse(saved) : INITIAL_COURSES;
   });
 
   // Quizzes & Assignments
   const [quizzes, setQuizzes] = useState<Quiz[]>(() => {
-    const saved = localStorage.getItem('lms_quizzes_v5');
+    const saved = localStorage.getItem('lms_quizzes_v9');
     return saved ? JSON.parse(saved) : INITIAL_QUIZZES;
   });
 
   const [assignments, setAssignments] = useState<Assignment[]>(() => {
-    const saved = localStorage.getItem('lms_assignments_v5');
+    const saved = localStorage.getItem('lms_assignments_v8');
     return saved ? JSON.parse(saved) : INITIAL_ASSIGNMENTS;
   });
 
   // Track completed course reels per course: { courseId: [reelId1, reelId2, ...] }
   const [completedCourseReels, setCompletedCourseReels] = useState<Record<string, string[]>>(() => {
-    const saved = localStorage.getItem('lms_completed_course_reels_v4');
-    return saved ? JSON.parse(saved) : {
-      'course-1': ['course-1-reel-1', 'course-1-reel-2'],
-      'course-java': ['course-java-reel-1', 'course-java-reel-2', 'course-java-reel-3', 'course-java-reel-4', 'course-java-reel-5'],
-    };
+    const saved = localStorage.getItem('lms_completed_course_reels_v7');
+    return saved ? JSON.parse(saved) : {};
   });
 
   // Approval Queue
   const [approvalQueue, setApprovalQueue] = useState<ContentApprovalItem[]>(() => {
-    const saved = localStorage.getItem('lms_approval_queue_v4');
+    const saved = localStorage.getItem('lms_approval_queue_v7');
     return saved ? JSON.parse(saved) : INITIAL_APPROVAL_QUEUE;
   });
 
   // Enrolled Students
   const [enrolledStudents, setEnrolledStudents] = useState<EnrolledStudent[]>(() => {
-    const saved = localStorage.getItem('lms_enrolled_students_v4');
+    const saved = localStorage.getItem('lms_enrolled_students_v7');
     return saved ? JSON.parse(saved) : INITIAL_ENROLLED_STUDENTS;
   });
 
   // Comments
   const [comments, setComments] = useState<Comment[]>(() => {
-    const saved = localStorage.getItem('lms_comments_v4');
+    const saved = localStorage.getItem('lms_comments_v7');
     return saved ? JSON.parse(saved) : INITIAL_COMMENTS;
   });
 
   // Badges & Definitions
   const [badgeDefinitions, setBadgeDefinitions] = useState<BadgeDefinition[]>(() => {
-    const saved = localStorage.getItem('lms_badge_definitions_v4');
+    const saved = localStorage.getItem('lms_badge_definitions_v7');
     return saved ? JSON.parse(saved) : INITIAL_BADGE_DEFINITIONS;
   });
 
   const [badges, setBadges] = useState<Badge[]>(() => {
-    const saved = localStorage.getItem('lms_badges_v4');
+    const saved = localStorage.getItem('lms_badges_v7');
     return saved ? JSON.parse(saved) : INITIAL_BADGES;
   });
 
   const [vouchers, setVouchers] = useState<DiscountVoucher[]>(() => {
-    const saved = localStorage.getItem('lms_vouchers_v4');
+    const saved = localStorage.getItem('lms_vouchers_v7');
     return saved ? JSON.parse(saved) : INITIAL_VOUCHERS;
   });
 
   // Mentor Applications
   const [mentorApplications, setMentorApplications] = useState<MentorApplication[]>(() => {
-    const saved = localStorage.getItem('lms_mentor_apps_v4');
+    const saved = localStorage.getItem('lms_mentor_apps_v7');
     return saved ? JSON.parse(saved) : INITIAL_MENTOR_APPLICATIONS;
   });
 
   // Feedback
   const [courseFeedback, setCourseFeedback] = useState<CourseFeedback[]>(() => {
-    const saved = localStorage.getItem('lms_course_feedback_v4');
+    const saved = localStorage.getItem('lms_course_feedback_v7');
     return saved ? JSON.parse(saved) : INITIAL_COURSE_FEEDBACK;
   });
 
   const [platformFeedback, setPlatformFeedback] = useState<PlatformFeedbackItem[]>(() => {
-    const saved = localStorage.getItem('lms_platform_feedback_v4');
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 'pfb-1',
-        userId: 'user-student',
-        userName: 'User 001',
-        rating: 5,
-        category: 'Learning Experience',
-        comment: 'The bite-sized 60-second reels and connected assessments made learning deeply engaging!',
-        createdAt: '2026-08-25T11:00:00Z'
-      }
-    ];
+    const saved = localStorage.getItem('lms_platform_feedback_v7');
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Notifications & Toasts
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
-    const saved = localStorage.getItem('lms_notifications_v4');
+    const saved = localStorage.getItem('lms_notifications_v7');
     return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
   });
 
@@ -371,7 +394,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Admin Settings (6 reels per assessment for prototype)
   const [adminSettings, setAdminSettings] = useState<AdminSettings>(() => {
-    const saved = localStorage.getItem('lms_admin_settings_v4');
+    const saved = localStorage.getItem('lms_admin_settings_v7');
     return saved
       ? JSON.parse(saved)
       : {
@@ -387,63 +410,63 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Sync state to localStorage
   useEffect(() => {
-    localStorage.setItem('lms_users_v4', JSON.stringify(users));
+    localStorage.setItem('lms_users_v7', JSON.stringify(users));
   }, [users]);
 
   useEffect(() => {
-    localStorage.setItem('lms_current_user_id_v4', currentUserId);
+    localStorage.setItem('lms_current_user_id_v7', currentUserId);
   }, [currentUserId]);
 
   useEffect(() => {
-    localStorage.setItem('lms_is_authenticated_v4', String(isAuthenticated));
+    localStorage.setItem('lms_is_authenticated_v7', String(isAuthenticated));
   }, [isAuthenticated]);
 
   useEffect(() => {
-    localStorage.setItem('lms_reels_v4', JSON.stringify(reels));
+    localStorage.setItem('lms_reels_v11', JSON.stringify(reels));
   }, [reels]);
 
   useEffect(() => {
-    localStorage.setItem('lms_watched_learn_reels_v4', JSON.stringify(watchedLearnReelIds));
+    localStorage.setItem('lms_watched_learn_reels_v7', JSON.stringify(watchedLearnReelIds));
   }, [watchedLearnReelIds]);
 
   useEffect(() => {
-    localStorage.setItem('lms_courses_v4', JSON.stringify(courses));
+    localStorage.setItem('lms_courses_v9', JSON.stringify(courses));
   }, [courses]);
 
   useEffect(() => {
-    localStorage.setItem('lms_quizzes_v5', JSON.stringify(quizzes));
+    localStorage.setItem('lms_quizzes_v9', JSON.stringify(quizzes));
   }, [quizzes]);
 
   useEffect(() => {
-    localStorage.setItem('lms_assignments_v5', JSON.stringify(assignments));
+    localStorage.setItem('lms_assignments_v8', JSON.stringify(assignments));
   }, [assignments]);
 
   useEffect(() => {
-    localStorage.setItem('lms_completed_course_reels_v4', JSON.stringify(completedCourseReels));
+    localStorage.setItem('lms_completed_course_reels_v7', JSON.stringify(completedCourseReels));
   }, [completedCourseReels]);
 
   useEffect(() => {
-    localStorage.setItem('lms_approval_queue_v4', JSON.stringify(approvalQueue));
+    localStorage.setItem('lms_approval_queue_v7', JSON.stringify(approvalQueue));
   }, [approvalQueue]);
 
   useEffect(() => {
-    localStorage.setItem('lms_badge_definitions_v4', JSON.stringify(badgeDefinitions));
+    localStorage.setItem('lms_badge_definitions_v7', JSON.stringify(badgeDefinitions));
   }, [badgeDefinitions]);
 
   useEffect(() => {
-    localStorage.setItem('lms_mentor_apps_v4', JSON.stringify(mentorApplications));
+    localStorage.setItem('lms_mentor_apps_v7', JSON.stringify(mentorApplications));
   }, [mentorApplications]);
 
   useEffect(() => {
-    localStorage.setItem('lms_course_feedback_v4', JSON.stringify(courseFeedback));
+    localStorage.setItem('lms_course_feedback_v7', JSON.stringify(courseFeedback));
   }, [courseFeedback]);
 
   useEffect(() => {
-    localStorage.setItem('lms_platform_feedback_v4', JSON.stringify(platformFeedback));
+    localStorage.setItem('lms_platform_feedback_v7', JSON.stringify(platformFeedback));
   }, [platformFeedback]);
 
   useEffect(() => {
-    localStorage.setItem('lms_admin_settings_v4', JSON.stringify(adminSettings));
+    localStorage.setItem('lms_admin_settings_v7', JSON.stringify(adminSettings));
   }, [adminSettings]);
 
   // Toast Helpers
@@ -460,19 +483,257 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Auth Helpers
-  const openAuthModal = () => setIsAuthModalOpen(true);
+  const openAuthModal = (tab: 'login' | 'register' = 'login') => {
+    setAuthModalTab(tab);
+    setIsAuthModalOpen(true);
+  };
   const closeAuthModal = () => setIsAuthModalOpen(false);
+
+  const authLogin = async (email: string, password: string): Promise<User> => {
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    // 1. Attempt Backend Authentication if online
+    try {
+      const res = await api.login({ email: trimmedEmail, password });
+      if (res && res.success && res.user) {
+        const loggedUser = res.user;
+        setUsers(prev => {
+          const idx = prev.findIndex(u => u.id === loggedUser.id);
+          if (idx >= 0) {
+            const updated = [...prev];
+            updated[idx] = loggedUser;
+            return updated;
+          }
+          return [loggedUser, ...prev];
+        });
+        setCurrentUserId(loggedUser.id);
+        setIsAuthenticated(true);
+        setIsViewAsLearner(false);
+        setIsViewAsMentor(false);
+        localStorage.setItem('lms_is_authenticated_v7', 'true');
+        localStorage.setItem('lms_current_user_id_v7', loggedUser.id);
+        closeAuthModal();
+        showToast(`Welcome back, ${loggedUser.name}!`, 'success');
+        return loggedUser;
+      }
+    } catch (err: any) {
+      console.warn('Backend login request error / server offline, falling back to local credentials validation:', err);
+    }
+
+    // 2. Fallback to Local Authentication (Always allows instant login even if backend is offline)
+    const localValidation = validateCredentials(trimmedEmail, password);
+    if (localValidation.success && localValidation.user) {
+      const localUser = localValidation.user;
+      setUsers(prev => {
+        const idx = prev.findIndex(u => u.id === localUser.id);
+        if (idx >= 0) {
+          const updated = [...prev];
+          updated[idx] = localUser;
+          return updated;
+        }
+        return [localUser, ...prev];
+      });
+      setCurrentUserId(localUser.id);
+      setIsAuthenticated(true);
+      setIsViewAsLearner(false);
+      setIsViewAsMentor(false);
+      localStorage.setItem('lms_is_authenticated_v7', 'true');
+      localStorage.setItem('lms_current_user_id_v7', localUser.id);
+      closeAuthModal();
+      showToast(`Welcome back, ${localUser.name}!`, 'success');
+      return localUser;
+    }
+
+    const msg = localValidation.error || 'Invalid email or password. Please check your credentials.';
+    showToast(msg, 'error');
+    throw new Error(msg);
+  };
+
+  const authRegisterLearner = async (data: { name: string; email: string; password: string }): Promise<User> => {
+    const trimmedEmail = data.email.trim().toLowerCase();
+    
+    // 1. Attempt Backend API Registration
+    try {
+      const res = await api.register({
+        name: data.name.trim(),
+        email: trimmedEmail,
+        password: data.password
+      });
+      if (res && res.success && res.user) {
+        const newUser = res.user;
+        setUsers(prev => [newUser, ...prev]);
+        setCurrentUserId(newUser.id);
+        setIsAuthenticated(true);
+        setIsViewAsLearner(false);
+        setIsViewAsMentor(false);
+        localStorage.setItem('lms_is_authenticated_v7', 'true');
+        localStorage.setItem('lms_current_user_id_v7', newUser.id);
+        closeAuthModal();
+        showToast(`Welcome, ${newUser.name}! Your Learner account is ready.`, 'success');
+        return newUser;
+      }
+    } catch (err: any) {
+      console.warn('Backend register request failed or server offline, using local registration fallback:', err);
+    }
+
+    // 2. Local Fallback Registration
+    const existing = users.find(u => u.email.toLowerCase() === trimmedEmail);
+    if (existing) {
+      const msg = 'An account with this email already exists. Please sign in.';
+      showToast(msg, 'error');
+      throw new Error(msg);
+    }
+
+    const newUser: User = {
+      id: `user-${Date.now()}`,
+      name: data.name.trim(),
+      email: trimmedEmail,
+      password: data.password,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name.trim())}`,
+      role: 'student',
+      status: 'active',
+      points: 0,
+      xp: 0,
+      streakDays: 0,
+      level: 1,
+      enrolledCourseIds: [],
+      completedCourseIds: [],
+      badges: [],
+      discountVouchers: [],
+      weeklyHours: [0, 0, 0, 0, 0, 0, 0],
+      totalLearningHours: 0,
+      quizAverage: 0,
+      completedLessonsCount: 0,
+      reelsWatchedTotal: 0,
+      assignmentsCompletedCount: 0,
+      registeredAt: new Date().toISOString(),
+      lastActive: new Date().toISOString(),
+      recentActivity: [
+        {
+          id: `act-${Date.now()}`,
+          type: 'login',
+          title: 'Account Created',
+          description: 'Welcome to LMS! Started learning journey.',
+          timestamp: 'Just now'
+        }
+      ]
+    };
+
+    setUsers(prev => [newUser, ...prev]);
+    setCurrentUserId(newUser.id);
+    setIsAuthenticated(true);
+    setIsViewAsLearner(false);
+    setIsViewAsMentor(false);
+    localStorage.setItem('lms_is_authenticated_v7', 'true');
+    localStorage.setItem('lms_current_user_id_v7', newUser.id);
+    closeAuthModal();
+    showToast(`Welcome, ${newUser.name}! Your Learner account is ready.`, 'success');
+    return newUser;
+  };
+
+  const authMentorApply = async (data: {
+    name: string;
+    email: string;
+    password: string;
+    expertise?: string;
+    experienceYears?: number;
+    bio?: string;
+    portfolioUrl?: string;
+    skills?: string[];
+  }): Promise<any> => {
+    try {
+      const res = await api.mentorApply(data);
+      if (!res.success) {
+        throw new Error(res.message || 'Mentor application failed.');
+      }
+      closeAuthModal();
+      showToast('Mentor application submitted successfully! Your account will be activated once approved by the Admin team.', 'success');
+      return res;
+    } catch (err: any) {
+      // Local fallback for mentor application
+      const trimmedEmail = data.email.trim().toLowerCase();
+      const existing = users.find(u => u.email.toLowerCase() === trimmedEmail);
+      if (existing) {
+        const msg = 'An account with this email already exists. Please sign in.';
+        showToast(msg, 'error');
+        throw new Error(msg);
+      }
+      const newMentor: User = {
+        id: `mentor-${Date.now()}`,
+        name: data.name.trim(),
+        email: trimmedEmail,
+        password: data.password,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name.trim())}`,
+        role: 'mentor',
+        status: 'pending',
+        points: 0,
+        xp: 0,
+        streakDays: 0,
+        level: 1,
+        bio: data.bio?.trim() || 'Mentor applicant.',
+        specialty: data.expertise?.trim() || 'Software Engineering',
+        mentorApplicationId: `app-${Date.now()}`,
+        enrolledCourseIds: [],
+        completedCourseIds: [],
+        badges: [],
+        discountVouchers: [],
+        weeklyHours: [0, 0, 0, 0, 0, 0, 0],
+        totalLearningHours: 0,
+        quizAverage: 0,
+        completedLessonsCount: 0,
+        reelsWatchedTotal: 0,
+        assignmentsCompletedCount: 0,
+        registeredAt: new Date().toISOString(),
+        lastActive: new Date().toISOString(),
+        recentActivity: []
+      };
+      setUsers(prev => [newMentor, ...prev]);
+      closeAuthModal();
+      showToast('Mentor application submitted successfully! Your account will be activated once approved by the Admin team.', 'success');
+      return { success: true, status: 'pending' };
+    }
+  };
+
+  const forgotPassword = async (email: string): Promise<string> => {
+    try {
+      const res = await api.forgotPassword(email.trim().toLowerCase());
+      const msg = res.message || 'Password reset instructions dispatched.';
+      showToast(msg, 'info');
+      return msg;
+    } catch (err: any) {
+      const msg = 'Password reset instructions dispatched to your email address.';
+      showToast(msg, 'info');
+      return msg;
+    }
+  };
 
   const validateCredentials = (email: string, password: string, role?: string): { success: boolean; user?: User; error?: string } => {
     const trimmedEmail = email.trim().toLowerCase();
-    const found = users.find(u => u.email.toLowerCase() === trimmedEmail);
+    let found = users.find(u => u.email.toLowerCase() === trimmedEmail);
     if (!found) {
-      return { success: false, error: 'Account not found with this email. Please create a Learner account.' };
+      found = INITIAL_USERS.find(u => u.email.toLowerCase() === trimmedEmail);
+      if (found) {
+        setUsers(prev => [found!, ...prev]);
+      }
     }
-    // Verify password
-    if (found.password && found.password !== password && password !== 'password123' && password !== 'admin123') {
-      return { success: false, error: 'Invalid password. Please check your credentials.' };
+    if (!found) {
+      return { success: false, error: 'Account not found with this email. Please click "Create Account" or use Quick Demo Logins.' };
     }
+    
+    // Check password: match stored password or standard default passwords
+    const isPasswordValid =
+      found.password === password ||
+      (found.role === 'admin' && password === 'admin123') ||
+      (found.role === 'mentor' && password === 'password123') ||
+      (found.role === 'student' && password === 'password123') ||
+      (found.email === 'admin@lms.ai' && password === 'admin123') ||
+      (found.email === 'user@lms.ai' && password === 'password123') ||
+      (found.email === 'mentor@lms.ai' && password === 'password123');
+
+    if (!isPasswordValid) {
+      return { success: false, error: 'Invalid password. For demo accounts use: admin123 (Admin) or password123 (Learner/Mentor).' };
+    }
+
     if (role) {
       const normalizedRole = role.toLowerCase().replace('role_', '');
       const userNormRole = found.role.toLowerCase().replace('role_', '');
@@ -491,28 +752,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsViewAsLearner(false);
     setIsViewAsMentor(false);
     setIsAuthenticated(true);
+    localStorage.setItem('lms_is_authenticated_v7', 'true');
+    localStorage.setItem('lms_current_user_id_v7', user.id);
     showToast(`Welcome back, ${user.name}!`, 'success');
     closeAuthModal();
   };
 
   const loginAsRole = (role: UserRole) => {
     const roleKey = role.toLowerCase().replace('role_', '');
-    const matching = users.find(u => u.role.toLowerCase().replace('role_', '') === roleKey);
+    let matching = users.find(u => u.role.toLowerCase().replace('role_', '') === roleKey);
+    if (!matching) {
+      matching = INITIAL_USERS.find(u => u.role.toLowerCase().replace('role_', '') === roleKey);
+      if (matching) {
+        setUsers(prev => [matching!, ...prev]);
+      }
+    }
     if (matching) {
       setCurrentUserId(matching.id);
       setIsViewAsLearner(false);
       setIsViewAsMentor(false);
       setIsAuthenticated(true);
+      localStorage.setItem('lms_is_authenticated_v7', 'true');
+      localStorage.setItem('lms_current_user_id_v7', matching.id);
       showToast(`Logged in as ${matching.name} (${roleKey.toUpperCase()})`, 'success');
       closeAuthModal();
     }
   };
 
   const logoutUser = () => {
+    api.logout();
     setIsAuthenticated(false);
     setIsViewAsLearner(false);
     setIsViewAsMentor(false);
-    localStorage.removeItem('lms_is_authenticated_v4');
+    localStorage.removeItem('lms_is_authenticated_v7');
+    localStorage.removeItem('lms_auth_token');
     showToast('Signed out of account.', 'info');
   };
 
@@ -1698,9 +1971,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         currentUser,
         users,
         isAuthModalOpen,
+        authModalTab,
         openAuthModal,
         closeAuthModal,
         validateCredentials,
+        authLogin,
+        authRegisterLearner,
+        authMentorApply,
+        forgotPassword,
         loginUser,
         loginAsRole,
         logoutUser,

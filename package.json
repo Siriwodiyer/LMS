@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "backend": "npm run dev --prefix backend",
+    "backend:node": "npm run dev --prefix backend",
+    "backend:py": "python backend_py/run.py",
+    "seed:py": "python -m backend_py.seed.seeder"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.3",

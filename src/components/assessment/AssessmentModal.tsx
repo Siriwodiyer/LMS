@@ -11,13 +11,10 @@ import {
   RotateCcw,
   Check,
   Zap,
-  Gift,
   Clock,
-  TrendingUp,
   X,
   UserCheck,
-  Copy,
-  BookOpen
+  ShieldCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -35,8 +32,6 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
     closeAssessment,
     getAssessmentQuestionsForUser,
     submitAssessmentAnswers,
-    latestAssessmentResult,
-    adminSettings,
     currentUser,
     isUserEligibleForMentor,
     showToast
@@ -101,18 +96,23 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
   };
 
   const handleSubmitQuiz = () => {
-    const result = submitAssessmentAnswers(selectedAnswers, questions);
+    if (questions.length === 0) return;
+
+    const result = submitAssessmentAnswers(selectedAnswers);
     setResultData(result);
     setShowResult(true);
 
-    // Trigger confetti if passed
     if (result.passed) {
-      confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#2563eb', '#38bdf8', '#10b981', '#f59e0b']
-      });
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } catch {}
+      showToast(`Assessment Passed! Score: ${result.scorePercentage}%`, 'success');
+    } else {
+      showToast(`Score: ${result.scorePercentage}%. Minimum required is 80%.`, 'error');
     }
   };
 
@@ -120,52 +120,57 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
   const eligibility = isUserEligibleForMentor(currentUser.id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in">
-      <div className="w-full max-w-xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs p-4 animate-in fade-in">
+      <div className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-slate-900 dark:text-slate-100 transition-colors">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center">
-              <Zap size={18} />
+            <div className="p-1.5 rounded-lg bg-blue-600 text-white shadow-2xs">
+              <Zap size={16} />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-slate-900">6-Reel Micro-Assessment</h3>
-              <p className="text-[11px] text-slate-500">Test concepts from the 6 Learn reels & unlock rewards</p>
+              <span className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400 block tracking-wider">
+                Automated Evaluation
+              </span>
+              <h1 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
+                6-Reel Micro-Assessment
+              </h1>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             {!showResult && (
-              <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-mono text-amber-600 font-bold shadow-xs">
-                <Clock size={13} />
-                <span>{timeLeft}s</span>
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-mono font-bold">
+                <Clock size={13} className={timeLeft < 20 ? 'text-rose-500 animate-pulse' : 'text-slate-400'} />
+                <span>{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span>
               </div>
             )}
-
             <button
               onClick={closeAssessment}
-              className="p-1.5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+              className="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
           </div>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-6 overflow-y-auto flex-1">
+        {/* Content Body */}
+        <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {!showResult ? (
-            /* ACTIVE QUIZ QUESTIONS (1 to 6) */
+            /* QUESTION SCREEN */
             <div className="space-y-6">
-              {/* Progress indicator */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+              {/* Question Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
                   <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
-                  <span className="text-blue-600 font-mono">{currentQ?.category}</span>
+                  <span className="text-blue-600 dark:text-blue-400">
+                    {Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%
+                  </span>
                 </div>
-                <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-blue-600 transition-all duration-200"
-                    style={{ width: `${((currentQuestionIndex + 1) / (questions.length || 1)) * 100}%` }}
+                    className="h-full bg-blue-600 dark:bg-blue-500 transition-all duration-300"
+                    style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                   />
                 </div>
               </div>
@@ -173,31 +178,40 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
               {/* Question Card */}
               {currentQ && (
                 <div className="space-y-4">
-                  <h4 className="text-base font-bold text-slate-900 leading-snug">
-                    {currentQ.prompt}
-                  </h4>
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-relaxed">
+                      {currentQ.prompt}
+                    </h3>
+                  </div>
 
+                  {/* Options */}
                   <div className="space-y-2.5">
-                    {currentQ.options.map((opt, idx) => {
+                    {currentQ.options.map((option, idx) => {
                       const isSelected = selectedAnswers[currentQ.id] === idx;
                       return (
                         <button
                           key={idx}
+                          type="button"
                           onClick={() => handleSelectOption(idx)}
-                          className={`w-full text-left p-3.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-between gap-3 cursor-pointer ${
+                          className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between gap-3 cursor-pointer ${
                             isSelected
-                              ? 'bg-blue-50 border-blue-500 text-blue-900 shadow-xs'
-                              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                              ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-600 dark:border-blue-500 text-blue-900 dark:text-blue-200 shadow-xs'
+                              : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <span>{opt}</span>
-                          <div
-                            className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                              isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300'
-                            }`}
-                          >
-                            {isSelected && <Check size={12} />}
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-6 h-6 rounded-full font-bold text-xs flex items-center justify-center shrink-0 ${
+                                isSelected
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                              }`}
+                            >
+                              {String.fromCharCode(65 + idx)}
+                            </div>
+                            <span className="text-xs font-semibold leading-relaxed">{option}</span>
                           </div>
+                          {isSelected && <Check size={16} className="text-blue-600 dark:text-blue-400 shrink-0" />}
                         </button>
                       );
                     })}
@@ -214,8 +228,8 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
                   <div
                     className={`p-6 rounded-2xl border text-center space-y-3 ${
                       resultData.passed
-                        ? 'bg-emerald-50/70 border-emerald-200'
-                        : 'bg-rose-50/70 border-rose-200'
+                        ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800'
+                        : 'bg-rose-50/70 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800'
                     }`}
                   >
                     <div
@@ -227,72 +241,44 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
                     </div>
 
                     <div>
-                      <span className="text-3xl font-black font-display text-slate-900">
+                      <span className="text-3xl font-black font-display text-slate-900 dark:text-white">
                         {resultData.scorePercentage}%
                       </span>
-                      <h4 className="text-base font-bold text-slate-900 mt-1">
+                      <h4 className="text-base font-bold text-slate-900 dark:text-white mt-1">
                         {resultData.passed ? 'Assessment Passed! 🎉' : 'Assessment Incomplete'}
                       </h4>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                         You answered {resultData.correctCount} out of {resultData.totalQuestions} questions correctly.
                         {resultData.passed
-                          ? ' Minimum threshold (80%) satisfied.'
-                          : ' You need 80% to pass. You can retake anytime!'}
+                          ? ' Minimum threshold (80%) satisfied. Milestone badge unlocked!'
+                          : ' You need 80% to pass. Review the reels and retake anytime!'}
                       </p>
                     </div>
                   </div>
 
-                  {/* Rewards Breakdown */}
-                  {resultData.passed && resultData.rewardsEarned && (
-                    <div className="p-4 rounded-xl bg-blue-50 border border-blue-200 space-y-3">
-                      <div className="flex items-center gap-2 text-xs font-bold text-blue-900">
-                        <Gift size={16} className="text-blue-600" />
-                        <span>Rewards Credited to Your Account</span>
+                  {/* Milestone Badge Credential Notification */}
+                  {resultData.passed && (
+                    <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-center gap-3 text-xs">
+                      <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 shrink-0">
+                        <Award size={20} />
                       </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div className="p-2.5 rounded-lg bg-white border border-blue-100 font-semibold text-slate-800">
-                          <span className="text-[10px] text-slate-400 block">Experience Points</span>
-                          <span className="text-blue-600 font-bold">+{resultData.rewardsEarned.points} XP</span>
-                        </div>
-
-                        <div className="p-2.5 rounded-lg bg-white border border-blue-100 font-semibold text-slate-800">
-                          <span className="text-[10px] text-slate-400 block">Streak Update</span>
-                          <span className="text-amber-600 font-bold">🔥 +1 Day Streak</span>
-                        </div>
+                      <div>
+                        <strong className="font-bold text-amber-900 dark:text-amber-200 block">
+                          Milestone Badge Awarded: Quiz Champion
+                        </strong>
+                        <p className="text-amber-800 dark:text-amber-300 mt-0.5">
+                          Your verified badge has been credited to your profile and achievements gallery.
+                        </p>
                       </div>
-
-                      {resultData.rewardsEarned.voucher && (
-                        <div className="p-3 rounded-lg bg-white border border-blue-200 flex items-center justify-between">
-                          <div>
-                            <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                              25% Off Voucher
-                            </span>
-                            <p className="text-xs font-mono font-bold text-slate-900 mt-1">
-                              {resultData.rewardsEarned.voucher.code}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(resultData.rewardsEarned?.voucher?.code || '');
-                              showToast('Voucher code copied to clipboard!', 'success');
-                            }}
-                            className="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer"
-                          >
-                            <Copy size={12} />
-                            <span>Copy</span>
-                          </button>
-                        </div>
-                      )}
                     </div>
                   )}
 
                   {/* Mentor Eligibility Milestone */}
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3 text-xs">
-                    <UserCheck size={18} className="text-purple-600 shrink-0 mt-0.5" />
+                  <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-start gap-3 text-xs">
+                    <UserCheck size={18} className="text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-bold text-slate-900">Mentor Qualification Progress:</span>
-                      <p className="text-slate-600 mt-0.5 leading-relaxed">
+                      <span className="font-bold text-slate-900 dark:text-white">Mentor Promotion Criteria:</span>
+                      <p className="text-slate-600 dark:text-slate-400 mt-0.5 leading-relaxed">
                         {eligibility.isEligible
                           ? '🎉 You have satisfied all mentor eligibility criteria! You can now apply for verified Mentor status.'
                           : eligibility.reason}
@@ -306,12 +292,12 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between">
           {!showResult ? (
             <>
               <button
                 onClick={closeAssessment}
-                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200 text-xs font-bold transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all cursor-pointer"
               >
                 Exit
               </button>
@@ -322,7 +308,7 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
                 className={`px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all ${
                   isAnswered
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs cursor-pointer'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
                 }`}
               >
                 <span>{currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Submit Assessment'}</span>
@@ -338,7 +324,7 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
                   setSelectedAnswers({});
                   setTimeLeft(90);
                 }}
-                className="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
               >
                 <RotateCcw size={13} />
                 <span>Retake Quiz</span>

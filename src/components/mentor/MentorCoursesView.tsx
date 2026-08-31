@@ -5,25 +5,18 @@ import {
   BookOpen,
   Plus,
   Search,
-  Filter,
   Eye,
   Edit,
   Trash2,
   Clock,
-  Users,
   DollarSign,
-  Star,
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  HelpCircle,
   PlayCircle,
-  ExternalLink,
-  Layers,
   Sparkles,
   ArrowRight,
-  X,
-  Check
+  X
 } from 'lucide-react';
 
 interface MentorCoursesViewProps {
@@ -73,12 +66,6 @@ export const MentorCoursesView: React.FC<MentorCoursesViewProps> = ({
     });
   }, [mentorCourses, searchQuery, statusFilter, categoryFilter]);
 
-  // Unique categories
-  const categories = useMemo(() => {
-    const set = new Set(mentorCourses.map(c => c.category));
-    return Array.from(set);
-  }, [mentorCourses]);
-
   // Statistics
   const totalCourses = mentorCourses.length;
   const publishedCount = mentorCourses.filter(c => c.status === 'published' || c.status === 'approved').length;
@@ -92,134 +79,131 @@ export const MentorCoursesView: React.FC<MentorCoursesViewProps> = ({
       case 'published':
       case 'approved':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold uppercase tracking-wider">
             <CheckCircle2 size={12} /> Published
           </span>
         );
       case 'submitted':
       case 'under_review':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-[11px] font-bold uppercase tracking-wider">
             <Clock size={12} /> Under Review
           </span>
         );
       case 'changes_requested':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-800 border border-orange-200 text-[11px] font-bold uppercase tracking-wider">
-            <AlertTriangle size={12} /> Changes Needed
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/40 text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-800 text-[11px] font-bold uppercase tracking-wider">
+            <AlertTriangle size={12} /> Changes Requested
           </span>
         );
       case 'rejected':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200 text-[11px] font-bold uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-[11px] font-bold uppercase tracking-wider">
             <XCircle size={12} /> Rejected
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-bold uppercase tracking-wider">
-            <HelpCircle size={12} /> Draft
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-[11px] font-bold uppercase tracking-wider">
+            Draft
           </span>
         );
     }
   };
 
-  const handleSaveEditCourse = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingCourse) return;
-
-    updateCourse(editingCourse.id, {
-      title: editingCourse.title,
-      subtitle: editingCourse.subtitle,
-      description: editingCourse.description,
-      price: Number(editingCourse.price),
-      discountedPrice: editingCourse.discountedPrice ? Number(editingCourse.discountedPrice) : undefined,
-      category: editingCourse.category,
-      level: editingCourse.level,
-      status: 'submitted', // re-submit for review upon major edits
-      submittedAt: new Date().toISOString()
-    });
-
-    showToast(`Course "${editingCourse.title}" updated and submitted for review!`, 'success');
-    setEditingCourse(null);
+  const handleConfirmDelete = () => {
+    if (courseToDelete) {
+      deleteCourse(courseToDelete.id);
+      showToast(`Course "${courseToDelete.title}" deleted.`, 'info');
+      setCourseToDelete(null);
+    }
   };
 
-  const handleConfirmDelete = () => {
-    if (!courseToDelete) return;
-    deleteCourse(courseToDelete.id);
-    showToast(`Course "${courseToDelete.title}" removed.`, 'info');
-    setCourseToDelete(null);
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingCourse) {
+      updateCourse(editingCourse.id, {
+        title: editingCourse.title,
+        subtitle: editingCourse.subtitle,
+        description: editingCourse.description,
+        price: editingCourse.price,
+        discountedPrice: editingCourse.discountedPrice,
+        category: editingCourse.category,
+        level: editingCourse.level,
+        status: 'submitted' // Resubmit on edit
+      });
+      showToast(`Course updated and resubmitted for admin review.`, 'success');
+      setEditingCourse(null);
+    }
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6 pb-24 animate-in fade-in duration-200">
-      {/* Top Header Banner */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="w-full max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6 pb-24 animate-in fade-in duration-200">
+      {/* Top Banner */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1">
-              <BookOpen size={13} /> Course Management
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Instructor Studio</span>
+            <span className="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold border border-emerald-200 dark:border-emerald-800">
+              5-Reel Curriculum Engine
             </span>
-            <span className="text-xs text-slate-500">• {totalCourses} Total Courses</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 font-display mt-2">
-            My Courses & Curriculum
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
-            Manage your educational courses, track review status, update lessons and review feedback from the administration team.
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display mt-1">My Courses Management</h1>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-xl">
+            Create, manage, and inspect your micro-courses. All published courses feature 5 short vertical reels.
           </p>
         </div>
 
         <button
           onClick={onNavigateToCreateCourse}
-          className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-sm hover:shadow transition-all shrink-0"
+          className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all self-start md:self-auto cursor-pointer"
         >
-          <Plus size={18} />
+          <Plus size={16} />
           <span>Create New Course</span>
         </button>
       </div>
 
-      {/* Metric Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total</span>
-          <strong className="text-xl sm:text-2xl font-bold text-slate-900 font-mono block mt-1">{totalCourses}</strong>
-          <span className="text-[10px] text-slate-400 mt-0.5 block">Active catalog</span>
+      {/* Summary KPI Badges */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total</span>
+          <strong className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-mono block mt-1">{totalCourses}</strong>
+          <span className="text-[10px] text-slate-400 mt-0.5 block">Authored courses</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider block">Published</span>
-          <strong className="text-xl sm:text-2xl font-bold text-emerald-600 font-mono block mt-1">{publishedCount}</strong>
-          <span className="text-[10px] text-slate-400 mt-0.5 block">Live in store</span>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Published</span>
+          <strong className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono block mt-1">{publishedCount}</strong>
+          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 block font-semibold">Live in catalog</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider block">In Review</span>
-          <strong className="text-xl sm:text-2xl font-bold text-amber-600 font-mono block mt-1">{pendingCount}</strong>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">In Review</span>
+          <strong className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400 font-mono block mt-1">{pendingCount}</strong>
           <span className="text-[10px] text-slate-400 mt-0.5 block">Pending admin</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-orange-600 uppercase tracking-wider block">Action Req.</span>
-          <strong className="text-xl sm:text-2xl font-bold text-orange-600 font-mono block mt-1">{changesCount}</strong>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <span className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider block">Action Req.</span>
+          <strong className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400 font-mono block mt-1">{changesCount}</strong>
           <span className="text-[10px] text-slate-400 mt-0.5 block">Changes needed</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider block">Students</span>
-          <strong className="text-xl sm:text-2xl font-bold text-blue-600 font-mono block mt-1">{totalStudents}</strong>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">Students</span>
+          <strong className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 font-mono block mt-1">{totalStudents}</strong>
           <span className="text-[10px] text-slate-400 mt-0.5 block">Total enrolled</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-slate-700 uppercase tracking-wider block">Earnings</span>
-          <strong className="text-xl sm:text-2xl font-bold text-slate-900 font-mono block mt-1">${totalEarnings.toLocaleString()}</strong>
-          <span className="text-[10px] text-emerald-600 mt-0.5 block font-semibold">Gross sales</span>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider block">Earnings</span>
+          <strong className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white font-mono block mt-1">${totalEarnings.toLocaleString()}</strong>
+          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 block font-semibold">Gross sales</span>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -227,13 +211,13 @@ export const MentorCoursesView: React.FC<MentorCoursesViewProps> = ({
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search by course title, category or keyword..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
+            placeholder="Search by course title, category..."
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
             >
               <X size={14} />
             </button>
@@ -244,40 +228,40 @@ export const MentorCoursesView: React.FC<MentorCoursesViewProps> = ({
         <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
           <button
             onClick={() => setStatusFilter('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               statusFilter === 'all'
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             All ({mentorCourses.length})
           </button>
           <button
             onClick={() => setStatusFilter('published')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               statusFilter === 'published'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800'
             }`}
           >
             Published ({publishedCount})
           </button>
           <button
             onClick={() => setStatusFilter('under_review')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               statusFilter === 'under_review'
-                ? 'bg-amber-600 text-white shadow-sm'
-                : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800'
             }`}
           >
             Under Review ({pendingCount})
           </button>
           <button
             onClick={() => setStatusFilter('changes_requested')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               statusFilter === 'changes_requested'
-                ? 'bg-orange-600 text-white shadow-sm'
-                : 'bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200'
+                ? 'bg-orange-600 text-white shadow-xs'
+                : 'bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/60 border border-orange-200 dark:border-orange-800'
             }`}
           >
             Changes Req. ({changesCount})
@@ -285,19 +269,19 @@ export const MentorCoursesView: React.FC<MentorCoursesViewProps> = ({
         </div>
 
         {/* View Toggle */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 self-end md:self-auto">
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 self-end md:self-auto">
           <button
             onClick={() => setViewLayout('grid')}
-            className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
-              viewLayout === 'grid' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              viewLayout === 'grid' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             Cards
           </button>
           <button
             onClick={() => setViewLayout('table')}
-            className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
-              viewLayout === 'table' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              viewLayout === 'table' ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             Table
@@ -305,483 +289,190 @@ export const MentorCoursesView: React.FC<MentorCoursesViewProps> = ({
         </div>
       </div>
 
-      {/* Courses Display */}
+      {/* Courses Display (Grid or Table) */}
       {filteredCourses.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-          <div className="w-14 h-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-            <BookOpen size={24} />
-          </div>
-          <h3 className="text-base font-bold text-slate-900">No courses match your criteria</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Try adjusting your search terms or status filters, or create a brand new course curriculum.
+        <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 transition-colors">
+          <BookOpen size={36} className="mx-auto text-slate-300 dark:text-slate-600" />
+          <h3 className="text-base font-bold text-slate-800 dark:text-white">No courses found</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {searchQuery || statusFilter !== 'all'
+              ? 'Try changing your search keywords or clearing the active filters.'
+              : "You haven't authored any courses yet. Get started by creating your first course!"}
           </p>
-          <button
-            onClick={onNavigateToCreateCourse}
-            className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-all shadow-sm"
-          >
-            <Plus size={15} /> Create Course
-          </button>
+          {onNavigateToCreateCourse && (
+            <button
+              onClick={onNavigateToCreateCourse}
+              className="mt-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+            >
+              <Plus size={14} />
+              <span>Create Course</span>
+            </button>
+          )}
         </div>
       ) : viewLayout === 'grid' ? (
-        /* GRID VIEW */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredCourses.map(course => {
-            const hasAdminFeedback = Boolean(course.rejectionFeedback);
-            return (
-              <div
-                key={course.id}
-                className="rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden group"
-              >
-                {/* Thumbnail & Badges */}
-                <div className="relative h-44 w-full bg-slate-100 overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCourses.map(course => (
+            <div
+              key={course.id}
+              className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between"
+            >
+              <div>
+                {/* Thumbnail Header */}
+                <div className="relative h-44 w-full bg-slate-900 overflow-hidden group">
                   <img
                     src={course.thumbnailUrl}
                     alt={course.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                    {getStatusBadge(course.status)}
-                  </div>
-
-                  <div className="absolute top-3 right-3">
-                    <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold border border-white/20">
-                      {course.level}
-                    </span>
-                  </div>
-
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
-                    <span className="font-semibold bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm text-[11px]">
+                  <div className="absolute top-3 left-3">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
                       {course.category}
                     </span>
-                    <span className="font-bold font-mono text-sm bg-emerald-600/90 px-2 py-0.5 rounded backdrop-blur-sm">
-                      ${course.price}
-                    </span>
+                  </div>
+                  <div className="absolute top-3 right-3">{getStatusBadge(course.status)}</div>
+                  <div className="absolute bottom-3 left-3 right-3 text-white text-xs font-semibold flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <PlayCircle size={13} className="text-emerald-400" />
+                      <span>5 Vertical Reels</span>
+                    </div>
+                    <span>{course.level}</span>
                   </div>
                 </div>
 
-                {/* Card Body */}
-                <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug line-clamp-2">
-                      {course.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                      {course.subtitle || course.description}
-                    </p>
-                  </div>
-
-                  {/* Modules & Stats Row */}
-                  <div className="pt-3 border-t border-slate-100 grid grid-cols-3 gap-2 text-center text-xs">
-                    <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] text-slate-400 block font-medium">Modules</span>
-                      <strong className="text-slate-800 font-mono font-bold block mt-0.5">
-                        {course.modules?.length || 1}
-                      </strong>
-                    </div>
-                    <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] text-slate-400 block font-medium">Students</span>
-                      <strong className="text-blue-600 font-mono font-bold block mt-0.5">
-                        {course.studentsCount || 0}
-                      </strong>
-                    </div>
-                    <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                      <span className="text-[10px] text-slate-400 block font-medium">Rating</span>
-                      <div className="flex items-center justify-center gap-1 mt-0.5">
-                        <Star size={11} className="text-amber-500 fill-amber-500" />
-                        <strong className="text-slate-800 font-mono font-bold text-[11px]">
-                          {course.rating ? course.rating.toFixed(1) : '5.0'}
-                        </strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Admin Feedback Box (if any) */}
-                  {hasAdminFeedback && (
-                    <div className="p-3 rounded-xl bg-orange-50 border border-orange-200 text-orange-900 text-xs space-y-1.5">
-                      <div className="flex items-center gap-1.5 font-bold text-orange-950">
-                        <AlertTriangle size={13} className="text-orange-600" />
-                        <span>Admin Review Feedback:</span>
-                      </div>
-                      <p className="text-[11px] text-orange-800 leading-relaxed bg-white/70 p-2 rounded border border-orange-200/60">
-                        {course.rejectionFeedback}
-                      </p>
-                      <button
-                        onClick={() => setEditingCourse(course)}
-                        className="text-[11px] font-bold text-orange-900 hover:text-orange-950 underline flex items-center gap-1 mt-1"
-                      >
-                        <Edit size={11} /> Edit & Resubmit to Review Queue
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Action Buttons Footer */}
-                  <div className="pt-2 flex items-center justify-between gap-2 border-t border-slate-100">
-                    <button
-                      onClick={() => setSelectedCourseForDetails(course)}
-                      className="flex-1 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
-                    >
-                      <Eye size={13} />
-                      <span>Curriculum</span>
-                    </button>
-
-                    <button
-                      onClick={() => setEditingCourse(course)}
-                      className="px-3 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center gap-1.5 border border-emerald-200 transition-all"
-                      title="Edit Course"
-                    >
-                      <Edit size={13} />
-                      <span>Edit</span>
-                    </button>
-
-                    <button
-                      onClick={() => setCourseToDelete(course)}
-                      className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
-                      title="Delete Course"
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
+                {/* Body Content */}
+                <div className="p-5 space-y-2">
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                    {course.title}
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                    {course.description}
+                  </p>
                 </div>
               </div>
-            );
-          })}
+
+              {/* Card Footer Actions */}
+              <div className="p-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div className="text-xs font-mono font-bold text-slate-900 dark:text-white">
+                  ${course.price}
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setSelectedCourseForDetails(course)}
+                    className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                    title="View Course Details"
+                  >
+                    <Eye size={14} />
+                  </button>
+                  <button
+                    onClick={() => setEditingCourse(course)}
+                    className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                    title="Edit Course"
+                  >
+                    <Edit size={14} />
+                  </button>
+                  <button
+                    onClick={() => setCourseToDelete(course)}
+                    className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
+                    title="Delete Course"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
-        /* TABLE VIEW */
-        <div className="overflow-x-auto rounded-2xl bg-white border border-slate-200 shadow-sm">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
-              <tr>
-                <th className="p-4 font-bold">Course Title & Info</th>
-                <th className="p-4 font-bold">Category</th>
-                <th className="p-4 font-bold">Level</th>
-                <th className="p-4 font-bold">Price</th>
-                <th className="p-4 font-bold">Enrolled</th>
-                <th className="p-4 font-bold">Status</th>
-                <th className="p-4 font-bold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {filteredCourses.map(course => (
-                <tr key={course.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
+        /* Table Layout */
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden transition-colors">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+              <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
+                <tr>
+                  <th className="p-4">Course</th>
+                  <th className="p-4">Category</th>
+                  <th className="p-4">Level</th>
+                  <th className="p-4">Price</th>
+                  <th className="p-4">Status</th>
+                  <th className="p-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {filteredCourses.map(course => (
+                  <tr key={course.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="p-4 flex items-center gap-3">
                       <img
                         src={course.thumbnailUrl}
                         alt={course.title}
-                        className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0"
+                        className="w-10 h-10 rounded-lg object-cover shrink-0"
                       />
                       <div>
-                        <strong className="text-slate-900 block font-bold text-xs">{course.title}</strong>
-                        <span className="text-[11px] text-slate-500">{course.modules?.length || 1} modules</span>
+                        <strong className="text-slate-900 dark:text-white font-bold block">{course.title}</strong>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">5 Vertical Reels</span>
                       </div>
-                    </div>
-                  </td>
-                  <td className="p-4 font-medium">{course.category}</td>
-                  <td className="p-4">
-                    <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold border border-slate-200">
-                      {course.level}
-                    </span>
-                  </td>
-                  <td className="p-4 font-mono font-bold text-slate-900">${course.price}</td>
-                  <td className="p-4 font-mono font-bold text-blue-600">{course.studentsCount || 0}</td>
-                  <td className="p-4">{getStatusBadge(course.status)}</td>
-                  <td className="p-4 text-right">
-                    <div className="flex items-center justify-end gap-1.5">
+                    </td>
+                    <td className="p-4">{course.category}</td>
+                    <td className="p-4">{course.level}</td>
+                    <td className="p-4 font-mono font-bold text-slate-900 dark:text-white">${course.price}</td>
+                    <td className="p-4">{getStatusBadge(course.status)}</td>
+                    <td className="p-4 text-right space-x-1">
                       <button
                         onClick={() => setSelectedCourseForDetails(course)}
-                        className="px-2.5 py-1.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px]"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                        title="View Course"
                       >
-                        Details
+                        <Eye size={13} />
                       </button>
                       <button
                         onClick={() => setEditingCourse(course)}
-                        className="p-1.5 rounded hover:bg-emerald-50 text-emerald-700"
-                        title="Edit"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                        title="Edit Course"
                       >
-                        <Edit size={14} />
+                        <Edit size={13} />
                       </button>
                       <button
                         onClick={() => setCourseToDelete(course)}
-                        className="p-1.5 rounded hover:bg-rose-50 text-rose-600"
-                        title="Delete"
+                        className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
+                        title="Delete Course"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={13} />
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* 1. Course Details / Curriculum Modal */}
-      {selectedCourseForDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="w-full max-w-3xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <div className="flex items-center gap-3">
-                <img
-                  src={selectedCourseForDetails.thumbnailUrl}
-                  alt={selectedCourseForDetails.title}
-                  className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-sm"
-                />
-                <div>
-                  <h3 className="font-bold text-base text-slate-900">{selectedCourseForDetails.title}</h3>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    {getStatusBadge(selectedCourseForDetails.status)}
-                    <span className="text-xs text-slate-500 font-mono">• ${selectedCourseForDetails.price}</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setSelectedCourseForDetails(null)}
-                className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="p-6 overflow-y-auto space-y-6 text-xs text-slate-700">
-              <div>
-                <h4 className="font-bold text-slate-900 text-sm mb-1">Course Overview & Description</h4>
-                <p className="text-slate-600 leading-relaxed">{selectedCourseForDetails.description}</p>
-              </div>
-
-              {/* Learning Outcomes */}
-              {selectedCourseForDetails.learningOutcomes && selectedCourseForDetails.learningOutcomes.length > 0 && (
-                <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 space-y-2">
-                  <h4 className="font-bold text-emerald-950 text-xs flex items-center gap-1.5">
-                    <Sparkles size={14} className="text-emerald-600" />
-                    <span>Key Learning Outcomes</span>
-                  </h4>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {selectedCourseForDetails.learningOutcomes.map((outcome, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-[11px] text-slate-700">
-                        <Check size={13} className="text-emerald-600 shrink-0 mt-0.5" />
-                        <span>{outcome}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Modules List */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                    <Layers size={16} className="text-emerald-600" />
-                    <span>Curriculum Modules ({selectedCourseForDetails.modules?.length || 0})</span>
-                  </h4>
-                </div>
-
-                <div className="space-y-2">
-                  {selectedCourseForDetails.modules?.map((mod, idx) => (
-                    <div
-                      key={mod.id || idx}
-                      className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-3"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">
-                          {idx + 1}
-                        </div>
-                        <div>
-                          <strong className="text-slate-900 block font-semibold text-xs">{mod.title}</strong>
-                          <p className="text-slate-500 text-[11px] mt-0.5">{mod.description}</p>
-                          {mod.videoUrl && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-blue-600 font-semibold mt-1">
-                              <PlayCircle size={12} /> Video Lecture ({mod.durationMinutes || 25} min)
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {mod.isFreePreview && (
-                        <span className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-bold shrink-0">
-                          Free Preview
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-2">
-              <button
-                onClick={() => setSelectedCourseForDetails(null)}
-                className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  const toEdit = selectedCourseForDetails;
-                  setSelectedCourseForDetails(null);
-                  setEditingCourse(toEdit);
-                }}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm"
-              >
-                <Edit size={13} /> Edit Course
-              </button>
-            </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      {/* 2. Quick Edit Course Modal */}
-      {editingCourse && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <div className="flex items-center gap-2">
-                <Edit size={18} className="text-emerald-600" />
-                <h3 className="font-bold text-base text-slate-900">Edit Course Details</h3>
-              </div>
-              <button
-                onClick={() => setEditingCourse(null)}
-                className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveEditCourse} className="p-6 overflow-y-auto space-y-4 text-xs">
-              <div>
-                <label className="block text-slate-700 font-bold mb-1">Course Title</label>
-                <input
-                  type="text"
-                  required
-                  value={editingCourse.title}
-                  onChange={e => setEditingCourse({ ...editingCourse, title: e.target.value })}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600 text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-slate-700 font-bold mb-1">Subtitle / Tagline</label>
-                <input
-                  type="text"
-                  value={editingCourse.subtitle || ''}
-                  onChange={e => setEditingCourse({ ...editingCourse, subtitle: e.target.value })}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600 text-slate-900"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Category</label>
-                  <input
-                    type="text"
-                    value={editingCourse.category}
-                    onChange={e => setEditingCourse({ ...editingCourse, category: e.target.value })}
-                    className="w-full p-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600 text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Skill Level</label>
-                  <select
-                    value={editingCourse.level}
-                    onChange={e => setEditingCourse({ ...editingCourse, level: e.target.value as any })}
-                    className="w-full p-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600 text-slate-900 bg-white"
-                  >
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="All Levels">All Levels</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Price ($)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={editingCourse.price}
-                    onChange={e => setEditingCourse({ ...editingCourse, price: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600 text-slate-900"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 font-bold mb-1">Discount Price ($)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={editingCourse.discountedPrice || ''}
-                    onChange={e => setEditingCourse({ ...editingCourse, discountedPrice: Number(e.target.value) })}
-                    className="w-full p-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600 text-slate-900"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-700 font-bold mb-1">Description</label>
-                <textarea
-                  rows={4}
-                  value={editingCourse.description}
-                  onChange={e => setEditingCourse({ ...editingCourse, description: e.target.value })}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 focus:outline-none focus:border-emerald-600 text-slate-900 resize-none"
-                />
-              </div>
-
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-[11px]">
-                <strong>Note:</strong> Updating this course will automatically resubmit it to the admin approval queue to ensure content quality.
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setEditingCourse(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm"
-                >
-                  Save & Resubmit Course
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 3. Delete Confirmation Dialog */}
+      {/* Delete Confirmation Modal */}
       {courseToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 space-y-4">
-            <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 space-y-4 text-slate-900 dark:text-white">
+            <div className="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
               <Trash2 size={22} />
             </div>
 
             <div className="text-center space-y-1">
-              <h3 className="font-bold text-slate-900 text-base">Delete Course</h3>
-              <p className="text-xs text-slate-500">
-                Are you sure you want to delete <strong className="text-slate-800">"{courseToDelete.title}"</strong>? This action cannot be undone.
+              <h3 className="font-bold text-base">Delete Course</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Are you sure you want to delete <strong className="text-slate-800 dark:text-slate-200">"{courseToDelete.title}"</strong>? This action cannot be undone.
               </p>
             </div>
 
             <div className="flex items-center gap-2 pt-2">
               <button
                 onClick={() => setCourseToDelete(null)}
-                className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs"
+                className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmDelete}
-                className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm"
+                className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs cursor-pointer"
               >
                 Yes, Delete
               </button>

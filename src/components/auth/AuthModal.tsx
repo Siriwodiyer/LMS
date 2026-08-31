@@ -1,47 +1,81 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
-import { UserRole } from '../../types';
+import { useTheme } from '../../context/ThemeContext';
 import {
   GraduationCap,
-  UserCheck,
-  ShieldCheck,
-  Sparkles,
   ArrowRight,
   Mail,
   Lock,
   User,
   X,
-  Zap,
   Eye,
   EyeOff,
-  RefreshCw,
   AlertCircle,
   CheckCircle2,
   Shield,
+  Briefcase,
+  Award,
+  BookOpen,
+  Loader2,
   Check,
-  FileText
+  Zap,
+  Sparkles,
+  KeyRound,
+  ShieldCheck
 } from 'lucide-react';
 
 export const AuthModal: React.FC = () => {
-  const { isAuthModalOpen, closeAuthModal, loginAsRole, loginUser, registerUser, validateCredentials, showToast } = useApp();
-  const [activeTab, setActiveTab] = useState<'login' | 'demo' | 'register'>('login');
+  const {
+    isAuthModalOpen,
+    authModalTab,
+    closeAuthModal,
+    authLogin,
+    authRegisterLearner,
+    authMentorApply,
+    forgotPassword,
+    loginAsRole,
+    showToast
+  } = useApp();
 
-  // Login Role Path (User, Mentor, Admin)
-  const [loginRole, setLoginRole] = useState<'student' | 'mentor' | 'admin'>('student');
-  const [loginEmail, setLoginEmail] = useState('user@lms.ai');
-  const [loginPassword, setLoginPassword] = useState('password123');
+  const { theme } = useTheme();
+
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [accountType, setAccountType] = useState<'learner' | 'mentor'>('learner');
+
+  // Sign In Form State
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(() => {
+    return localStorage.getItem('lms_remember_me') === 'true';
+  });
   const [loginError, setLoginError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Register State (Learner only)
+  // Learner Register Form State
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [showRegPassword, setShowRegPassword] = useState(false);
-  const [regAvatar, setRegAvatar] = useState('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80');
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
+  const [regTerms, setRegTerms] = useState(false);
   const [regError, setRegError] = useState('');
 
-  // Forgot Password modal
+  // Mentor Apply Form State
+  const [mentorName, setMentorName] = useState('');
+  const [mentorEmail, setMentorEmail] = useState('');
+  const [mentorPassword, setMentorPassword] = useState('');
+  const [showMentorPassword, setShowMentorPassword] = useState(false);
+  const [mentorExpertise, setMentorExpertise] = useState('');
+  const [mentorExperience, setMentorExperience] = useState('3');
+  const [mentorBio, setMentorBio] = useState('');
+  const [mentorPortfolio, setMentorPortfolio] = useState('');
+  const [mentorTerms, setMentorTerms] = useState(false);
+  const [mentorError, setMentorError] = useState('');
+  const [mentorSuccess, setMentorSuccess] = useState(false);
+
+  // Forgot Password
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSubmitted, setForgotSubmitted] = useState(false);
@@ -49,722 +83,983 @@ export const AuthModal: React.FC = () => {
   // Policy Modals
   const [policyModal, setPolicyModal] = useState<'terms' | 'privacy' | null>(null);
 
-  // Functional Human Verification State
+  // Bot Verification (Quick Check)
   const [isHumanVerified, setIsHumanVerified] = useState(false);
-  const [captchaNum1, setCaptchaNum1] = useState(5);
-  const [captchaNum2, setCaptchaNum2] = useState(3);
-  const [captchaInput, setCaptchaInput] = useState('');
-  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
 
-  const refreshCaptcha = () => {
-    const n1 = Math.floor(Math.random() * 8) + 2;
-    const n2 = Math.floor(Math.random() * 8) + 1;
-    setCaptchaNum1(n1);
-    setCaptchaNum2(n2);
-    setCaptchaInput('');
-    setIsCaptchaValid(false);
-    setIsHumanVerified(false);
-  };
+  // Password strength calculation
+  const passwordStrength = useMemo(() => {
+    if (!regPassword) return { score: 0, label: '', color: '', width: '0%' };
+    let score = 0;
+    if (regPassword.length >= 6) score++;
+    if (regPassword.length >= 8) score++;
+    if (/[A-Z]/.test(regPassword)) score++;
+    if (/[0-9]/.test(regPassword)) score++;
+    if (/[^A-Za-z0-9]/.test(regPassword)) score++;
+
+    if (score <= 2) return { score: 1, label: 'Weak', color: 'bg-rose-500 text-rose-500', width: '25%' };
+    if (score === 3) return { score: 2, label: 'Fair', color: 'bg-amber-500 text-amber-500', width: '50%' };
+    if (score === 4) return { score: 3, label: 'Good', color: 'bg-blue-500 text-blue-500', width: '75%' };
+    return { score: 4, label: 'Strong', color: 'bg-emerald-500 text-emerald-500', width: '100%' };
+  }, [regPassword]);
 
   useEffect(() => {
     if (isAuthModalOpen) {
-      refreshCaptcha();
+      setActiveTab(authModalTab || 'login');
       setLoginError('');
       setRegError('');
+      setMentorError('');
+      setMentorSuccess(false);
       setShowForgotPassword(false);
       setForgotSubmitted(false);
-      setPolicyModal(null);
-    }
-  }, [isAuthModalOpen, activeTab, loginRole]);
-
-  // Sync default emails when role path changes
-  const handleSelectLoginRole = (role: 'student' | 'mentor' | 'admin') => {
-    setLoginRole(role);
-    setLoginError('');
-    setIsHumanVerified(false);
-    setIsCaptchaValid(false);
-    setCaptchaInput('');
-    if (role === 'student') {
-      setLoginEmail('user@lms.ai');
-      setLoginPassword('password123');
-    } else if (role === 'mentor') {
-      setLoginEmail('mentor@lms.ai');
-      setLoginPassword('password123');
-    } else if (role === 'admin') {
-      setLoginEmail('admin@lms.ai');
-      setLoginPassword('admin123');
-    }
-  };
-
-  const handleCaptchaChange = (val: string) => {
-    setCaptchaInput(val);
-    const parsed = parseInt(val.trim(), 10);
-    if (!isNaN(parsed) && parsed === captchaNum1 + captchaNum2) {
-      setIsCaptchaValid(true);
-      setIsHumanVerified(true);
-    } else {
-      setIsCaptchaValid(false);
+      setIsSubmitting(false);
       setIsHumanVerified(false);
-    }
-  };
 
-  const handleCheckboxVerification = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setIsHumanVerified(true);
-      setIsCaptchaValid(true);
-    } else {
-      setIsHumanVerified(false);
-      setIsCaptchaValid(false);
+      const savedEmail = localStorage.getItem('lms_remembered_email');
+      if (savedEmail) {
+        setLoginEmail(savedEmail);
+        setRememberMe(true);
+      }
     }
-  };
+  }, [isAuthModalOpen, authModalTab]);
 
   if (!isAuthModalOpen) return null;
 
-  const handleCustomLogin = (e: React.FormEvent) => {
+  // Handle Login
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
 
-    if (!isHumanVerified && !isCaptchaValid) {
-      setLoginError('Human verification is mandatory. Please check "I am not a robot" or complete the challenge.');
+    if (!loginEmail.trim() || !loginPassword) {
+      setLoginError('Please enter both your email address and password.');
       return;
     }
 
-    const res = validateCredentials(loginEmail, loginPassword, loginRole);
-    if (!res.success || !res.user) {
-      setLoginError(res.error || 'Invalid credentials. Please verify your email and password.');
+    if (!isHumanVerified) {
+      setLoginError('Please check the verification box to proceed.');
       return;
     }
 
-    loginUser(res.user);
+    try {
+      setIsSubmitting(true);
+      await authLogin(loginEmail.trim(), loginPassword);
+      if (rememberMe) {
+        localStorage.setItem('lms_remember_me', 'true');
+        localStorage.setItem('lms_remembered_email', loginEmail.trim());
+      } else {
+        localStorage.removeItem('lms_remember_me');
+        localStorage.removeItem('lms_remembered_email');
+      }
+    } catch (err: any) {
+      setLoginError(err.message || 'Invalid credentials. Please check your email and password.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  // Handle Learner Register
+  const handleLearnerRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegError('');
 
-    if (!isHumanVerified && !isCaptchaValid) {
-      setRegError('Please complete the human verification step.');
-      return;
-    }
-
-    if (!regName.trim() || !regEmail.trim() || !regPassword.trim()) {
-      setRegError('Please fill in all required fields.');
+    if (!regName.trim() || !regEmail.trim() || !regPassword) {
+      setRegError('All fields are required.');
       return;
     }
 
     if (regPassword.length < 6) {
-      setRegError('Password must be at least 6 characters.');
+      setRegError('Password must be at least 6 characters in length.');
       return;
     }
 
-    const res = registerUser({
-      name: regName.trim(),
-      email: regEmail.trim(),
-      password: regPassword,
-      avatar: regAvatar
-    });
+    if (regPassword !== regConfirmPassword) {
+      setRegError('Passwords do not match. Please verify your confirm password.');
+      return;
+    }
 
-    if (!res.success) {
-      setRegError(res.message || 'Registration failed.');
+    if (!regTerms) {
+      setRegError('You must agree to the Terms of Service and Privacy Policy.');
+      return;
+    }
+
+    if (!isHumanVerified) {
+      setRegError('Please check the verification box to proceed.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await authRegisterLearner({
+        name: regName.trim(),
+        email: regEmail.trim(),
+        password: regPassword
+      });
+    } catch (err: any) {
+      setRegError(err.message || 'Failed to create account. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleForgotPasswordSubmit = (e: React.FormEvent) => {
+  // Handle Mentor Application
+  const handleMentorApply = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!forgotEmail.trim()) return;
-    setForgotSubmitted(true);
-    showToast(`Password reset link sent to ${forgotEmail}`, 'success');
+    setMentorError('');
+
+    if (!mentorName.trim() || !mentorEmail.trim() || !mentorPassword) {
+      setMentorError('Name, email, and password are required.');
+      return;
+    }
+
+    if (mentorPassword.length < 6) {
+      setMentorError('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (!mentorExpertise.trim()) {
+      setMentorError('Please specify your domain expertise.');
+      return;
+    }
+
+    if (!mentorBio.trim()) {
+      setMentorError('Please write a brief summary of your teaching background.');
+      return;
+    }
+
+    if (!mentorTerms) {
+      setMentorError('You must agree to the Mentor Code of Conduct & Terms.');
+      return;
+    }
+
+    if (!isHumanVerified) {
+      setMentorError('Please check the verification box to proceed.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await authMentorApply({
+        name: mentorName.trim(),
+        email: mentorEmail.trim(),
+        password: mentorPassword,
+        expertise: mentorExpertise.trim(),
+        experienceYears: parseInt(mentorExperience) || 3,
+        bio: mentorBio.trim(),
+        portfolioUrl: mentorPortfolio.trim() || undefined
+      });
+      setMentorSuccess(true);
+    } catch (err: any) {
+      setMentorError(err.message || 'Failed to submit mentor application.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const avatarPresets = [
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-  ];
+  // Handle Forgot Password
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) return;
+
+    try {
+      setIsSubmitting(true);
+      await forgotPassword(forgotEmail.trim());
+      setForgotSubmitted(true);
+    } catch (err: any) {
+      setLoginError(err.message || 'Failed to dispatch reset instructions.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl rounded-2xl bg-white border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-        {/* Top Accent Stripe */}
-        <div className="h-1.5 w-full bg-blue-600" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/80 dark:bg-black/80 backdrop-blur-md animate-fadeIn overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto transition-all">
+        {/* Header Banner */}
+        <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-5 sm:p-6 text-white text-center relative">
+          <button
+            onClick={closeAuthModal}
+            className="absolute top-4 right-4 p-2 text-white/80 hover:text-white rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+            title="Close modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
 
-        {/* Close Button */}
-        <button
-          onClick={closeAuthModal}
-          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-all z-10 cursor-pointer"
-        >
-          <X size={18} />
-        </button>
-
-        {/* Header */}
-        <div className="p-6 sm:p-7 pb-3 text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-2.5">
-            <Shield size={13} />
-            <span>LMS AUTHENTICATION GATEWAY</span>
+          <div className="w-12 h-12 bg-white/10 rounded-2xl border border-white/20 flex items-center justify-center mx-auto mb-3 backdrop-blur-md shadow-inner">
+            <GraduationCap className="w-7 h-7 text-white" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-display">
-            Welcome to <span className="text-blue-600">LMS</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-md mx-auto">
-            Choose your login path or create a learner account to continue.
+
+          <h3 className="text-xl sm:text-2xl font-bold tracking-tight font-display">LMS Platform</h3>
+          <p className="text-blue-100 text-xs sm:text-sm mt-1">
+            {activeTab === 'login' ? 'Sign in to access your dashboard' : 'Create an account to begin your journey'}
           </p>
 
-          {/* Top Tabs */}
-          <div className="flex items-center justify-center gap-1 mt-5 p-1 bg-slate-100 rounded-xl border border-slate-200 max-w-md mx-auto">
+          {/* Tab Switcher */}
+          <div className="mt-5 flex bg-black/20 p-1 rounded-xl backdrop-blur-sm">
             <button
-              onClick={() => { setActiveTab('login'); setLoginError(''); setRegError(''); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeTab === 'login' ? 'bg-white text-blue-600 shadow-xs border border-slate-200' : 'text-slate-600 hover:text-slate-900'
+              onClick={() => {
+                setActiveTab('login');
+                setShowForgotPassword(false);
+                setLoginError('');
+              }}
+              className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+                activeTab === 'login' && !showForgotPassword
+                  ? 'bg-white text-blue-700 shadow-md'
+                  : 'text-white/80 hover:text-white hover:bg-white/5'
               }`}
             >
-              <Lock size={14} />
-              <span>Sign In</span>
+              Sign In
             </button>
             <button
-              onClick={() => { setActiveTab('demo'); setLoginError(''); setRegError(''); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeTab === 'demo' ? 'bg-white text-blue-600 shadow-xs border border-slate-200' : 'text-slate-600 hover:text-slate-900'
+              onClick={() => {
+                setActiveTab('register');
+                setShowForgotPassword(false);
+                setRegError('');
+                setMentorError('');
+              }}
+              className={`flex-1 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+                activeTab === 'register' && !showForgotPassword
+                  ? 'bg-white text-blue-700 shadow-md'
+                  : 'text-white/80 hover:text-white hover:bg-white/5'
               }`}
             >
-              <Zap size={14} />
-              <span>1-Click Demo</span>
-            </button>
-            <button
-              onClick={() => { setActiveTab('register'); setLoginError(''); setRegError(''); }}
-              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeTab === 'register' ? 'bg-white text-blue-600 shadow-xs border border-slate-200' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <User size={14} />
-              <span>Sign Up (Learner)</span>
+              Create Account
             </button>
           </div>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 sm:p-7 pt-2 overflow-y-auto space-y-4 flex-1">
-          {/* TAB 1: ROLE-BASED LOGIN */}
-          {activeTab === 'login' && (
-            <form onSubmit={handleCustomLogin} className="space-y-4">
-              {loginError && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-xs text-rose-700 font-medium animate-in fade-in">
-                  <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
-                  <span>{loginError}</span>
+        <div className="p-5 sm:p-7 max-h-[75vh] overflow-y-auto">
+          {/* ================= FORGOT PASSWORD VIEW ================= */}
+          {showForgotPassword ? (
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <Mail className="w-5 h-5" />
                 </div>
-              )}
-
-              {/* 3 Separate Login Paths */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Select Login Path</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSelectLoginRole('student')}
-                    className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                      loginRole === 'student'
-                        ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-xs'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <GraduationCap size={15} />
-                    <span>User Login</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectLoginRole('mentor')}
-                    className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                      loginRole === 'mentor'
-                        ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-xs'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <UserCheck size={15} />
-                    <span>Mentor Login</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleSelectLoginRole('admin')}
-                    className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                      loginRole === 'admin'
-                        ? 'bg-purple-50 border-purple-500 text-purple-700 shadow-xs'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    <ShieldCheck size={15} />
-                    <span>Admin Login</span>
-                  </button>
-                </div>
+                <h4 className="text-lg font-bold text-slate-900 dark:text-white">Reset Your Password</h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Enter the email address registered with your LMS account.
+                </p>
               </div>
 
-              {/* Email / Username */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Email / Username</label>
-                <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="email"
-                    required
-                    placeholder={
-                      loginRole === 'student'
-                        ? 'user@lms.ai'
-                        : loginRole === 'mentor'
-                        ? 'mentor@lms.ai'
-                        : 'admin@lms.ai'
-                    }
-                    value={loginEmail}
-                    onChange={e => setLoginEmail(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-slate-400"
-                  />
-                </div>
-              </div>
-
-              {/* Password with Show/Hide Toggle */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-slate-700">Password</label>
+              {forgotSubmitted ? (
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl text-center space-y-3">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400 mx-auto" />
+                  <h5 className="font-bold text-slate-900 dark:text-white text-sm">Instructions Dispatched</h5>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
+                    If an account is associated with <strong>{forgotEmail}</strong>, you will receive password reset instructions shortly.
+                  </p>
                   <button
-                    type="button"
                     onClick={() => {
-                      setForgotEmail(loginEmail);
-                      setShowForgotPassword(true);
+                      setShowForgotPassword(false);
+                      setForgotSubmitted(false);
                     }}
-                    className="text-xs text-blue-600 hover:underline font-semibold cursor-pointer"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type={showLoginPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Enter password"
-                    value={loginPassword}
-                    onChange={e => setLoginPassword(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-slate-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Functional Human Verification */}
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Shield size={14} className="text-blue-600" />
-                    <span>Human Verification</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={refreshCaptcha}
-                    className="text-[11px] text-slate-500 hover:text-blue-600 flex items-center gap-1 cursor-pointer"
-                  >
-                    <RefreshCw size={11} />
-                    <span>Refresh</span>
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
-                  <label className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={isHumanVerified}
-                      onChange={handleCheckboxVerification}
-                      className="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                    />
-                    <span>I am not a robot</span>
-                  </label>
-
-                  {isHumanVerified ? (
-                    <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                      <CheckCircle2 size={16} />
-                      <span>Verified ✓</span>
-                    </span>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 bg-slate-100 rounded text-xs font-mono font-bold text-slate-700">
-                        {captchaNum1} + {captchaNum2} =
-                      </span>
-                      <input
-                        type="number"
-                        placeholder="?"
-                        value={captchaInput}
-                        onChange={e => handleCaptchaChange(e.target.value)}
-                        className="w-14 bg-white border border-slate-300 rounded px-2 py-1 text-xs font-bold text-center focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Login Button (Disabled until Human Verification is Completed) */}
-              <button
-                type="submit"
-                disabled={!isHumanVerified}
-                className={`w-full py-3 rounded-xl font-bold text-sm shadow-xs flex items-center justify-center gap-2 transition-all ${
-                  isHumanVerified
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer hover:shadow-sm'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                }`}
-              >
-                <span>Sign In as {loginRole === 'student' ? 'User' : loginRole === 'mentor' ? 'Mentor' : 'Admin'}</span>
-                <ArrowRight size={16} />
-              </button>
-
-              {/* Policy Links */}
-              <p className="text-[11px] text-center text-slate-400">
-                By logging in, you agree to our{' '}
-                <button
-                  type="button"
-                  onClick={() => setPolicyModal('terms')}
-                  className="text-blue-600 hover:underline font-semibold cursor-pointer"
-                >
-                  Terms & Conditions
-                </button>
-                {' '}and{' '}
-                <button
-                  type="button"
-                  onClick={() => setPolicyModal('privacy')}
-                  className="text-blue-600 hover:underline font-semibold cursor-pointer"
-                >
-                  Privacy Policy
-                </button>.
-              </p>
-            </form>
-          )}
-
-          {/* TAB 2: 1-CLICK DEMO PERSONAS */}
-          {activeTab === 'demo' && (
-            <div className="space-y-3">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                <p className="text-xs font-semibold text-slate-700">
-                  Instant 1-Click login for testing role-specific ecosystem workflows:
-                </p>
-              </div>
-
-              {/* Persona 1: User 001 */}
-              <div
-                onClick={() => loginAsRole('student')}
-                className="group p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-500 hover:shadow-xs transition-all cursor-pointer flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center font-bold text-base">
-                    <GraduationCap size={22} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                        User 001
-                      </h3>
-                      <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">
-                        USER (LEARNER)
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      user@lms.ai • 6 Learn Reels • Micro-Assessments • Mentor Application
-                    </p>
-                  </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-blue-600 text-slate-400 group-hover:text-white flex items-center justify-center transition-all">
-                  <ArrowRight size={16} />
-                </div>
-              </div>
-
-              {/* Persona 2: Mentor 001 */}
-              <div
-                onClick={() => loginAsRole('mentor')}
-                className="group p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 hover:shadow-xs transition-all cursor-pointer flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center font-bold text-base">
-                    <UserCheck size={22} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
-                        Mentor 001
-                      </h3>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200">
-                        VERIFIED MENTOR
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      mentor@lms.ai • Create 5-Reel Courses • View Students & Earnings
-                    </p>
-                  </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-emerald-600 text-slate-400 group-hover:text-white flex items-center justify-center transition-all">
-                  <ArrowRight size={16} />
-                </div>
-              </div>
-
-              {/* Persona 3: Administrator */}
-              <div
-                onClick={() => loginAsRole('admin')}
-                className="group p-4 rounded-xl bg-white border border-slate-200 hover:border-purple-500 hover:shadow-xs transition-all cursor-pointer flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center font-bold text-base">
-                    <ShieldCheck size={22} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900 group-hover:text-purple-600 transition-colors">
-                        Administrator
-                      </h3>
-                      <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 text-[10px] font-bold border border-purple-200">
-                        ADMINISTRATOR
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      admin@lms.ai • Approve Mentor Apps • Course 5-Reel Approvals • Analytics
-                    </p>
-                  </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-purple-600 text-slate-400 group-hover:text-white flex items-center justify-center transition-all">
-                  <ArrowRight size={16} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: CREATE LEARNER ACCOUNT */}
-          {activeTab === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-4">
-              {regError && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-xs text-rose-700 font-medium animate-in fade-in">
-                  <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
-                  <span>{regError}</span>
-                </div>
-              )}
-
-              <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-100 text-xs text-blue-800">
-                <p className="font-semibold">💡 Public Learner Registration</p>
-                <p className="text-blue-600 mt-0.5">
-                  Creates a User / Learner account. You can qualify for Mentor access by completing assessments!
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Full Name</label>
-                <div className="relative">
-                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Enter your name"
-                    value={regName}
-                    onChange={e => setRegName(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Email Address</label>
-                <div className="relative">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="learner@example.com"
-                    value={regEmail}
-                    onChange={e => setRegEmail(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Password</label>
-                <div className="relative">
-                  <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type={showRegPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Minimum 6 characters"
-                    value={regPassword}
-                    onChange={e => setRegPassword(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500 transition-all placeholder:text-slate-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowRegPassword(!showRegPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    {showRegPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Profile Avatar</label>
-                <div className="flex items-center gap-3">
-                  {avatarPresets.map((url, i) => (
-                    <img
-                      key={i}
-                      src={url}
-                      alt="Preset"
-                      onClick={() => setRegAvatar(url)}
-                      className={`w-11 h-11 rounded-xl object-cover cursor-pointer border-2 transition-all ${
-                        regAvatar === url ? 'border-blue-600 scale-105 shadow-xs' : 'border-slate-200 opacity-60 hover:opacity-100'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Human Verification */}
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
-                  <label className="flex items-center gap-2.5 text-xs text-slate-700 font-semibold cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={isHumanVerified}
-                      onChange={handleCheckboxVerification}
-                      className="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer"
-                    />
-                    <span>I am not a robot</span>
-                  </label>
-                  {isHumanVerified && (
-                    <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                      <CheckCircle2 size={16} />
-                      <span>Verified ✓</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={!isHumanVerified}
-                className={`w-full py-3 rounded-xl font-bold text-sm shadow-xs flex items-center justify-center gap-2 transition-all ${
-                  isHumanVerified
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer hover:shadow-sm'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                }`}
-              >
-                <span>Create User Account</span>
-                <ArrowRight size={16} />
-              </button>
-            </form>
-          )}
-        </div>
-
-        {/* FORGOT PASSWORD MODAL */}
-        {showForgotPassword && (
-          <div className="absolute inset-0 bg-white z-20 p-6 flex flex-col justify-between animate-in fade-in">
-            <div>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                <h3 className="text-base font-bold text-slate-900">Reset Password</h3>
-                <button
-                  type="button"
-                  onClick={() => setShowForgotPassword(false)}
-                  className="p-1 rounded-full text-slate-400 hover:text-slate-700 cursor-pointer"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              {!forgotSubmitted ? (
-                <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
-                  <p className="text-xs text-slate-600">
-                    Enter the email address associated with your account. We will send a secure password reset link.
-                  </p>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1.5">Email Address</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="name@lms.ai"
-                      value={forgotEmail}
-                      onChange={e => setForgotEmail(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-blue-500"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs cursor-pointer"
-                  >
-                    Send Reset Link
-                  </button>
-                </form>
-              ) : (
-                <div className="p-6 text-center space-y-3">
-                  <CheckCircle2 size={40} className="mx-auto text-emerald-500" />
-                  <h4 className="text-sm font-bold text-slate-900">Reset Link Sent</h4>
-                  <p className="text-xs text-slate-600">
-                    If an account exists for {forgotEmail}, instructions to reset your password have been dispatched.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPassword(false)}
-                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
+                    className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-semibold text-xs hover:bg-blue-700 transition-colors cursor-pointer"
                   >
                     Back to Sign In
                   </button>
                 </div>
+              ) : (
+                <form onSubmit={handleForgotSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        required
+                        value={forgotEmail}
+                        onChange={e => setForgotEmail(e.target.value)}
+                        placeholder="you@domain.com"
+                        className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(false)}
+                      className="flex-1 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !forgotEmail.trim()}
+                      className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-md hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send Reset Link'}
+                    </button>
+                  </div>
+                </form>
               )}
             </div>
-          </div>
-        )}
+          ) : activeTab === 'login' ? (
+            /* ================= SIGN IN VIEW ================= */
+            <form onSubmit={handleLoginSubmit} className="space-y-4">
+              {loginError && (
+                <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs">
+                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                  <div>
+                    <strong className="font-semibold block">Authentication Error</strong>
+                    <span>{loginError}</span>
+                  </div>
+                </div>
+              )}
 
-        {/* POLICY MODAL */}
-        {policyModal && (
-          <div className="absolute inset-0 bg-white z-20 p-6 flex flex-col justify-between animate-in fade-in">
-            <div className="overflow-y-auto pr-1">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                <h3 className="text-base font-bold text-slate-900">
-                  {policyModal === 'terms' ? 'Terms & Conditions' : 'Privacy Policy'}
-                </h3>
+              {/* Email */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    value={loginEmail}
+                    onChange={e => setLoginEmail(e.target.value)}
+                    placeholder="Enter your registered email"
+                    className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type={showLoginPassword ? 'text' : 'password'}
+                    required
+                    value={loginPassword}
+                    onChange={e => setLoginPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                    title={showLoginPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember Me & Forgot Password */}
+              <div className="flex items-center justify-between py-0.5">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-600 dark:text-slate-300 select-none hover:text-slate-900 dark:hover:text-white transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={e => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span className="font-medium">Remember me</span>
+                </label>
+
                 <button
                   type="button"
-                  onClick={() => setPolicyModal(null)}
-                  className="p-1 rounded-full text-slate-400 hover:text-slate-700 cursor-pointer"
+                  onClick={() => {
+                    setShowForgotPassword(true);
+                    setForgotEmail(loginEmail);
+                  }}
+                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer"
                 >
-                  <X size={18} />
+                  Forgot Password?
                 </button>
               </div>
 
-              <div className="text-xs text-slate-600 space-y-3 leading-relaxed">
-                {policyModal === 'terms' ? (
+              {/* Human Verification */}
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between">
+                <label className="flex items-center gap-2.5 cursor-pointer text-xs text-slate-700 dark:text-slate-200 select-none">
+                  <input
+                    type="checkbox"
+                    checked={isHumanVerified}
+                    onChange={e => setIsHumanVerified(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span>I am not a robot</span>
+                </label>
+                <Shield className="w-4 h-4 text-slate-400" />
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting || !loginEmail.trim() || !loginPassword}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isSubmitting ? (
                   <>
-                    <p><strong>1. Acceptance of Terms:</strong> By accessing and using the LMS platform, you agree to comply with all platform community rules, assessment integrity standards, and content creation policies.</p>
-                    <p><strong>2. Micro-Assessment Integrity:</strong> Assessments unlock strictly upon completion of all 6 vertical Learn reels. Multiple submissions and answers are automatically scored.</p>
-                    <p><strong>3. Mentor Verification:</strong> Mentor status requires achieving eligibility performance on 3 assessments followed by platform administrator review and approval.</p>
-                    <p><strong>4. Course Publishing:</strong> All course creations require 5 vertical educational reels and quality verification prior to publication in the student course catalog.</p>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Verifying Credentials...</span>
                   </>
                 ) : (
                   <>
-                    <p><strong>1. Information Collection:</strong> We collect learning activity data, reel watch completion progress, assessment accuracy metrics, and certification records.</p>
-                    <p><strong>2. Data Usage:</strong> Your learning statistics are utilized solely to determine micro-assessment unlocking, reward vouchers, and mentor teaching eligibility.</p>
-                    <p><strong>3. Anonymization & Privacy:</strong> User records and demo identifiers follow privacy best practices without selling data to third parties.</p>
+                    <span>Sign In</span>
+                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
-              </div>
-            </div>
+              </button>
 
-            <div className="pt-4 border-t border-slate-100 text-right">
+              {/* Quick 1-Click Demo Access Cards */}
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-amber-500" />
+                    Quick 1-Click Demo Logins
+                  </span>
+                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Click to login</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {/* Student */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginEmail('user@lms.ai');
+                      setLoginPassword('password123');
+                      setIsHumanVerified(true);
+                      loginAsRole('student');
+                    }}
+                    className="p-2.5 rounded-xl bg-blue-50/70 hover:bg-blue-100/80 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200/80 dark:border-blue-800/60 text-left transition-all group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-blue-700 dark:text-blue-300">Learner</span>
+                      <Award className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">user@lms.ai</p>
+                    <p className="text-[9px] text-blue-600 dark:text-blue-400 font-mono mt-0.5 font-medium">password123</p>
+                  </button>
+
+                  {/* Mentor */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginEmail('mentor@lms.ai');
+                      setLoginPassword('password123');
+                      setIsHumanVerified(true);
+                      loginAsRole('mentor');
+                    }}
+                    className="p-2.5 rounded-xl bg-indigo-50/70 hover:bg-indigo-100/80 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/60 text-left transition-all group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300">Mentor</span>
+                      <Briefcase className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">mentor@lms.ai</p>
+                    <p className="text-[9px] text-indigo-600 dark:text-indigo-400 font-mono mt-0.5 font-medium">password123</p>
+                  </button>
+
+                  {/* Admin */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginEmail('admin@lms.ai');
+                      setLoginPassword('admin123');
+                      setIsHumanVerified(true);
+                      loginAsRole('admin');
+                    }}
+                    className="p-2.5 rounded-xl bg-purple-50/70 hover:bg-purple-100/80 dark:bg-purple-950/40 dark:hover:bg-purple-900/60 border border-purple-200/80 dark:border-purple-800/60 text-left transition-all group cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-purple-700 dark:text-purple-300">Admin</span>
+                      <ShieldCheck className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">admin@lms.ai</p>
+                    <p className="text-[9px] text-purple-600 dark:text-purple-400 font-mono mt-0.5 font-medium">admin123</p>
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-center pt-2">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('register');
+                      setRegError('');
+                      setMentorError('');
+                    }}
+                    className="font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                  >
+                    Create Account
+                  </button>
+                </p>
+              </div>
+            </form>
+          ) : (
+            /* ================= CREATE ACCOUNT (DUAL PATH: LEARNER vs MENTOR) ================= */
+            <div className="space-y-4">
+              {/* Account Type Toggle */}
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountType('learner');
+                    setRegError('');
+                    setMentorError('');
+                  }}
+                  className={`p-2.5 rounded-lg text-left transition-all cursor-pointer ${
+                    accountType === 'learner'
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <BookOpen className={`w-4 h-4 ${accountType === 'learner' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`} />
+                    <span className="text-xs font-bold">Learner</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Instant access to courses</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAccountType('mentor');
+                    setRegError('');
+                    setMentorError('');
+                  }}
+                  className={`p-2.5 rounded-lg text-left transition-all cursor-pointer ${
+                    accountType === 'mentor'
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Briefcase className={`w-4 h-4 ${accountType === 'mentor' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`} />
+                    <span className="text-xs font-bold">Mentor</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">Apply for teaching portal</p>
+                </button>
+              </div>
+
+              {/* ============ LEARNER REGISTRATION ============ */}
+              {accountType === 'learner' ? (
+                <form onSubmit={handleLearnerRegister} className="space-y-3.5">
+                  <div className="p-3 bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/60 rounded-xl flex items-start gap-2.5 text-blue-800 dark:text-blue-200 text-xs">
+                    <Award className="w-4 h-4 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <strong className="font-semibold block">Learner Account Benefits</strong>
+                      <span>Learn courses, watch 9:16 reels, take quizzes & assignments, and earn verified credentials.</span>
+                    </div>
+                  </div>
+
+                  {regError && (
+                    <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{regError}</span>
+                    </div>
+                  )}
+
+                  {/* Full Name */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+                    <div className="relative">
+                      <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        required
+                        value={regName}
+                        onChange={e => setRegName(e.target.value)}
+                        placeholder="e.g. Alex Johnson"
+                        className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        required
+                        value={regEmail}
+                        onChange={e => setRegEmail(e.target.value)}
+                        placeholder="you@domain.com"
+                        className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password & Strength Indicator */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Password</label>
+                      {regPassword && (
+                        <span className={`text-[10px] font-bold ${passwordStrength.color}`}>
+                          {passwordStrength.label}
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type={showRegPassword ? 'text' : 'password'}
+                        required
+                        value={regPassword}
+                        onChange={e => setRegPassword(e.target.value)}
+                        placeholder="Create a strong password (min 6 chars)"
+                        className="w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPassword(!showRegPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                      >
+                        {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {regPassword && (
+                      <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mt-1.5 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            passwordStrength.score === 1
+                              ? 'bg-rose-500'
+                              : passwordStrength.score === 2
+                              ? 'bg-amber-500'
+                              : passwordStrength.score === 3
+                              ? 'bg-blue-500'
+                              : 'bg-emerald-500'
+                          }`}
+                          style={{ width: passwordStrength.width }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Confirm Password */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Confirm Password</label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type={showRegConfirmPassword ? 'text' : 'password'}
+                        required
+                        value={regConfirmPassword}
+                        onChange={e => setRegConfirmPassword(e.target.value)}
+                        placeholder="Re-type your password"
+                        className="w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                      >
+                        {showRegConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Terms */}
+                  <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-600 dark:text-slate-300 select-none">
+                    <input
+                      type="checkbox"
+                      checked={regTerms}
+                      onChange={e => setRegTerms(e.target.checked)}
+                      className="w-4 h-4 mt-0.5 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
+                    />
+                    <span>
+                      I agree to the{' '}
+                      <button
+                        type="button"
+                        onClick={() => setPolicyModal('terms')}
+                        className="text-blue-600 dark:text-blue-400 font-semibold hover:underline cursor-pointer"
+                      >
+                        Terms of Service
+                      </button>{' '}
+                      and{' '}
+                      <button
+                        type="button"
+                        onClick={() => setPolicyModal('privacy')}
+                        className="text-blue-600 dark:text-blue-400 font-semibold hover:underline cursor-pointer"
+                      >
+                        Privacy Policy
+                      </button>
+                      .
+                    </span>
+                  </label>
+
+                  {/* Human Verification */}
+                  <div className="p-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between">
+                    <label className="flex items-center gap-2.5 cursor-pointer text-xs text-slate-700 dark:text-slate-200 select-none">
+                      <input
+                        type="checkbox"
+                        checked={isHumanVerified}
+                        onChange={e => setIsHumanVerified(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
+                      />
+                      <span>I am not a robot</span>
+                    </label>
+                    <Shield className="w-4 h-4 text-slate-400" />
+                  </div>
+
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || !regName.trim() || !regEmail.trim() || !regPassword || !regConfirmPassword || !regTerms}
+                    className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Creating Learner Account...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Create Learner Account</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </form>
+              ) : (
+                /* ============ MENTOR APPLICATION ============ */
+                mentorSuccess ? (
+                  <div className="p-6 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-center space-y-4">
+                    <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-300 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-base font-bold text-slate-900 dark:text-white font-display">
+                        Application Submitted for Review
+                      </h4>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                        Your mentor application has been submitted successfully and is awaiting administrator review. Once approved, you will receive full access to the Mentor Studio.
+                      </p>
+                    </div>
+                    <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-emerald-200 dark:border-emerald-800 text-left text-xs space-y-1">
+                      <div className="flex justify-between text-slate-500 dark:text-slate-400">
+                        <span>Applicant:</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">{mentorName}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-500 dark:text-slate-400">
+                        <span>Email:</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">{mentorEmail}</span>
+                      </div>
+                      <div className="flex justify-between text-slate-500 dark:text-slate-400">
+                        <span>Status:</span>
+                        <span className="font-bold text-amber-600 dark:text-amber-400 uppercase text-[10px] bg-amber-50 dark:bg-amber-900/30 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800">
+                          Pending Review
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setMentorSuccess(false);
+                        setActiveTab('login');
+                      }}
+                      className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer"
+                    >
+                      Return to Sign In
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleMentorApply} className="space-y-3.5">
+                    <div className="p-3 bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl flex items-start gap-2.5 text-amber-900 dark:text-amber-200 text-xs">
+                      <Shield className="w-4 h-4 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                      <div>
+                        <strong className="font-semibold block">Faculty Verification Notice</strong>
+                        <span>Mentor accounts require administrator review and approval before teaching access is unlocked.</span>
+                      </div>
+                    </div>
+
+                    {mentorError && (
+                      <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>{mentorError}</span>
+                      </div>
+                    )}
+
+                    {/* Name */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Legal Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={mentorName}
+                        onChange={e => setMentorName(e.target.value)}
+                        placeholder="e.g. Dr. Sarah Connor"
+                        className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Official / Institutional Email</label>
+                      <input
+                        type="email"
+                        required
+                        value={mentorEmail}
+                        onChange={e => setMentorEmail(e.target.value)}
+                        placeholder="s.connor@university.edu"
+                        className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+
+                    {/* Password */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Account Password</label>
+                      <div className="relative">
+                        <input
+                          type={showMentorPassword ? 'text' : 'password'}
+                          required
+                          value={mentorPassword}
+                          onChange={e => setMentorPassword(e.target.value)}
+                          placeholder="Min 6 characters"
+                          className="w-full pl-3.5 pr-10 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowMentorPassword(!showMentorPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                        >
+                          {showMentorPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Domain & Experience */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Primary Domain</label>
+                        <input
+                          type="text"
+                          required
+                          value={mentorExpertise}
+                          onChange={e => setMentorExpertise(e.target.value)}
+                          placeholder="e.g. Java, Cloud, DevOps"
+                          className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Years Experience</label>
+                        <select
+                          value={mentorExperience}
+                          onChange={e => setMentorExperience(e.target.value)}
+                          className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all cursor-pointer"
+                        >
+                          <option value="1">1-2 Years</option>
+                          <option value="3">3-5 Years</option>
+                          <option value="6">6-10 Years</option>
+                          <option value="10">10+ Years</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Bio */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Professional Bio & Teaching Background</label>
+                      <textarea
+                        required
+                        rows={2}
+                        value={mentorBio}
+                        onChange={e => setMentorBio(e.target.value)}
+                        placeholder="Summarize your engineering background and course focus..."
+                        className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                      />
+                    </div>
+
+                    {/* Portfolio / LinkedIn */}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Portfolio or LinkedIn URL (Optional)</label>
+                      <input
+                        type="url"
+                        value={mentorPortfolio}
+                        onChange={e => setMentorPortfolio(e.target.value)}
+                        placeholder="https://linkedin.com/in/yourprofile"
+                        className="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+
+                    {/* Agreement Checkbox */}
+                    <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-600 dark:text-slate-300 select-none">
+                      <input
+                        type="checkbox"
+                        checked={mentorTerms}
+                        onChange={e => setMentorTerms(e.target.checked)}
+                        className="w-4 h-4 mt-0.5 text-indigo-600 rounded border-slate-300 dark:border-slate-600 focus:ring-indigo-500 cursor-pointer"
+                      />
+                      <span>I agree to the LMS Faculty Code of Conduct, curriculum standards, and terms.</span>
+                    </label>
+
+                    {/* Human Verification */}
+                    <div className="p-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between">
+                      <label className="flex items-center gap-2.5 cursor-pointer text-xs text-slate-700 dark:text-slate-200 select-none">
+                        <input
+                          type="checkbox"
+                          checked={isHumanVerified}
+                          onChange={e => setIsHumanVerified(e.target.checked)}
+                          className="w-4 h-4 text-blue-600 rounded border-slate-300 dark:border-slate-600 focus:ring-blue-500 cursor-pointer"
+                        />
+                        <span>I am not a robot</span>
+                      </label>
+                      <Shield className="w-4 h-4 text-slate-400" />
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !mentorName.trim() || !mentorEmail.trim() || !mentorPassword || !mentorExpertise.trim() || !mentorBio.trim() || !mentorTerms}
+                      className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Submitting Application...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Submit Mentor Application</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Policy Modal Overlay */}
+      {policyModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <h4 className="text-base font-bold font-display">
+                {policyModal === 'terms' ? 'Terms of Service' : 'Privacy Policy'}
+              </h4>
               <button
-                type="button"
                 onClick={() => setPolicyModal(null)}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
               >
-                Close
+                <X size={18} />
               </button>
             </div>
+            <div className="text-xs text-slate-600 dark:text-slate-300 space-y-2 max-h-60 overflow-y-auto pr-2 leading-relaxed">
+              <p>
+                By creating an account on the LMS Platform, you agree to uphold academic integrity, engage in respectful educational discussions, and follow curriculum guidelines.
+              </p>
+              <p>
+                Your personal data is encrypted and securely maintained in accordance with enterprise data protection standards.
+              </p>
+            </div>
+            <button
+              onClick={() => setPolicyModal(null)}
+              className="w-full py-2.5 bg-blue-600 text-white rounded-xl font-bold text-xs cursor-pointer"
+            >
+              I Understand & Agree
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

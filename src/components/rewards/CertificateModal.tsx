@@ -1,21 +1,25 @@
 import React from 'react';
-import { Award, Download, Printer, CheckCircle, ShieldCheck, X } from 'lucide-react';
+import { Award, Download, Printer, ShieldCheck, X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 interface CertificateModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   certificateTitle?: string;
+  courseTitle?: string;
 }
 
 export const CertificateModal: React.FC<CertificateModalProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
-  certificateTitle = 'Full-Stack Modern AI Architecture & Micro-Learning Mastery'
+  certificateTitle,
+  courseTitle
 }) => {
   const { currentUser, showToast } = useApp();
 
   if (!isOpen) return null;
+
+  const title = courseTitle || certificateTitle || 'Java Core & Modern Enterprise Architecture';
 
   const handlePrint = () => {
     window.print();
@@ -27,16 +31,16 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in">
-      <div className="w-full max-w-2xl glass-panel bg-slate-900/95 border border-white/15 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-white">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Award size={18} className="text-amber-400" />
             <h3 className="font-bold text-base text-white">Verified Milestone Certificate</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
+            className="p-1.5 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
             <X size={16} />
           </button>
@@ -68,13 +72,13 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
           </p>
 
           <div className="my-4 p-3 rounded-xl bg-blue-950/60 border border-blue-500/30 max-w-md mx-auto">
-            <h4 className="text-sm sm:text-base font-bold text-blue-200">{certificateTitle}</h4>
+            <h4 className="text-sm sm:text-base font-bold text-blue-200">{title}</h4>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-400 max-w-md mx-auto pt-4 border-t border-white/10 mt-4">
+          <div className="flex items-center justify-between text-xs text-slate-400 max-w-md mx-auto pt-4 border-t border-slate-800 mt-4">
             <div className="text-left">
               <span className="block text-[10px] text-slate-500 uppercase">Issue Date</span>
-              <strong className="text-slate-200">August 24, 2026</strong>
+              <strong className="text-slate-200">{new Date().toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</strong>
             </div>
 
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
@@ -90,10 +94,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-white/10 flex items-center justify-end gap-3 bg-slate-900/80">
+        <div className="px-6 py-4 border-t border-slate-800 flex items-center justify-end gap-3 bg-slate-900/80">
           <button
             onClick={handlePrint}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-white/10"
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-700 cursor-pointer"
           >
             <Printer size={15} />
             <span>Print</span>
@@ -101,7 +105,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
           <button
             onClick={handleDownload}
-            className="px-5 py-2 rounded-xl gradient-btn-emerald text-xs font-bold flex items-center gap-1.5"
+            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
           >
             <Download size={15} />
             <span>Download Certificate</span>

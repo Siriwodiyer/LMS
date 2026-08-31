@@ -77,7 +77,7 @@ export const LearnerInspectorModal: React.FC<LearnerInspectorModalProps> = ({
         {/* Scrollable Content */}
         <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1 text-xs text-slate-700">
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
               <span className="text-[11px] text-slate-500 font-medium">Assigned Mentor</span>
               <p className="text-xs font-bold text-slate-900 truncate">

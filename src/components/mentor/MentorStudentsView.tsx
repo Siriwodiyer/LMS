@@ -4,21 +4,12 @@ import { EnrolledStudent } from '../../types';
 import {
   Users,
   Search,
-  Filter,
-  GraduationCap,
-  Award,
-  Mail,
   MessageSquare,
-  Clock,
   TrendingUp,
-  CheckCircle2,
   BookOpen,
-  Sparkles,
   Download,
   Send,
-  X,
-  ExternalLink,
-  ChevronDown
+  X
 } from 'lucide-react';
 
 export const MentorStudentsView: React.FC = () => {
@@ -40,7 +31,7 @@ export const MentorStudentsView: React.FC = () => {
       .map(c => c.id);
   }, [courses, currentUser]);
 
-  // Enrolled students in mentor's courses (or fallback to all mock students if none match)
+  // Enrolled students in mentor's courses
   const mentorStudents = useMemo(() => {
     const matching = enrolledStudents.filter(s => mentorCourseIds.includes(s.courseId));
     return matching.length > 0 ? matching : enrolledStudents;
@@ -100,317 +91,250 @@ export const MentorStudentsView: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `mentor_students_roster_${Date.now()}.csv`);
+    link.setAttribute('download', `enrolled_students_${Date.now()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('Student roster exported as CSV successfully.', 'info');
+    showToast('Exported student roster to CSV!', 'success');
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6 pb-24 animate-in fade-in duration-200">
-      {/* Top Header Banner */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="w-full max-w-6xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6 pb-24 animate-in fade-in duration-200">
+      {/* Header Banner */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-1">
-              <Users size={13} /> Student Roster & Analytics
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Classroom Analytics</span>
+            <span className="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[10px] font-semibold border border-blue-200 dark:border-blue-800">
+              Live Telemetry
             </span>
-            <span className="text-xs text-slate-500">• {totalStudents} Active Students</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 font-display mt-2">
-            Enrolled Students Directory
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
-            Track student progress, monitor quiz scores, check certificate completions, and send direct guidance notes.
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display mt-1">Student Roster & Progress</h1>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-xl">
+            Track individual learner milestone progress across your authored course reels, review quiz scores, and provide direct feedback.
           </p>
         </div>
 
         <button
           onClick={handleExportCSV}
-          className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-2 border border-slate-200 transition-all shadow-sm shrink-0"
+          className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center gap-2 border border-slate-200 dark:border-slate-700 shadow-xs transition-all self-start md:self-auto cursor-pointer"
         >
           <Download size={15} />
-          <span>Export Student CSV</span>
+          <span>Export CSV</span>
         </button>
       </div>
 
-      {/* Metric Cards */}
+      {/* KPI Statistic Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Learners</span>
-          <strong className="text-2xl font-bold text-slate-900 font-mono block mt-1">{totalStudents}</strong>
-          <span className="text-[10px] text-slate-400 mt-0.5 block">Across all courses</span>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
+            <span>Enrolled Students</span>
+            <Users size={14} className="text-blue-600 dark:text-blue-400" />
+          </div>
+          <strong className="text-2xl font-bold text-slate-900 dark:text-white font-mono block mt-1">{totalStudents}</strong>
+          <span className="text-[10px] text-slate-400 mt-0.5 block">Active learners</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider block">In Progress</span>
-          <strong className="text-2xl font-bold text-blue-600 font-mono block mt-1">{inProgressCount}</strong>
-          <span className="text-[10px] text-slate-400 mt-0.5 block">Active learning</span>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
+            <span>Completed (5/5)</span>
+            <BookOpen size={14} className="text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <strong className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 font-mono block mt-1">{completedCount}</strong>
+          <span className="text-[10px] text-slate-400 mt-0.5 block">Finished all reels</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-wider block">Completed</span>
-          <strong className="text-2xl font-bold text-emerald-600 font-mono block mt-1">{completedCount}</strong>
-          <span className="text-[10px] text-emerald-600 mt-0.5 block font-semibold">Certificates awarded</span>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
+            <span>In Progress</span>
+            <TrendingUp size={14} className="text-amber-600 dark:text-amber-400" />
+          </div>
+          <strong className="text-2xl font-bold text-amber-600 dark:text-amber-400 font-mono block mt-1">{inProgressCount}</strong>
+          <span className="text-[10px] text-slate-400 mt-0.5 block">Active watching</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider block">Avg Quiz Score</span>
-          <strong className="text-2xl font-bold text-amber-600 font-mono block mt-1">{avgQuizScore}%</strong>
-          <span className="text-[10px] text-slate-400 mt-0.5 block">Overall performance</span>
+        <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs">
+            <span>Average Quiz Score</span>
+            <span className="text-xs font-bold text-purple-600 dark:text-purple-400">Score</span>
+          </div>
+          <strong className="text-2xl font-bold text-purple-600 dark:text-purple-400 font-mono block mt-1">{avgQuizScore}%</strong>
+          <span className="text-[10px] text-slate-400 mt-0.5 block">Classroom average</span>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Search */}
+      <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors">
         <div className="relative flex-1 max-w-md">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search student by name, email, or course..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
+            placeholder="Search by student name or email..."
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all"
           />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-            >
-              <X size={14} />
-            </button>
-          )}
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Course filter */}
-          <select
-            value={selectedCourseFilter}
-            onChange={e => setSelectedCourseFilter(e.target.value)}
-            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-emerald-500"
+          <button
+            onClick={() => setCompletionFilter('all')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              completionFilter === 'all'
+                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+            }`}
           >
-            <option value="all">All Courses</option>
-            {courses.map(c => (
-              <option key={c.id} value={c.id}>
-                {c.title.length > 30 ? c.title.substring(0, 30) + '...' : c.title}
-              </option>
-            ))}
-          </select>
-
-          {/* Completion status */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-            <button
-              onClick={() => setCompletionFilter('all')}
-              className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
-                completionFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setCompletionFilter('in_progress')}
-              className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
-                completionFilter === 'in_progress' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              In Progress
-            </button>
-            <button
-              onClick={() => setCompletionFilter('completed')}
-              className={`px-2.5 py-1 rounded text-xs font-bold transition-all ${
-                completionFilter === 'completed' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              Completed
-            </button>
-          </div>
+            All Students
+          </button>
+          <button
+            onClick={() => setCompletionFilter('completed')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              completionFilter === 'completed'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800'
+            }`}
+          >
+            Completed
+          </button>
+          <button
+            onClick={() => setCompletionFilter('in_progress')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              completionFilter === 'in_progress'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200 dark:border-amber-800'
+            }`}
+          >
+            In Progress
+          </button>
         </div>
       </div>
 
-      {/* Student List Table */}
-      {filteredStudents.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-          <div className="w-14 h-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-            <Users size={24} />
-          </div>
-          <h3 className="text-base font-bold text-slate-900">No students found</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Try adjusting your search criteria or course selection.
-          </p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto rounded-2xl bg-white border border-slate-200 shadow-sm">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
+      {/* Students Table */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden transition-colors">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+            <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
               <tr>
-                <th className="p-4 font-bold">Student</th>
-                <th className="p-4 font-bold">Course Enrolled</th>
-                <th className="p-4 font-bold">Learning Progress</th>
-                <th className="p-4 font-bold">Quiz Average</th>
-                <th className="p-4 font-bold">Enrolled Date</th>
-                <th className="p-4 font-bold">Last Active</th>
-                <th className="p-4 font-bold text-right">Actions</th>
+                <th className="p-4">Student</th>
+                <th className="p-4">Enrolled Course</th>
+                <th className="p-4">Reels Progress</th>
+                <th className="p-4">Quiz Average</th>
+                <th className="p-4">Enrolled Date</th>
+                <th className="p-4 text-right">Direct Feedback</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {filteredStudents.map(student => {
-                const isCompleted = student.progressPercent >= 100;
-                const initials = student.userName
-                  .split(' ')
-                  .map(n => n[0])
-                  .join('')
-                  .substring(0, 2)
-                  .toUpperCase();
-
-                return (
-                  <tr key={student.id} className="hover:bg-slate-50 transition-colors">
-                    {/* Student Info */}
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">
-                          {initials}
-                        </div>
-                        <div>
-                          <strong className="text-slate-900 block font-bold text-xs">{student.userName}</strong>
-                          <span className="text-[11px] text-slate-500">{student.userEmail}</span>
-                        </div>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {filteredStudents.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-slate-400">
+                    No student records found matching your filters.
+                  </td>
+                </tr>
+              ) : (
+                filteredStudents.map(student => (
+                  <tr key={student.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                    <td className="p-4 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center justify-center shrink-0">
+                        {student.userName.charAt(0)}
+                      </div>
+                      <div>
+                        <strong className="text-slate-900 dark:text-white font-bold block">{student.userName}</strong>
+                        <span className="text-[11px] text-slate-400">{student.userEmail}</span>
                       </div>
                     </td>
-
-                    {/* Course */}
-                    <td className="p-4 font-medium text-slate-800">
-                      <div className="max-w-xs truncate" title={student.courseTitle}>
-                        {student.courseTitle}
-                      </div>
-                    </td>
-
-                    {/* Progress Bar */}
                     <td className="p-4">
-                      <div className="w-36 space-y-1">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-bold text-slate-900 font-mono">{student.progressPercent}%</span>
-                          {isCompleted && (
-                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                              Completed
-                            </span>
-                          )}
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{student.courseTitle}</span>
+                    </td>
+                    <td className="p-4">
+                      <div className="w-32 space-y-1">
+                        <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
+                          <span>{student.progressPercent}%</span>
+                          <span>{Math.round((student.progressPercent / 100) * 5)}/5</span>
                         </div>
-                        <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                           <div
-                            className={`h-full rounded-full transition-all duration-300 ${
-                              isCompleted
-                                ? 'bg-emerald-600'
-                                : student.progressPercent > 50
-                                ? 'bg-blue-600'
-                                : 'bg-amber-500'
-                            }`}
-                            style={{ width: `${Math.min(student.progressPercent, 100)}%` }}
+                            className="h-full bg-blue-600 dark:bg-blue-500 rounded-full"
+                            style={{ width: `${student.progressPercent}%` }}
                           />
                         </div>
                       </div>
                     </td>
-
-                    {/* Quiz Average */}
                     <td className="p-4">
-                      <span className="px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-800 font-mono font-bold text-xs">
-                        {student.quizAverage || 88}%
-                      </span>
+                      <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{student.quizAverage || 85}%</span>
                     </td>
-
-                    {/* Enrolled Date */}
-                    <td className="p-4 text-slate-500 font-mono text-[11px]">
+                    <td className="p-4 text-slate-500 dark:text-slate-400">
                       {new Date(student.enrolledAt).toLocaleDateString()}
                     </td>
-
-                    {/* Last Active */}
-                    <td className="p-4 text-slate-500 font-mono text-[11px]">
-                      {new Date(student.lastActive).toLocaleDateString()}
-                    </td>
-
-                    {/* Actions */}
                     <td className="p-4 text-right">
                       <button
-                        onClick={() => {
-                          setSelectedStudentForMessage(student);
-                          setMessageSubject(`Feedback on ${student.courseTitle}`);
-                          setMessageBody(`Hi ${student.userName.split(' ')[0]},\n\nGreat work progressing through the course! I wanted to check in and see how you are finding the modules.`);
-                        }}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs inline-flex items-center gap-1.5 border border-emerald-200 transition-all shadow-sm"
+                        onClick={() => setSelectedStudentForMessage(student)}
+                        className="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center gap-1.5 ml-auto border border-blue-200 dark:border-blue-800 cursor-pointer transition-colors"
                       >
                         <MessageSquare size={13} />
-                        <span>Message</span>
+                        <span>Send Feedback</span>
                       </button>
                     </td>
                   </tr>
-                );
-              })}
+                ))
+              )}
             </tbody>
           </table>
         </div>
-      )}
+      </div>
 
-      {/* Direct Feedback / Message Modal */}
+      {/* Direct Feedback Modal */}
       {selectedStudentForMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
-                  <MessageSquare size={16} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-base text-slate-900">Message Student</h3>
-                  <p className="text-xs text-slate-500">To: {selectedStudentForMessage.userName} ({selectedStudentForMessage.userEmail})</p>
-                </div>
-              </div>
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col text-slate-900 dark:text-white">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60">
+              <h3 className="font-bold text-sm">Send Direct Feedback to {selectedStudentForMessage.userName}</h3>
               <button
                 onClick={() => setSelectedStudentForMessage(null)}
-                className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700"
+                className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleSendMessage} className="p-6 space-y-4 text-xs">
+            <form onSubmit={handleSendMessage} className="p-6 space-y-4">
               <div>
-                <label className="block text-slate-700 font-bold mb-1">Subject</label>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Subject</label>
                 <input
                   type="text"
                   required
+                  placeholder="e.g. Great progress on Reel 3 Architecture assignment!"
                   value={messageSubject}
                   onChange={e => setMessageSubject(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-600 text-xs text-slate-900"
+                  className="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-700 font-bold mb-1">Message Content</label>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Feedback Note</label>
                 <textarea
-                  rows={5}
+                  rows={4}
                   required
+                  placeholder="Share constructive coaching notes, suggestions, or code review comments..."
                   value={messageBody}
                   onChange={e => setMessageBody(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-600 text-xs text-slate-900 resize-none"
+                  className="w-full p-2.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 resize-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setSelectedStudentForMessage(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer"
                 >
-                  <Send size={14} />
+                  <Send size={13} />
                   <span>Send Message</span>
                 </button>
               </div>

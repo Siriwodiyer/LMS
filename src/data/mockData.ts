@@ -31,7 +31,7 @@ export const INITIAL_BADGE_DEFINITIONS: BadgeDefinition[] = [
     conditionThreshold: 80,
     conditionText: 'Complete Java Fundamentals course with score >= 80%',
     isActive: true,
-    earnedCount: 42,
+    earnedCount: 0,
     createdAt: '2026-08-01T00:00:00Z',
   },
   {
@@ -44,7 +44,7 @@ export const INITIAL_BADGE_DEFINITIONS: BadgeDefinition[] = [
     conditionThreshold: 6,
     conditionText: 'Complete all 6 Learn reels and pass the assessment',
     isActive: true,
-    earnedCount: 128,
+    earnedCount: 0,
     createdAt: '2026-08-05T00:00:00Z',
   },
   {
@@ -57,283 +57,39 @@ export const INITIAL_BADGE_DEFINITIONS: BadgeDefinition[] = [
     conditionThreshold: 7,
     conditionText: 'Maintain 7 consecutive days active streak',
     isActive: true,
-    earnedCount: 84,
+    earnedCount: 0,
     createdAt: '2026-08-10T00:00:00Z',
-  },
-  {
-    id: 'badge-def-4',
-    title: 'DSA Champion',
-    description: 'Master binary search trees, graph algorithms, and dynamic programming.',
-    icon: '🌳',
-    rarity: 'legendary',
-    conditionType: 'quiz_score',
-    conditionCourseId: 'course-dsa',
-    conditionThreshold: 85,
-    conditionText: 'Complete Data Structures & Algorithms course with >= 85%',
-    isActive: true,
-    earnedCount: 19,
-    createdAt: '2026-08-12T00:00:00Z',
-  },
-  {
-    id: 'badge-def-5',
-    title: 'Full-Stack Architect',
-    description: 'Aced React 19 & Agentic AI workflows masterclass.',
-    icon: '💻',
-    rarity: 'epic',
-    conditionType: 'course_completion',
-    conditionCourseId: 'course-1',
-    conditionThreshold: 100,
-    conditionText: 'Complete 100% of Modern AI Architecture course',
-    isActive: true,
-    earnedCount: 35,
-    createdAt: '2026-08-15T00:00:00Z',
-  },
+  }
 ];
 
-export const INITIAL_BADGES: Badge[] = [
-  {
-    id: 'badge-1',
-    title: 'Speed Learner',
-    description: 'Completed your first 6-reel micro-assessment with distinction!',
-    icon: '⚡',
-    unlockedAt: '2026-08-20T10:00:00Z',
-    rarity: 'rare',
-  },
-  {
-    id: 'badge-2',
-    title: 'Streak Master',
-    description: 'Maintained a 7-day continuous learning streak.',
-    icon: '🔥',
-    unlockedAt: '2026-08-22T14:30:00Z',
-    rarity: 'epic',
-  },
-  {
-    id: 'badge-3',
-    title: 'Java Specialist',
-    description: 'Complete Java Fundamentals course with score >= 80%',
-    icon: '☕',
-    unlockedAt: '2026-08-23T09:15:00Z',
-    rarity: 'common',
-  },
-  {
-    id: 'badge-4',
-    title: 'DSA Champion',
-    description: 'Master binary search trees, graph algorithms, and dynamic programming.',
-    icon: '🌳',
-    unlockedAt: '2026-08-24T08:00:00Z',
-    rarity: 'legendary',
-  },
-];
-
-export const INITIAL_VOUCHERS: DiscountVoucher[] = [
-  {
-    id: 'vouch-1',
-    code: 'REELPRO30',
-    discountPercent: 30,
-    description: '30% off any premium course on the platform',
-    expiresAt: '2026-09-30T23:59:59Z',
-    isUsed: false,
-  },
-  {
-    id: 'vouch-2',
-    code: 'MASTER50',
-    discountPercent: 50,
-    description: '50% off Next.js Masterclass (Earned via Assessment Pass)',
-    expiresAt: '2026-09-15T23:59:59Z',
-    isUsed: false,
-  },
-];
+export const INITIAL_BADGES: Badge[] = [];
+export const INITIAL_VOUCHERS: DiscountVoucher[] = [];
 
 export const INITIAL_USERS: User[] = [
   {
     id: 'user-student',
-    name: 'User 001',
+    name: 'Learner',
     email: 'user@lms.ai',
     password: 'password123',
     role: 'student',
     status: 'active',
-    points: 1450,
-    xp: 2850,
-    streakDays: 7,
-    level: 4,
-    bio: 'Software engineering learner focused on full-stack architecture, micro-reels, and interactive masterclasses.',
-    assignedMentorId: 'user-mentor',
-    assignedMentorName: 'Mentor 001',
-    enrolledCourseIds: ['course-1', 'course-2', 'course-java'],
-    completedCourseIds: ['course-3'],
-    badges: INITIAL_BADGES,
-    discountVouchers: INITIAL_VOUCHERS,
-    weeklyHours: [2.5, 3.8, 4.2, 1.9, 5.1, 6.0, 4.5],
-    totalLearningHours: 42.5,
-    quizAverage: 92,
-    completedLessonsCount: 18,
-    reelsWatchedTotal: 65,
-    assignmentsCompletedCount: 4,
-    registeredAt: '2026-07-15T10:00:00Z',
-    lastActive: '2026-08-25T11:45:00Z',
-    recentActivity: [
-      {
-        id: 'act-1',
-        type: 'quiz',
-        title: 'Completed Micro-Assessment',
-        description: 'Scored 100% on automated assessment quiz',
-        timestamp: '2 hours ago',
-        scoreOrPoints: '+100 XP'
-      },
-      {
-        id: 'act-2',
-        type: 'reel',
-        title: 'Watched 6 Tech & AI Reels',
-        description: 'Completed 6-reel series on Modern Engineering',
-        timestamp: 'Yesterday',
-        scoreOrPoints: '+60 pts'
-      },
-      {
-        id: 'act-3',
-        type: 'badge',
-        title: 'Unlocked "Streak Master" Badge',
-        description: 'Maintained 7 days continuous streak',
-        timestamp: '2 days ago',
-        scoreOrPoints: 'Epic Badge'
-      },
-      {
-        id: 'act-4',
-        type: 'course',
-        title: 'Progressed in AI Architecture Course',
-        description: 'Finished Reel 3: Structured Output & Tool Calling',
-        timestamp: '3 days ago',
-        scoreOrPoints: '68% Complete'
-      }
-    ]
-  },
-  {
-    id: 'user-learner-2',
-    name: 'User 002',
-    email: 'user002@lms.ai',
-    password: 'password123',
-    role: 'student',
-    status: 'active',
-    points: 980,
-    xp: 1950,
-    streakDays: 4,
-    level: 3,
-    bio: 'Computer Science student focusing on DSA and System Design.',
-    assignedMentorId: 'user-mentor-2',
-    assignedMentorName: 'Mentor 002',
-    enrolledCourseIds: ['course-dsa', 'course-2'],
-    completedCourseIds: [],
-    badges: [INITIAL_BADGES[0], INITIAL_BADGES[2]],
-    discountVouchers: [],
-    weeklyHours: [1.8, 2.4, 3.1, 2.0, 4.0, 3.5, 2.2],
-    totalLearningHours: 28.0,
-    quizAverage: 84,
-    completedLessonsCount: 11,
-    reelsWatchedTotal: 42,
-    assignmentsCompletedCount: 2,
-    registeredAt: '2026-08-01T09:30:00Z',
-    lastActive: '2026-08-25T08:15:00Z',
-    recentActivity: [
-      {
-        id: 'act-201',
-        type: 'quiz',
-        title: 'Completed Binary Search Trees Assessment',
-        description: 'Scored 85% on DSA Module',
-        timestamp: 'Yesterday',
-        scoreOrPoints: '+80 XP'
-      }
-    ]
-  },
-  {
-    id: 'user-learner-3',
-    name: 'User 003',
-    email: 'user003@lms.ai',
-    password: 'password123',
-    role: 'student',
-    status: 'active',
-    points: 2150,
-    xp: 4300,
-    streakDays: 14,
-    level: 5,
-    bio: 'Backend developer transitioning to Cloud & Distributed Systems. Completed multiple qualifying assessments.',
-    assignedMentorId: 'user-mentor',
-    assignedMentorName: 'Mentor 001',
-    enrolledCourseIds: ['course-1', 'course-java', 'course-dbms'],
-    completedCourseIds: ['course-java'],
-    badges: INITIAL_BADGES,
-    discountVouchers: [INITIAL_VOUCHERS[0]],
-    weeklyHours: [3.5, 4.0, 5.2, 4.8, 6.0, 5.5, 4.0],
-    totalLearningHours: 56.4,
-    quizAverage: 96,
-    completedLessonsCount: 24,
-    reelsWatchedTotal: 98,
-    assignmentsCompletedCount: 6,
-    registeredAt: '2026-07-01T14:00:00Z',
-    lastActive: '2026-08-25T10:30:00Z',
-    recentActivity: [
-      {
-        id: 'act-301',
-        type: 'course',
-        title: 'Completed Java Fundamentals Course',
-        description: 'Earned Java Specialist Badge with 96% score',
-        timestamp: '3 days ago',
-        scoreOrPoints: '100% Done'
-      }
-    ]
-  },
-  {
-    id: 'user-learner-4',
-    name: 'User 004',
-    email: 'user004@lms.ai',
-    password: 'password123',
-    role: 'student',
-    status: 'inactive',
-    points: 340,
-    xp: 600,
+    points: 0,
+    xp: 0,
     streakDays: 0,
     level: 1,
-    bio: 'Exploring career transition to web development.',
-    assignedMentorId: 'user-mentor-2',
-    assignedMentorName: 'Mentor 002',
-    enrolledCourseIds: ['course-2'],
+    bio: 'Software engineering learner exploring courses, vertical reels, and assessments.',
+    enrolledCourseIds: [],
     completedCourseIds: [],
     badges: [],
     discountVouchers: [],
-    weeklyHours: [0.5, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
-    totalLearningHours: 6.2,
-    quizAverage: 62,
-    completedLessonsCount: 3,
-    reelsWatchedTotal: 12,
+    weeklyHours: [0, 0, 0, 0, 0, 0, 0],
+    totalLearningHours: 0,
+    quizAverage: 0,
+    completedLessonsCount: 0,
+    reelsWatchedTotal: 0,
     assignmentsCompletedCount: 0,
-    registeredAt: '2026-08-10T11:00:00Z',
-    lastActive: '2026-08-18T16:20:00Z',
-    recentActivity: []
-  },
-  {
-    id: 'user-learner-5',
-    name: 'User 005',
-    email: 'user005@lms.ai',
-    password: 'password123',
-    role: 'student',
-    status: 'active',
-    points: 1680,
-    xp: 3200,
-    streakDays: 9,
-    level: 4,
-    bio: 'Systems engineer focusing on DBMS and Operating Systems.',
-    assignedMentorId: 'user-mentor-3',
-    assignedMentorName: 'Mentor 003',
-    enrolledCourseIds: ['course-dbms', 'course-dsa'],
-    completedCourseIds: [],
-    badges: [INITIAL_BADGES[0], INITIAL_BADGES[1]],
-    discountVouchers: [INITIAL_VOUCHERS[1]],
-    weeklyHours: [2.0, 3.2, 4.5, 3.8, 4.0, 5.0, 3.5],
-    totalLearningHours: 36.8,
-    quizAverage: 89,
-    completedLessonsCount: 15,
-    reelsWatchedTotal: 58,
-    assignmentsCompletedCount: 3,
-    registeredAt: '2026-07-28T09:00:00Z',
-    lastActive: '2026-08-25T09:40:00Z',
+    registeredAt: '2026-08-01T00:00:00Z',
+    lastActive: '2026-08-31T00:00:00Z',
     recentActivity: []
   },
   {
@@ -343,86 +99,20 @@ export const INITIAL_USERS: User[] = [
     password: 'password123',
     role: 'mentor',
     status: 'active',
-    points: 8400,
-    xp: 12500,
-    streakDays: 45,
-    level: 8,
-    bio: 'Senior AI Systems Architect & Verified Instructor. Ex-FAANG AI Researcher.',
-    specialty: 'Artificial Intelligence & Neural Architectures',
-    assignedLearnerIds: ['user-student', 'user-learner-3'],
-    enrolledCourseIds: [],
-    completedCourseIds: [],
-    badges: INITIAL_BADGES,
-    discountVouchers: [],
-    weeklyHours: [4.0, 6.0, 5.5, 7.0, 8.0, 6.0, 4.0],
-    registeredAt: '2026-03-01T00:00:00Z',
-    lastActive: '2026-08-25T12:00:00Z',
-  },
-  {
-    id: 'user-mentor-2',
-    name: 'Mentor 002',
-    email: 'mentor002@lms.ai',
-    password: 'password123',
-    role: 'mentor',
-    status: 'active',
-    points: 6200,
-    xp: 9800,
-    streakDays: 30,
-    level: 7,
-    bio: 'Principal Frontend Architect & Open Source Contributor specializing in TypeScript & Motion Design.',
-    specialty: 'Frontend Engineering & Motion Design',
-    assignedLearnerIds: ['user-learner-2', 'user-learner-4'],
-    enrolledCourseIds: [],
-    completedCourseIds: [],
-    badges: [INITIAL_BADGES[0], INITIAL_BADGES[1], INITIAL_BADGES[2]],
-    discountVouchers: [],
-    weeklyHours: [3.0, 4.5, 5.0, 4.0, 6.0, 5.0, 3.5],
-    registeredAt: '2026-04-15T09:00:00Z',
-    lastActive: '2026-08-25T11:00:00Z',
-  },
-  {
-    id: 'user-mentor-3',
-    name: 'Mentor 003',
-    email: 'mentor003@lms.ai',
-    password: 'password123',
-    role: 'mentor',
-    status: 'active',
-    points: 7100,
-    xp: 11200,
-    streakDays: 40,
-    level: 7,
-    bio: 'Database Internals Specialist & Storage Systems Engineer.',
-    specialty: 'Database Management Systems & Storage Engines',
-    assignedLearnerIds: ['user-learner-5'],
-    enrolledCourseIds: [],
-    completedCourseIds: [],
-    badges: [INITIAL_BADGES[0], INITIAL_BADGES[3]],
-    discountVouchers: [],
-    weeklyHours: [4.5, 5.5, 6.0, 5.0, 7.0, 4.5, 5.0],
-    registeredAt: '2026-05-20T08:00:00Z',
-    lastActive: '2026-08-25T07:30:00Z',
-  },
-  {
-    id: 'user-mentor-4',
-    name: 'Mentor 004',
-    email: 'mentor004@lms.ai',
-    password: 'password123',
-    role: 'mentor',
-    status: 'inactive',
-    points: 3100,
-    xp: 4500,
+    points: 0,
+    xp: 0,
     streakDays: 0,
-    level: 5,
-    bio: 'Technical Interview Coach and Competitive Programming Master.',
-    specialty: 'DSA & Technical Interview Preparation',
+    level: 1,
+    bio: 'Senior Java & AI Systems Architect • Verified Mentor.',
+    specialty: 'Java Core & Modern Enterprise Architecture',
     assignedLearnerIds: [],
     enrolledCourseIds: [],
     completedCourseIds: [],
-    badges: [INITIAL_BADGES[0]],
+    badges: [],
     discountVouchers: [],
-    weeklyHours: [1.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0],
-    registeredAt: '2026-07-10T12:00:00Z',
-    lastActive: '2026-08-15T14:00:00Z',
+    weeklyHours: [0, 0, 0, 0, 0, 0, 0],
+    registeredAt: '2026-08-01T00:00:00Z',
+    lastActive: '2026-08-31T00:00:00Z',
   },
   {
     id: 'user-admin',
@@ -431,24 +121,24 @@ export const INITIAL_USERS: User[] = [
     password: 'admin123',
     role: 'admin',
     status: 'active',
-    points: 9999,
-    xp: 25000,
-    streakDays: 120,
-    level: 10,
-    bio: 'Platform Administrator & Curriculum Governance Lead at LMS.',
-    specialty: 'Platform Operations & Quality Governance',
+    points: 0,
+    xp: 0,
+    streakDays: 0,
+    level: 1,
+    bio: 'Platform Administrator & Curriculum Governance Lead.',
+    specialty: 'Platform Governance & Operations',
     assignedLearnerIds: [],
     enrolledCourseIds: [],
     completedCourseIds: [],
-    badges: INITIAL_BADGES,
+    badges: [],
     discountVouchers: [],
-    weeklyHours: [6.0, 7.0, 8.0, 6.5, 7.5, 5.0, 6.0],
+    weeklyHours: [0, 0, 0, 0, 0, 0, 0],
     registeredAt: '2026-01-01T00:00:00Z',
-    lastActive: '2026-08-25T12:00:00Z',
+    lastActive: '2026-08-31T00:00:00Z',
   }
 ];
 
-// EXACTLY 6 VERTICAL EDUCATIONAL LEARN REELS
+// 12 HIGH-IMPACT VERTICAL EDUCATIONAL REELS & SHORTS (YouTube Shorts, Instagram Reels, Verified LMS)
 export const INITIAL_REELS: Reel[] = [
   {
     id: 'reel-1',
@@ -457,21 +147,25 @@ export const INITIAL_REELS: Reel[] = [
     category: 'Python',
     subject: 'Python',
     topic: 'Memory Management & References',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    videoUrl: 'https://www.youtube.com/shorts/k9TUPpGqYTo',
     thumbnailUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
+    source: 'youtube',
+    platformEmbedId: 'k9TUPpGqYTo',
+    externalUrl: 'https://www.youtube.com/shorts/k9TUPpGqYTo',
+    channelName: 'Tech With Tim',
     creatorId: 'user-mentor',
-    creatorName: 'Mentor 001',
+    creatorName: 'Tech With Tim (YouTube)',
     creatorRole: 'Mentor',
     difficulty: 'Beginner',
     durationSeconds: 50,
-    likesCount: 2450,
-    commentsCount: 145,
-    sharesCount: 620,
-    viewsCount: 31200,
-    isLiked: true,
-    isBookmarked: true,
+    likesCount: 5420,
+    commentsCount: 142,
+    sharesCount: 1620,
+    viewsCount: 68200,
+    isLiked: false,
+    isBookmarked: false,
     isPublished: true,
-    tags: ['Python', 'Memory', 'Variables', 'Beginner'],
+    tags: ['Python', 'Memory', 'Variables', 'YouTubeShorts'],
     createdAt: '2026-08-18T10:00:00Z',
     questions: [
       {
@@ -494,41 +188,45 @@ export const INITIAL_REELS: Reel[] = [
   },
   {
     id: 'reel-2',
-    title: 'Java 21: Virtual Threads vs OS Threads in 60s',
-    description: 'Learn how Project Loom lightweight threads allow 1 million concurrent tasks without OS stack memory exhaustion.',
-    category: 'Java',
-    subject: 'Java',
-    topic: 'Concurrency & Virtual Threads',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80',
+    title: 'JavaScript Event Loop & Microtasks in 60s',
+    description: 'Learn how the V8 JavaScript engine orchestrates the Call Stack, Microtask Queue (Promises), and Task Queue (setTimeout).',
+    category: 'Web Dev',
+    subject: 'JavaScript',
+    topic: 'Event Loop & Asynchronous Architecture',
+    videoUrl: 'https://www.youtube.com/shorts/Mus_vwhTCq0',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1579468118864-ddb62129a843?w=600&auto=format&fit=crop&q=80',
+    source: 'youtube',
+    platformEmbedId: 'Mus_vwhTCq0',
+    externalUrl: 'https://www.youtube.com/shorts/Mus_vwhTCq0',
+    channelName: 'Fireship',
     creatorId: 'user-admin',
-    creatorName: 'Administrator',
+    creatorName: 'Fireship (YouTube)',
     creatorRole: 'Admin',
     difficulty: 'Intermediate',
-    durationSeconds: 52,
-    likesCount: 3150,
-    commentsCount: 184,
-    sharesCount: 780,
-    viewsCount: 38400,
+    durationSeconds: 55,
+    likesCount: 8930,
+    commentsCount: 280,
+    sharesCount: 2450,
+    viewsCount: 94100,
     isLiked: false,
-    isBookmarked: true,
+    isBookmarked: false,
     isPublished: true,
-    tags: ['Java', 'VirtualThreads', 'JVM', 'Concurrency'],
+    tags: ['JavaScript', 'Async', 'EventLoop', 'YouTubeShorts'],
     createdAt: '2026-08-19T11:00:00Z',
     questions: [
       {
         id: 'q-reel-2',
-        category: 'Java',
+        category: 'Web Dev',
         type: 'mcq',
-        prompt: 'What primary architectural advantage do Java 21 Virtual Threads provide over traditional platform threads?',
+        prompt: 'In the JavaScript runtime, what runs first when the Call Stack becomes empty: a resolved Promise callback (Microtask) or a setTimeout callback (Macrotask)?',
         options: [
-          'They bypass JVM garbage collection entirely',
-          'They provide M:N lightweight threading that does not tie up 1MB OS stack memory during blocking I/O',
-          'They make Java bytecode compile natively to GPU shaders',
-          'They eliminate thread synchronization locking globally'
+          'The setTimeout callback runs first',
+          'All pending Microtasks (Promise callbacks) run before the next Macrotask is dequeued',
+          'They run concurrently on two separate CPU threads',
+          'Whichever callback was registered earliest in milliseconds'
         ],
         correctIndex: 1,
-        explanation: 'Virtual Threads are managed directly by the JVM with tiny heap memory overhead, enabling high concurrency without exhausting OS thread pools.',
+        explanation: 'The Event Loop drains the entire Microtask queue (Promises, queueMicrotask) immediately after the current synchronous stack empties before picking the next task.',
         difficulty: 'Intermediate',
         marks: 15
       }
@@ -536,36 +234,40 @@ export const INITIAL_REELS: Reel[] = [
   },
   {
     id: 'reel-3',
-    title: 'Spring Boot 3: Transaction Proxies & Self-Invocation',
-    description: 'Why calling an @Transactional method from inside the same bean skips proxy interception and fails rollback.',
-    category: 'Web Dev',
-    subject: 'Spring Boot',
-    topic: 'Transaction Proxies & AOP',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
+    title: 'System Design: API Gateways vs Load Balancers in 60s',
+    description: 'Master Layer 7 routing, rate limiting, authentication, SSL termination, and reverse proxying for high-scale microservices.',
+    category: 'System Design',
+    subject: 'System Architecture',
+    topic: 'API Gateways & Load Balancing',
+    videoUrl: 'https://www.instagram.com/reel/C8qXY12v9aB/',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=80',
+    source: 'instagram',
+    platformEmbedId: 'C8qXY12v9aB',
+    externalUrl: 'https://www.instagram.com/reel/C8qXY12v9aB/',
+    channelName: 'ByteByteGo',
     creatorId: 'user-mentor',
-    creatorName: 'Mentor 001',
+    creatorName: 'Alex Xu (Instagram)',
     creatorRole: 'Mentor',
     difficulty: 'Advanced',
-    durationSeconds: 58,
-    likesCount: 2890,
-    commentsCount: 165,
-    sharesCount: 710,
-    viewsCount: 34100,
-    isLiked: true,
+    durationSeconds: 60,
+    likesCount: 6740,
+    commentsCount: 195,
+    sharesCount: 1890,
+    viewsCount: 78200,
+    isLiked: false,
     isBookmarked: false,
     isPublished: true,
-    tags: ['Spring Boot', 'Transactions', 'AOP', 'Architecture'],
+    tags: ['SystemDesign', 'Architecture', 'Cloud', 'InstagramReels'],
     createdAt: '2026-08-20T14:00:00Z',
     questions: [
       {
         id: 'q-reel-3',
-        category: 'Web Dev',
+        category: 'System Design',
         type: 'true_false',
-        prompt: 'Direct method self-invocation within the same Spring bean bypasses AOP transaction interceptors for @Transactional.',
+        prompt: 'An API Gateway operates at OSI Layer 7 (Application Layer) and can handle authentication, rate limiting, and request transformation, whereas a standard L4 load balancer only routes raw TCP packets.',
         options: ['True', 'False'],
         correctIndex: 0,
-        explanation: 'True! Spring transactions use dynamic proxy wrappers. Internal `this.method()` calls bypass the proxy boundary.',
+        explanation: 'True! API Gateways inspect HTTP/REST headers and payloads (Layer 7) for auth and orchestration, whereas L4 load balancers forward packets at the TCP/UDP transport layer.',
         difficulty: 'Advanced',
         marks: 15
       }
@@ -578,75 +280,83 @@ export const INITIAL_REELS: Reel[] = [
     category: 'Data Structures',
     subject: 'DSA',
     topic: 'Array Algorithms & Sliding Window',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
+    videoUrl: 'https://www.youtube.com/shorts/RBSGKlAnoiM',
     thumbnailUrl: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&auto=format&fit=crop&q=80',
-    creatorId: 'user-mentor-2',
-    creatorName: 'Mentor 002',
+    source: 'youtube',
+    platformEmbedId: 'RBSGKlAnoiM',
+    externalUrl: 'https://www.youtube.com/shorts/RBSGKlAnoiM',
+    channelName: 'NeetCode',
+    creatorId: 'user-mentor',
+    creatorName: 'NeetCode DSA (YouTube)',
     creatorRole: 'Mentor',
     difficulty: 'Intermediate',
     durationSeconds: 49,
-    likesCount: 4100,
-    commentsCount: 230,
-    sharesCount: 1350,
-    viewsCount: 49800,
+    likesCount: 9810,
+    commentsCount: 310,
+    sharesCount: 3200,
+    viewsCount: 112000,
     isLiked: false,
     isBookmarked: false,
     isPublished: true,
-    tags: ['DSA', 'Algorithms', 'SlidingWindow', 'Arrays'],
+    tags: ['DSA', 'Algorithms', 'SlidingWindow', 'YouTubeShorts'],
     createdAt: '2026-08-21T09:30:00Z',
     questions: [
       {
         id: 'q-reel-4',
         category: 'Data Structures',
         type: 'mcq',
-        prompt: 'Which algorithmic pattern is optimal for finding the "longest contiguous subarray with sum at most K" in an array of positive integers?',
+        prompt: 'When is a dynamic sliding window algorithm mathematically applicable over a naive O(N^2) nested loop approach?',
         options: [
-          'Dynamic Programming with Memoization Table in O(N^2)',
-          'Variable-size Sliding Window with two pointers in amortized O(N)',
-          'Depth-First Search (DFS) with backtracking',
-          'Dijkstra Shortest Path Algorithm'
+          'Only on sorted numeric arrays with binary search',
+          'When the problem seeks an optimal contiguous subarray/substring with monotonic expand/shrink conditions',
+          'When the array contains exclusively negative values',
+          'When processing non-contiguous tree traversals'
         ],
         correctIndex: 1,
-        explanation: 'A dynamic sliding window expands the right pointer and contracts the left pointer, processing every element at most twice for optimal O(N) time.',
+        explanation: 'Sliding Window transforms nested subsegment evaluations into linear O(N) by expanding the right boundary and contracting the left boundary monotonically.',
         difficulty: 'Intermediate',
-        marks: 20
+        marks: 15
       }
     ]
   },
   {
     id: 'reel-5',
     title: 'SQL: Clustered vs Non-Clustered Indexes in 60s',
-    description: 'Understand how B-Tree leaf nodes store actual physical data rows in clustered indexes versus bookmark pointers in secondary indexes.',
+    description: 'Learn B-Tree root/leaf physical data ordering, leaf page lookups, and why a table can have only 1 clustered index.',
     category: 'DBMS',
-    subject: 'DBMS',
-    topic: 'B-Tree Indexing & Physical Storage',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+    subject: 'SQL & Database Design',
+    topic: 'Indexing & B-Trees',
+    videoUrl: 'https://www.instagram.com/reel/C9rZ128v1aC/',
     thumbnailUrl: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=600&auto=format&fit=crop&q=80',
-    creatorId: 'user-mentor-3',
-    creatorName: 'Mentor 003',
+    source: 'instagram',
+    platformEmbedId: 'C9rZ128v1aC',
+    externalUrl: 'https://www.instagram.com/reel/C9rZ128v1aC/',
+    channelName: 'Database Masters',
+    creatorId: 'user-mentor',
+    creatorName: 'Hussein Nasser (Instagram)',
     creatorRole: 'Mentor',
     difficulty: 'Intermediate',
     durationSeconds: 55,
-    likesCount: 2750,
-    commentsCount: 130,
-    sharesCount: 640,
-    viewsCount: 32900,
+    likesCount: 6150,
+    commentsCount: 160,
+    sharesCount: 1420,
+    viewsCount: 71400,
     isLiked: false,
-    isBookmarked: true,
+    isBookmarked: false,
     isPublished: true,
-    tags: ['SQL', 'DBMS', 'Indexing', 'BTree'],
-    createdAt: '2026-08-22T13:00:00Z',
+    tags: ['SQL', 'DBMS', 'Indexes', 'InstagramReels'],
+    createdAt: '2026-08-22T12:00:00Z',
     questions: [
       {
         id: 'q-reel-5',
         category: 'DBMS',
         type: 'mcq',
-        prompt: 'Why can a relational database table have only one Clustered Index?',
+        prompt: 'Why can a database table have only ONE Clustered Index, while having multiple Non-Clustered Indexes?',
         options: [
-          'Because the SQL standard disallows creating secondary index trees',
-          'Because the clustered index defines the actual physical sorting order of data pages on disk',
-          'Because query optimizers cannot evaluate multiple index definitions',
-          'Because RAM buffer pools can only hold one root node'
+          'SQL standards limit index file sizes to 10MB',
+          'The clustered index determines the physical on-disk sorting order of actual table row pages',
+          'Non-clustered indexes are stored exclusively in temporary RAM caches',
+          'Foreign keys automatically convert into secondary clustered indexes'
         ],
         correctIndex: 1,
         explanation: 'Data rows on disk can physically only be sorted in a single sequence, which is governed by the table clustered index.',
@@ -657,44 +367,310 @@ export const INITIAL_REELS: Reel[] = [
   },
   {
     id: 'reel-6',
-    title: 'Computer Networks: TCP 3-Way Handshake & SYN Floods',
-    description: 'SYN → SYN-ACK → ACK lifecycle, TCB connection state memory allocation, and how SYN cookies mitigate denial-of-service floods.',
-    category: 'Cloud',
-    subject: 'Computer Networks',
-    topic: 'Transport Layer Protocols & Handshake',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=80',
+    title: 'AI & LLMs: How Transformers & Self-Attention Work',
+    description: 'The mathematical breakthrough behind ChatGPT and modern LLMs: query-key-value vectors and parallel self-attention computation.',
+    category: 'AI & ML',
+    subject: 'Artificial Intelligence',
+    topic: 'Transformer Architecture & Self-Attention',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=600&auto=format&fit=crop&q=80',
+    source: 'direct',
+    channelName: 'LMS AI Faculty',
     creatorId: 'user-admin',
-    creatorName: 'Administrator',
+    creatorName: 'LMS AI Faculty (Verified)',
     creatorRole: 'Admin',
     difficulty: 'Intermediate',
-    durationSeconds: 51,
-    likesCount: 3400,
-    commentsCount: 175,
-    sharesCount: 890,
-    viewsCount: 41500,
+    durationSeconds: 58,
+    likesCount: 11400,
+    commentsCount: 420,
+    sharesCount: 4100,
+    viewsCount: 135000,
     isLiked: false,
     isBookmarked: false,
     isPublished: true,
-    tags: ['Networks', 'TCP', 'Security', 'Protocols'],
+    tags: ['AI', 'LLM', 'Transformers', 'VerifiedLMS'],
     createdAt: '2026-08-23T15:30:00Z',
     questions: [
       {
         id: 'q-reel-6',
-        category: 'Cloud',
+        category: 'AI & ML',
         type: 'true_false',
-        prompt: 'SYN Cookies allow servers to establish TCP connections without pre-allocating Transmission Control Block (TCB) state memory upon receiving a SYN.',
+        prompt: 'Unlike Recurrent Neural Networks (RNNs) that process text one token at a time, Transformers compute Self-Attention across all tokens in parallel using matrix operations.',
         options: ['True', 'False'],
         correctIndex: 0,
-        explanation: 'True! SYN Cookies cryptographically encode connection parameters within the sequence number, deflecting SYN flood resource exhaustion.',
+        explanation: 'True! Self-attention allows Transformers to evaluate relationships between all words simultaneously via GPU matrix multiplication, eliminating the sequential bottleneck of RNNs.',
         difficulty: 'Intermediate',
         marks: 20
+      }
+    ]
+  },
+  {
+    id: 'reel-7',
+    title: 'React: UseEffect Stale Closures & Dependency Array in 60s',
+    description: 'Why your React state is stuck inside useEffect callbacks and how useRef or state updaters solve stale closures.',
+    category: 'Web Dev',
+    subject: 'React',
+    topic: 'React Hooks & Closures',
+    videoUrl: 'https://www.youtube.com/shorts/0ZJgIjIuY7U',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&auto=format&fit=crop&q=80',
+    source: 'youtube',
+    platformEmbedId: '0ZJgIjIuY7U',
+    externalUrl: 'https://www.youtube.com/shorts/0ZJgIjIuY7U',
+    channelName: 'Web Dev Simplified',
+    creatorId: 'user-mentor',
+    creatorName: 'Kyle Cook (YouTube)',
+    creatorRole: 'Mentor',
+    difficulty: 'Intermediate',
+    durationSeconds: 52,
+    likesCount: 7890,
+    commentsCount: 215,
+    sharesCount: 1950,
+    viewsCount: 84000,
+    isLiked: false,
+    isBookmarked: false,
+    isPublished: true,
+    tags: ['React', 'WebDev', 'Hooks', 'YouTubeShorts'],
+    createdAt: '2026-08-24T09:00:00Z',
+    questions: [
+      {
+        id: 'q-reel-7',
+        category: 'Web Dev',
+        type: 'mcq',
+        prompt: 'How do you safely update state based on previous state inside an asynchronous useEffect without causing stale closures?',
+        options: [
+          'Use `setCount(count + 1)` with an empty dependency array',
+          'Pass a functional updater `setCount(prev => prev + 1)`',
+          'Call `forceUpdate()` on the window object',
+          'Remove the dependency array completely'
+        ],
+        correctIndex: 1,
+        explanation: 'Functional updaters `prev => prev + 1` guarantee access to the latest state value regardless of closure timing.',
+        difficulty: 'Intermediate',
+        marks: 15
+      }
+    ]
+  },
+  {
+    id: 'reel-8',
+    title: 'Docker: Containers vs Virtual Machines Explained in 60s',
+    description: 'Understand Hypervisors vs Linux OS-level kernel namespaces and cgroups for lightweight container virtualization.',
+    category: 'System Design',
+    subject: 'DevOps & Containers',
+    topic: 'Docker & Virtualization',
+    videoUrl: 'https://www.youtube.com/shorts/G3e-cpL7ofc',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1605745341112-85968b19335b?w=600&auto=format&fit=crop&q=80',
+    source: 'youtube',
+    platformEmbedId: 'G3e-cpL7ofc',
+    externalUrl: 'https://www.youtube.com/shorts/G3e-cpL7ofc',
+    channelName: 'NetworkChuck',
+    creatorId: 'user-mentor',
+    creatorName: 'Chuck Keith (YouTube)',
+    creatorRole: 'Mentor',
+    difficulty: 'Beginner',
+    durationSeconds: 58,
+    likesCount: 12400,
+    commentsCount: 380,
+    sharesCount: 4200,
+    viewsCount: 145000,
+    isLiked: false,
+    isBookmarked: false,
+    isPublished: true,
+    tags: ['Docker', 'DevOps', 'Containers', 'YouTubeShorts'],
+    createdAt: '2026-08-25T11:30:00Z',
+    questions: [
+      {
+        id: 'q-reel-8',
+        category: 'System Design',
+        type: 'mcq',
+        prompt: 'What is the primary architectural difference between a Docker container and a standard Type-2 Virtual Machine?',
+        options: [
+          'Containers bundle a complete guest operating system kernel inside every image',
+          'Containers share the host operating system kernel via Linux namespaces and cgroups, eliminating guest OS overhead',
+          'Virtual machines cannot run on x86 architectures',
+          'Containers require dedicated bare-metal hardware for each instance'
+        ],
+        correctIndex: 1,
+        explanation: 'Containers virtualize at the OS kernel level (sharing the host kernel), while VMs virtualize hardware and run entire guest OS instances.',
+        difficulty: 'Beginner',
+        marks: 15
+      }
+    ]
+  },
+  {
+    id: 'reel-9',
+    title: 'CSS: Modern Flexbox vs Grid Mental Model in 60s',
+    description: 'The golden rule of 1-Dimensional (Flexbox) vs 2-Dimensional (CSS Grid) layout orchestration for responsive web apps.',
+    category: 'Web Dev',
+    subject: 'CSS & Design',
+    topic: 'Flexbox & CSS Grid',
+    videoUrl: 'https://www.instagram.com/reel/C8kLM12x8aZ/',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=600&auto=format&fit=crop&q=80',
+    source: 'instagram',
+    platformEmbedId: 'C8kLM12x8aZ',
+    externalUrl: 'https://www.instagram.com/reel/C8kLM12x8aZ/',
+    channelName: 'Kevin Powell CSS',
+    creatorId: 'user-mentor',
+    creatorName: 'Kevin Powell (Instagram)',
+    creatorRole: 'Mentor',
+    difficulty: 'Beginner',
+    durationSeconds: 50,
+    likesCount: 5100,
+    commentsCount: 120,
+    sharesCount: 1340,
+    viewsCount: 62000,
+    isLiked: false,
+    isBookmarked: false,
+    isPublished: true,
+    tags: ['CSS', 'Flexbox', 'Grid', 'InstagramReels'],
+    createdAt: '2026-08-26T14:00:00Z',
+    questions: [
+      {
+        id: 'q-reel-9',
+        category: 'Web Dev',
+        type: 'true_false',
+        prompt: 'CSS Grid is designed for two-dimensional layouts (rows and columns simultaneously), whereas Flexbox is designed for one-dimensional layouts (either a single row or a single column).',
+        options: ['True', 'False'],
+        correctIndex: 0,
+        explanation: 'True! Grid manages both horizontal and vertical tracks concurrently, while Flexbox aligns items along a single main axis at a time.',
+        difficulty: 'Beginner',
+        marks: 15
+      }
+    ]
+  },
+  {
+    id: 'reel-10',
+    title: 'Cloud: S3 Object Storage vs Block Storage in 60s',
+    description: 'Learn when to use AWS S3/Cloud Storage object buckets vs EBS block volumes for high throughput cloud architectures.',
+    category: 'System Design',
+    subject: 'Cloud Engineering',
+    topic: 'AWS S3 & Cloud Storage',
+    videoUrl: 'https://www.instagram.com/reel/C7nXY99p3bA/',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80',
+    source: 'instagram',
+    platformEmbedId: 'C7nXY99p3bA',
+    externalUrl: 'https://www.instagram.com/reel/C7nXY99p3bA/',
+    channelName: 'Cloud Academy IG',
+    creatorId: 'user-mentor',
+    creatorName: 'Stephane Maarek (Instagram)',
+    creatorRole: 'Mentor',
+    difficulty: 'Intermediate',
+    durationSeconds: 56,
+    likesCount: 6890,
+    commentsCount: 175,
+    sharesCount: 1820,
+    viewsCount: 75000,
+    isLiked: false,
+    isBookmarked: false,
+    isPublished: true,
+    tags: ['Cloud', 'AWS', 'S3', 'InstagramReels'],
+    createdAt: '2026-08-27T16:00:00Z',
+    questions: [
+      {
+        id: 'q-reel-10',
+        category: 'System Design',
+        type: 'mcq',
+        prompt: 'Which feature makes Object Storage (like AWS S3) ideal for media & documents over Block Storage (like AWS EBS)?',
+        options: [
+          'Object storage can be formatted as a bootable OS root filesystem',
+          'Object storage provides flat RESTful key-value HTTP access with infinite scaling and custom metadata tags',
+          'Object storage requires dedicated NVMe physical cables',
+          'Object storage only stores data in volatile RAM caches'
+        ],
+        correctIndex: 1,
+        explanation: 'Object storage provides HTTP/REST GET/PUT access with arbitrary metadata, massive horizontal elasticity, and 99.999999999% durability.',
+        difficulty: 'Intermediate',
+        marks: 15
+      }
+    ]
+  },
+  {
+    id: 'reel-11',
+    title: 'Python Concurrency: AsyncIO Event Loop vs Multiprocessing',
+    description: 'When to use async/await cooperative coroutines for I/O bound tasks vs ProcessPoolExecutor for CPU-bound computation.',
+    category: 'Python',
+    subject: 'Python Engineering',
+    topic: 'AsyncIO & Concurrency',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
+    source: 'direct',
+    channelName: 'LMS Python Faculty',
+    creatorId: 'user-admin',
+    creatorName: 'LMS Python Faculty (Verified)',
+    creatorRole: 'Admin',
+    difficulty: 'Advanced',
+    durationSeconds: 58,
+    likesCount: 8400,
+    commentsCount: 230,
+    sharesCount: 2100,
+    viewsCount: 91000,
+    isLiked: false,
+    isBookmarked: false,
+    isPublished: true,
+    tags: ['Python', 'AsyncIO', 'Concurrency', 'VerifiedLMS'],
+    createdAt: '2026-08-28T10:00:00Z',
+    questions: [
+      {
+        id: 'q-reel-11',
+        category: 'Python',
+        type: 'mcq',
+        prompt: 'In CPython, why does `multiprocessing` bypass the Global Interpreter Lock (GIL) for CPU-heavy tasks while `threading` does not?',
+        options: [
+          'Multiprocessing converts Python bytecode to raw C code at runtime',
+          'Each process spawns an entirely independent CPython interpreter and memory space on a separate OS PID',
+          'Threading disables multi-core CPU scheduling',
+          'AsyncIO automatically unlocks the GIL for while loops'
+        ],
+        correctIndex: 1,
+        explanation: 'Each multiprocessing worker is an isolated Python process with its own private GIL and memory address space.',
+        difficulty: 'Advanced',
+        marks: 20
+      }
+    ]
+  },
+  {
+    id: 'reel-12',
+    title: 'Git: Rebase vs Merge Visualized in 60s',
+    description: 'Understand linear fast-forward git rebase commit replay vs merge commit graph topology for team pull requests.',
+    category: 'Web Dev',
+    subject: 'Git & Version Control',
+    topic: 'Git Branching & Rebase',
+    videoUrl: 'https://www.youtube.com/shorts/f1wnYdLEpgI',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=600&auto=format&fit=crop&q=80',
+    source: 'youtube',
+    platformEmbedId: 'f1wnYdLEpgI',
+    externalUrl: 'https://www.youtube.com/shorts/f1wnYdLEpgI',
+    channelName: 'Git Mastery',
+    creatorId: 'user-mentor',
+    creatorName: 'Git Mastery (YouTube)',
+    creatorRole: 'Mentor',
+    difficulty: 'Beginner',
+    durationSeconds: 54,
+    likesCount: 9450,
+    commentsCount: 290,
+    sharesCount: 2800,
+    viewsCount: 108000,
+    isLiked: false,
+    isBookmarked: false,
+    isPublished: true,
+    tags: ['Git', 'DevOps', 'VersionControl', 'YouTubeShorts'],
+    createdAt: '2026-08-29T12:00:00Z',
+    questions: [
+      {
+        id: 'q-reel-12',
+        category: 'Web Dev',
+        type: 'true_false',
+        prompt: '`git rebase` rewrites commit hashes by picking your branch commits and replaying them on top of the latest target branch tip, creating a clean linear commit history.',
+        options: ['True', 'False'],
+        correctIndex: 0,
+        explanation: 'True! Rebase replays your commits one by one on the new base, generating new commit SHA hashes and keeping commit logs linear.',
+        difficulty: 'Beginner',
+        marks: 15
       }
     ]
   }
 ];
 
-// Helper to generate 5 vertical course reels for any course
+// Helper to generate 5 vertical course reels for Java Core
 const createCourseReels = (courseId: string, baseTopic: string, titles: string[]): CourseReel[] => [
   {
     id: `${courseId}-reel-1`,
@@ -707,9 +683,9 @@ const createCourseReels = (courseId: string, baseTopic: string, titles: string[]
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80',
     likesCount: 1420,
-    isLiked: true,
+    isLiked: false,
     isBookmarked: false,
-    isCompleted: true
+    isCompleted: false
   },
   {
     id: `${courseId}-reel-2`,
@@ -723,8 +699,8 @@ const createCourseReels = (courseId: string, baseTopic: string, titles: string[]
     thumbnailUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80',
     likesCount: 1180,
     isLiked: false,
-    isBookmarked: true,
-    isCompleted: true
+    isBookmarked: false,
+    isCompleted: false
   },
   {
     id: `${courseId}-reel-3`,
@@ -767,72 +743,396 @@ const createCourseReels = (courseId: string, baseTopic: string, titles: string[]
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
     thumbnailUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
     likesCount: 1340,
-    isLiked: true,
-    isBookmarked: true,
+    isLiked: false,
+    isBookmarked: false,
     isCompleted: false
   }
 ];
 
+// COMPREHENSIVE MULTI-PLATFORM COURSES (YouTube, Udemy, Coursera, edX, Verified LMS)
 export const INITIAL_COURSES: Course[] = [
+  // 1. YOUTUBE - CS50 Harvard
   {
-    id: 'course-1',
-    title: 'Full-Stack Modern AI Architecture & Agentic Workflows',
-    subtitle: 'From React 19, FastAPI, Vector Search to Autonomous Multi-Agent Tool Calling',
-    description: 'Comprehensive 5-reel masterclass designed by Mentor 001. Master building enterprise LLM applications, RAG pipelines with Qdrant, structured outputs, streaming UI, and self-evaluating agents.',
-    category: 'AI & Engineering',
-    price: 89,
-    discountedPrice: 59,
+    id: 'course-yt-cs50',
+    title: 'CS50x: Introduction to Computer Science',
+    subtitle: 'Harvard University / Prof. David J. Malan',
+    description: 'An introduction to the intellectual enterprises of computer science and the art of programming. Covers C, Python, SQL, HTML, CSS, JavaScript, memory management, algorithms, and data structures.',
+    category: 'DSA',
+    platform: 'youtube',
+    platformUrl: 'https://www.youtube.com/watch?v=8mAITcNt710',
+    certificateIncluded: true,
+    price: 0,
+    discountedPrice: 0,
     instructorId: 'user-mentor',
-    instructorName: 'Mentor 001',
-    instructorBio: 'Senior AI Systems Architect & Tech Educator. Ex-FAANG AI Researcher.',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
-    level: 'Intermediate',
-    rating: 4.9,
-    reviewsCount: 320,
-    studentsCount: 1420,
+    instructorName: 'Prof. David J. Malan (Harvard / YouTube)',
+    instructorBio: 'Gordon McKay Professor of the Practice of Computer Science at Harvard University.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
+    level: 'Beginner',
+    rating: 4.98,
+    reviewsCount: 38400,
+    studentsCount: 420000,
     status: 'published',
-    progressPercent: 68,
-    lastLessonTitle: 'Reel 2: Structured Output Generation',
-    durationHours: 5,
-    lessonsCount: 5,
+    progressPercent: 0,
+    durationHours: 25,
+    lessonsCount: 12,
     reelsCount: 5,
     quizzesCount: 1,
     assignmentsCount: 1,
-    reels: createCourseReels('course-1', 'AI Architecture', [
-      'Embedding Spaces & Vector Indexing',
-      'Structured Outputs & JSON Schema Guardrails',
-      'Multi-Agent Choreography & Tool Execution',
-      'Semantic Caching & Streaming Latency Optimization',
-      'Production Deployment with Self-Correction'
-    ]),
     learningOutcomes: [
-      'Architect robust Retrieval-Augmented Generation (RAG) pipelines',
-      'Deploy tool-calling agents with fallback validation loops',
-      'Optimize latency with semantic caching & streaming responses',
-      'Build rich React 19 interactive interfaces for AI chat & artifact canvases'
+      'Master computational thinking, binary algorithms, and algorithmic complexity O(N)',
+      'Write robust programs in C with pointers, dynamic memory allocation, and hash tables',
+      'Build modern web applications with Python, Flask, and SQLite databases',
+      'Earn official Harvard CS50 verification milestone'
+    ],
+    modules: [],
+    createdAt: '2026-08-01T00:00:00Z'
+  },
+
+  // 2. YOUTUBE - freeCodeCamp Full Stack
+  {
+    id: 'course-yt-fullstack',
+    title: 'Full Stack Web Development Masterclass 2026',
+    subtitle: 'freeCodeCamp / Beau Carnes',
+    description: 'Complete hands-on curriculum covering modern React 19, Node.js, Express, PostgreSQL, Prisma ORM, Tailwind CSS, TypeScript, and Docker deployment.',
+    category: 'Web Dev',
+    platform: 'youtube',
+    platformUrl: 'https://www.youtube.com/watch?v=zJSY8tbf_ys',
+    certificateIncluded: true,
+    price: 0,
+    discountedPrice: 0,
+    instructorId: 'user-mentor',
+    instructorName: 'freeCodeCamp Team (YouTube)',
+    instructorBio: 'Open-source educator empowering millions of software engineers worldwide.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=80',
+    level: 'All Levels',
+    rating: 4.93,
+    reviewsCount: 24500,
+    studentsCount: 310000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 18,
+    lessonsCount: 10,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Build end-to-end full stack SaaS applications with React and Node.js',
+      'Implement JWT authentication, role-based access control, and PostgreSQL schemas',
+      'Deploy applications with Docker containers and CI/CD pipelines'
+    ],
+    modules: [],
+    createdAt: '2026-08-05T00:00:00Z'
+  },
+
+  // 3. YOUTUBE - Machine Learning Stanford
+  {
+    id: 'course-yt-ml',
+    title: 'Machine Learning Specialization: Core Algorithms',
+    subtitle: 'Stanford University / Andrew Ng (YouTube)',
+    description: 'Learn foundational machine learning principles: Linear Regression, Logistic Regression, Neural Networks, Decision Trees, Random Forests, and Unsupervised Clustering.',
+    category: 'AI & Engineering',
+    platform: 'youtube',
+    platformUrl: 'https://www.youtube.com/watch?v=i_LwzRVP7bg',
+    certificateIncluded: true,
+    price: 0,
+    discountedPrice: 0,
+    instructorId: 'user-mentor',
+    instructorName: 'Prof. Andrew Ng (Stanford / YouTube)',
+    instructorBio: 'Adjunct Professor at Stanford University and Founder of DeepLearning.AI.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?w=800&auto=format&fit=crop&q=80',
+    level: 'Intermediate',
+    rating: 4.96,
+    reviewsCount: 19800,
+    studentsCount: 185000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 14,
+    lessonsCount: 8,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Master Gradient Descent, Loss Functions, and Regularization (L1/L2)',
+      'Implement multi-layer perceptrons in NumPy and PyTorch from scratch',
+      'Evaluate ML models using Precision, Recall, ROC-AUC, and Cross-Validation'
+    ],
+    modules: [],
+    createdAt: '2026-08-08T00:00:00Z'
+  },
+
+  // 4. UDEMY - Angela Yu Web Dev Bootcamp
+  {
+    id: 'course-udemy-web',
+    title: 'The Complete 2026 Web Development Bootcamp',
+    subtitle: 'Dr. Angela Yu / Udemy Bestseller',
+    description: 'The #1 rated web development bootcamp on Udemy. Learn HTML, CSS, JavaScript, React, Node.js, Express, MongoDB, Web3 DApps, and build 16 real-world portfolio projects.',
+    category: 'Web Dev',
+    platform: 'udemy',
+    platformUrl: 'https://www.udemy.com/course/the-complete-web-development-bootcamp/',
+    certificateIncluded: true,
+    price: 89,
+    discountedPrice: 19,
+    instructorId: 'user-mentor',
+    instructorName: 'Dr. Angela Yu (Udemy)',
+    instructorBio: 'Lead Instructor at the London App Brewery and top-rated Udemy author.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&auto=format&fit=crop&q=80',
+    level: 'Beginner',
+    rating: 4.89,
+    reviewsCount: 340000,
+    studentsCount: 1250000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 65,
+    lessonsCount: 32,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Build fully functional web applications from scratch with React & Node',
+      'Create and deploy RESTful APIs with MongoDB and Express middleware',
+      'Master Git version control, GitHub workflows, and production hosting'
     ],
     modules: [],
     createdAt: '2026-08-10T00:00:00Z'
   },
+
+  // 5. UDEMY - Stephane Maarek AWS Solutions Architect
+  {
+    id: 'course-udemy-aws',
+    title: 'Ultimate AWS Certified Solutions Architect Associate (SAA-C03)',
+    subtitle: 'Stephane Maarek / Udemy AWS Bestseller',
+    description: 'Pass the AWS Certified Solutions Architect exam. Deep-dive into EC2, S3, RDS, DynamoDB, Lambda, VPC networking, IAM security, ECS, and Serverless architectures.',
+    category: 'Cloud',
+    platform: 'udemy',
+    platformUrl: 'https://www.udemy.com/course/aws-certified-solutions-architect-associate-saa-c03/',
+    certificateIncluded: true,
+    price: 79,
+    discountedPrice: 18,
+    instructorId: 'user-mentor',
+    instructorName: 'Stephane Maarek (Udemy)',
+    instructorBio: 'AWS Certified Solutions Architect Professional & Alexa Champion.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80',
+    level: 'Intermediate',
+    rating: 4.91,
+    reviewsCount: 180000,
+    studentsCount: 820000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 28,
+    lessonsCount: 18,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Design highly available, fault-tolerant, and resilient cloud architectures on AWS',
+      'Configure VPC subnets, route tables, internet gateways, and security groups',
+      'Pass the official AWS SAA-C03 certification exam with confidence'
+    ],
+    modules: [],
+    createdAt: '2026-08-12T00:00:00Z'
+  },
+
+  // 6. UDEMY - Abdul Bari DSA
+  {
+    id: 'course-udemy-dsa',
+    title: 'Mastering Data Structures & Algorithms using C and C++',
+    subtitle: 'Abdul Bari / Udemy Algorithms Legend',
+    description: 'Learn Data Structures & Algorithms visually: Recursion, Arrays, Linked Lists, Stacks, Queues, Binary Trees, AVL Trees, B-Trees, Graphs, Dynamic Programming, and Greedy Algorithms.',
+    category: 'DSA',
+    platform: 'udemy',
+    platformUrl: 'https://www.udemy.com/course/datastructurescncpp/',
+    certificateIncluded: true,
+    price: 69,
+    discountedPrice: 15,
+    instructorId: 'user-mentor',
+    instructorName: 'Abdul Bari (Udemy)',
+    instructorBio: 'World-renowned Computer Science educator with 2M+ algorithm students.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&auto=format&fit=crop&q=80',
+    level: 'Intermediate',
+    rating: 4.94,
+    reviewsCount: 92000,
+    studentsCount: 340000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 58,
+    lessonsCount: 25,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Master memory pointer manipulation and Big-O asymptotic analysis',
+      'Implement all fundamental data structures from scratch in C/C++',
+      'Ace technical FAANG/MANG data structures & algorithms coding interviews'
+    ],
+    modules: [],
+    createdAt: '2026-08-14T00:00:00Z'
+  },
+
+  // 7. COURSERA - Deep Learning Specialization Andrew Ng
+  {
+    id: 'course-coursera-dl',
+    title: 'Deep Learning Specialization',
+    subtitle: 'DeepLearning.AI & Prof. Andrew Ng / Coursera',
+    description: 'Master deep learning fundamentals: Neural Networks, Hyperparameter Tuning, Convolutional Neural Networks (CNNs), Sequence Models, Transformers, and LLMs.',
+    category: 'AI & Engineering',
+    platform: 'coursera',
+    platformUrl: 'https://www.coursera.org/specializations/deep-learning',
+    certificateIncluded: true,
+    price: 49,
+    discountedPrice: 49,
+    instructorId: 'user-mentor',
+    instructorName: 'Prof. Andrew Ng & DeepLearning.AI (Coursera)',
+    instructorBio: 'Co-Founder of Coursera and global AI pioneer.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&auto=format&fit=crop&q=80',
+    level: 'Advanced',
+    rating: 4.97,
+    reviewsCount: 220000,
+    studentsCount: 980000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 45,
+    lessonsCount: 20,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Build and train Deep Neural Networks with Adam, RMSprop, and Batch Normalization',
+      'Implement ResNet, YOLO Object Detection, and CNNs for Computer Vision',
+      'Develop NLP models with LSTM, GRU, Self-Attention, and Transformer architectures'
+    ],
+    modules: [],
+    createdAt: '2026-08-15T00:00:00Z'
+  },
+
+  // 8. COURSERA - Google Cloud Architecture
+  {
+    id: 'course-coursera-gcp',
+    title: 'Google Cloud Architecture Professional Certificate',
+    subtitle: 'Google Cloud Training / Coursera',
+    description: 'Official Google Cloud professional curriculum covering Compute Engine, Google Kubernetes Engine (GKE), Cloud SQL, BigQuery, Cloud Spanner, and IAM security.',
+    category: 'Cloud',
+    platform: 'coursera',
+    platformUrl: 'https://www.coursera.org/professional-certificates/gcp-cloud-architect',
+    certificateIncluded: true,
+    price: 49,
+    discountedPrice: 49,
+    instructorId: 'user-mentor',
+    instructorName: 'Google Cloud Training Team (Coursera)',
+    instructorBio: 'Google Cloud certified architects and engineers.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&auto=format&fit=crop&q=80',
+    level: 'Advanced',
+    rating: 4.86,
+    reviewsCount: 45000,
+    studentsCount: 240000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 35,
+    lessonsCount: 15,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Architect robust enterprise solutions on Google Cloud Platform',
+      'Deploy containerized microservices on Google Kubernetes Engine (GKE)',
+      'Prepare for the Google Cloud Professional Cloud Architect certification'
+    ],
+    modules: [],
+    createdAt: '2026-08-16T00:00:00Z'
+  },
+
+  // 9. COURSERA - Meta Front-End Developer
+  {
+    id: 'course-coursera-meta',
+    title: 'Meta Front-End Developer Professional Certificate',
+    subtitle: 'Meta Staff Engineers / Coursera',
+    description: 'Launch your career as a Front-End Developer with official Meta curriculum. Master HTML5, CSS3, JavaScript, React, UI/UX Design, and Version Control with Git.',
+    category: 'Web Dev',
+    platform: 'coursera',
+    platformUrl: 'https://www.coursera.org/professional-certificates/meta-front-end-developer',
+    certificateIncluded: true,
+    price: 49,
+    discountedPrice: 49,
+    instructorId: 'user-mentor',
+    instructorName: 'Meta Staff Engineers (Coursera)',
+    instructorBio: 'Engineers from Meta (Facebook, Instagram, WhatsApp).',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&auto=format&fit=crop&q=80',
+    level: 'Beginner',
+    rating: 4.82,
+    reviewsCount: 68000,
+    studentsCount: 310000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 40,
+    lessonsCount: 16,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Create interactive React applications using hooks, state management, and props',
+      'Build responsive, mobile-first web pages using modern CSS and Figma designs',
+      'Earn the industry-recognized Meta Front-End Developer certificate'
+    ],
+    modules: [],
+    createdAt: '2026-08-17T00:00:00Z'
+  },
+
+  // 10. EDX - MIT 6.00.1x Python
+  {
+    id: 'course-edx-mit',
+    title: 'MIT 6.00.1x: Introduction to Computer Science and Programming Using Python',
+    subtitle: 'Massachusetts Institute of Technology / Prof. John Guttag',
+    description: 'MIT\'s flagship introductory computer science course. Covers algorithmic thinking, data structures, computational complexity, object-oriented programming, and simulation models.',
+    category: 'Python',
+    platform: 'edx',
+    platformUrl: 'https://www.edx.org/learn/computer-science/massachusetts-institute-of-technology-introduction-to-computer-science-and-programming-using-python',
+    certificateIncluded: true,
+    price: 0,
+    discountedPrice: 0,
+    instructorId: 'user-mentor',
+    instructorName: 'Prof. John Guttag & Eric Grimson (MIT / edX)',
+    instructorBio: 'Dugald C. Jackson Professor of Computer Science and Electrical Engineering at MIT.',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    level: 'Beginner',
+    rating: 4.92,
+    reviewsCount: 110000,
+    studentsCount: 650000,
+    status: 'published',
+    progressPercent: 0,
+    durationHours: 36,
+    lessonsCount: 14,
+    reelsCount: 5,
+    quizzesCount: 1,
+    assignmentsCount: 1,
+    learningOutcomes: [
+      'Understand computation, Python syntax, control flow, and recursion',
+      'Analyze algorithmic complexity and search/sort algorithms (Bisection, Merge Sort)',
+      'Apply Object-Oriented Programming (OOP) and stochastic modeling'
+    ],
+    modules: [],
+    createdAt: '2026-08-18T00:00:00Z'
+  },
+
+  // 11. VERIFIED LMS - Java Core Masterclass
   {
     id: 'course-java',
     title: 'Java Core & Modern Enterprise Architecture',
-    subtitle: 'Master Java 21, Virtual Threads, JVM Internals & High-Concurrency Systems',
+    subtitle: 'LMS Verified Faculty / Senior Architects',
     description: 'The definitive 5-reel Java engineering masterclass covering JVM bytecode, garbage collectors (ZGC/G1), Project Loom virtual threads, concurrent data structures, and Spring Boot 3 enterprise best practices.',
     category: 'Java',
+    platform: 'lms',
+    certificateIncluded: true,
     price: 79,
     discountedPrice: 49,
     instructorId: 'user-mentor',
-    instructorName: 'Mentor 001',
-    instructorBio: 'Senior AI Systems Architect with 15+ years Java experience.',
+    instructorName: 'LMS Verified Faculty',
+    instructorBio: 'Senior AI Systems Architect with 15+ years enterprise experience.',
     thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
     level: 'Intermediate',
     rating: 4.95,
-    reviewsCount: 410,
-    studentsCount: 2350,
+    reviewsCount: 420,
+    studentsCount: 12400,
     status: 'published',
-    progressPercent: 100,
-    lastLessonTitle: 'Course Completed! Certificate & Badge Issued.',
+    progressPercent: 0,
     durationHours: 5,
     lessonsCount: 5,
     reelsCount: 5,
@@ -853,312 +1153,768 @@ export const INITIAL_COURSES: Course[] = [
     ],
     modules: [],
     createdAt: '2026-08-12T00:00:00Z'
-  },
-  {
-    id: 'course-dsa',
-    title: 'Data Structures & Algorithms for FAANG Interviews',
-    subtitle: 'From Big-O, Dynamic Programming, Graphs to Hard Interview Patterns',
-    description: 'Systematic 5-reel visual framework to crack top-tier technical interviews. Includes step-by-step intuition for sliding window, dynamic programming with bitmasking, union-find, and graph algorithms.',
-    category: 'DSA',
-    price: 99,
-    discountedPrice: 69,
-    instructorId: 'user-mentor-2',
-    instructorName: 'Mentor 002',
-    instructorBio: 'Principal Frontend Architect & Technical Interview Coach.',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&auto=format&fit=crop&q=80',
-    level: 'Advanced',
-    rating: 4.88,
-    reviewsCount: 530,
-    studentsCount: 3100,
-    status: 'published',
-    progressPercent: 45,
-    lastLessonTitle: 'Reel 2: Graph Traversals & Kahn Algorithm',
-    durationHours: 5,
-    lessonsCount: 5,
-    reelsCount: 5,
-    quizzesCount: 1,
-    assignmentsCount: 1,
-    reels: createCourseReels('course-dsa', 'DSA FAANG', [
-      'Amortized Complexity & Vector Doubling Mathematics',
-      'Graph Traversals: BFS, DFS & Kahn Topological Sort',
-      'Dynamic Programming: Memoization vs Tabulation Patterns',
-      'Disjoint Set Union (DSU) & Segment Trees Visualized',
-      'Systematic Interview Walkthrough of Hard Graph Problems'
-    ]),
-    learningOutcomes: [
-      'Deconstruct complex array and graph interview problems into recognizable algorithmic patterns',
-      'Implement custom data structures: Trie, Segment Tree, Disjoint Set Union (DSU)',
-      'Analyze space and time complexity with mathematical rigor'
-    ],
-    modules: [],
-    createdAt: '2026-08-05T00:00:00Z'
-  },
-  {
-    id: 'course-dbms',
-    title: 'Relational Database Management & SQL Mastery',
-    subtitle: 'ACID transactions, B+ Tree indexing, isolation levels & query optimization',
-    description: 'Deep dive 5-reel masterclass into how relational databases execute queries, buffer pool management, write-ahead logging (WAL), multi-version concurrency control (MVCC), and distributed SQL architectures.',
-    category: 'DBMS',
-    price: 69,
-    discountedPrice: 45,
-    instructorId: 'user-mentor-3',
-    instructorName: 'Mentor 003',
-    instructorBio: 'Systems Engineering Specialist in database internals.',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=800&auto=format&fit=crop&q=80',
-    level: 'Intermediate',
-    rating: 4.92,
-    reviewsCount: 280,
-    studentsCount: 1890,
-    status: 'published',
-    progressPercent: 20,
-    durationHours: 5,
-    lessonsCount: 5,
-    reelsCount: 5,
-    quizzesCount: 1,
-    assignmentsCount: 1,
-    reels: createCourseReels('course-dbms', 'DBMS & SQL', [
-      'Query Execution Engines & Physical Storage Pages',
-      'Clustered vs Secondary B+ Tree Indexing Structures',
-      'Transaction Isolation Levels: Dirty Reads to Phantom Reads',
-      'Write-Ahead Logging (WAL) & Buffer Pool Flushing',
-      'Diagnosing Lock Contention and Deadlock Graphs'
-    ]),
-    learningOutcomes: [
-      'Write optimized SQL queries that utilize index covering and avoid full table scans',
-      'Understand dirty reads, non-repeatable reads, and phantom reads across isolation levels',
-      'Diagnose locking contention and deadlocks in high-throughput transactional OLTP systems'
-    ],
-    modules: [],
-    createdAt: '2026-08-14T00:00:00Z'
-  },
-  {
-    id: 'course-2',
-    title: 'Advanced TypeScript & Production Design Patterns',
-    subtitle: 'Write type-safe, highly composable systems with zero type assertions',
-    description: 'Learn template literal types, mapped types, recursive AST parsers in type land, and enterprise architecture patterns from lead architects in 5 vertical reels.',
-    category: 'Web Dev',
-    price: 69,
-    discountedPrice: 45,
-    instructorId: 'user-mentor-2',
-    instructorName: 'Mentor 002',
-    instructorBio: 'Principal Frontend Architect & Open Source Contributor.',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80',
-    level: 'Advanced',
-    rating: 4.85,
-    reviewsCount: 195,
-    studentsCount: 860,
-    status: 'published',
-    progressPercent: 32,
-    lastLessonTitle: 'Reel 2: Conditional Types & Distributive Law',
-    durationHours: 5,
-    lessonsCount: 5,
-    reelsCount: 5,
-    quizzesCount: 1,
-    assignmentsCount: 1,
-    reels: createCourseReels('course-2', 'Advanced TypeScript', [
-      'Template Literal Types & Branded Primitives',
-      'Conditional Types, Distributive Laws & Infer Operator',
-      'Type-Safe State Machines without External Libraries',
-      'High-Performance Generic Builder Patterns',
-      'End-to-End Type-Safe RPC Architectures'
-    ]),
-    learningOutcomes: [
-      'Master advanced generic constraints, conditional infer logic, and variance',
-      'Build end-to-end type-safe RPC APIs without code generation',
-      'Refactor brittle any/unknown codebases into bulletproof types'
-    ],
-    modules: [],
-    createdAt: '2026-08-15T00:00:00Z'
-  },
-  {
-    id: 'course-3',
-    title: 'Micro-Interactions & Modern Motion Design with Framer Motion',
-    subtitle: 'Craft liquid animations, layout transitions, and tactile feedback in 5 reels',
-    description: 'Transform standard web apps into mesmerizing, award-worthy digital experiences with fluid physics and gestural interactions across 5 vertical reels.',
-    category: 'Design',
-    price: 49,
-    instructorId: 'user-mentor',
-    instructorName: 'Mentor 001',
-    instructorBio: 'Creative technologist & UI animator specializing in high-converting web experiences.',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&auto=format&fit=crop&q=80',
-    level: 'Beginner',
-    rating: 5.0,
-    reviewsCount: 12,
-    studentsCount: 45,
-    status: 'published',
-    progressPercent: 100,
-    lastLessonTitle: 'Course Completed! Certificate Unlocked.',
-    durationHours: 5,
-    lessonsCount: 5,
-    reelsCount: 5,
-    quizzesCount: 1,
-    assignmentsCount: 1,
-    reels: createCourseReels('course-3', 'Motion Design', [
-      'Spring Physics vs Easing Curves: Stiffness & Damping',
-      'Shared Layout Morphing with layoutId in React',
-      'Gestural Drag Physics & Velocity-Based Snapping',
-      'Scroll-Driven Micro-Interactions & Progress Interpolation',
-      'Hardware-Accelerated 60fps Animation Best Practices'
-    ]),
-    learningOutcomes: [
-      'Implement seamless layout animations using layoutId',
-      'Create custom drag, swipe, and spring physics',
-      'Optimize 60fps GPU-accelerated motion in React'
-    ],
-    modules: [],
-    createdAt: '2026-08-24T11:00:00Z'
   }
 ];
 
 export const INITIAL_LESSONS: Lesson[] = [];
 
+// COMPREHENSIVE COMPANY-SPECIFIC INTERVIEW ROUNDS, APTITUDE TESTS & COURSE QUIZZES
 export const INITIAL_QUIZZES: Quiz[] = [
+  // 1. GOOGLE SWE TECHNICAL INTERVIEW
   {
-    id: 'quiz-course-1',
-    courseId: 'course-1',
-    courseTitle: 'Full-Stack Modern AI Architecture & Agentic Workflows',
-    moduleId: 'mod-1',
-    moduleTitle: 'Module 1: AI Agent Foundations',
-    title: 'AI Agent Architectures & Vector Indexing Quiz',
-    difficulty: 'Intermediate',
-    totalMarks: 30,
+    id: 'quiz-google-swe',
+    title: 'Google Software Engineering: Algorithms & System Internals',
+    description: 'Targeted Google technical round questions covering Trie prefix trees, Dynamic Programming memoization, Graph algorithms (Dijkstra), Big-O asymptotic analysis, and distributed MapReduce fundamentals.',
+    category: 'Top Tech Giants',
+    company: 'Google',
+    targetRole: 'Software Engineer (L4/L5)',
+    difficulty: 'Advanced',
+    durationMinutes: 15,
+    totalMarks: 50,
     passingPercentage: 80,
-    createdAt: '2026-08-20T10:00:00Z',
+    rewardXp: 250,
+    createdAt: '2026-08-25T00:00:00Z',
     questions: [
       {
-        id: 'q-ai-1',
-        category: 'AI & Engineering',
+        id: 'q-goog-1',
+        category: 'DSA & Algorithms',
         type: 'mcq',
-        prompt: 'Which vector indexing metric is mathematically invariant to vector magnitude when measuring semantic similarity?',
+        prompt: 'In a Google-scale search autocomplete system, which data structure provides optimal O(K) prefix lookup time where K is the prefix length, independent of total dictionary size N?',
         options: [
-          'Euclidean Distance (L2)',
-          'Cosine Similarity',
-          'Manhattan Distance (L1)',
-          'Dot Product without normalization'
+          'Binary Search Tree (BST)',
+          'Trie (Prefix Tree) with top-ranked suggestions cached at each node',
+          'Singly Linked List with linear search',
+          'Max-Heap sorted by word frequency'
         ],
         correctIndex: 1,
-        explanation: 'Cosine similarity normalizes vectors by their magnitudes, evaluating strictly the cosine of the angle between them.',
+        explanation: 'A Trie explores prefix characters in O(K) steps directly along branch edges. Storing top precomputed search queries at each node yields instant sub-millisecond autocompletion.',
+        difficulty: 'Advanced',
         marks: 10
       },
       {
-        id: 'q-ai-2',
-        category: 'AI & Engineering',
+        id: 'q-goog-2',
+        category: 'Algorithms',
+        type: 'mcq',
+        prompt: 'What is the tightest worst-case time complexity of finding the Single Source Shortest Path on a weighted directed graph with non-negative edge weights using Dijkstra with a Min-Indexed Binary Heap?',
+        options: [
+          'O(V * E)',
+          'O((V + E) * log V)',
+          'O(V^3)',
+          'O(E^2)'
+        ],
+        correctIndex: 1,
+        explanation: 'Dijkstra with a Min-Heap performs |V| vertex extract-min operations (O(V log V)) and at most |E| edge relaxation key updates (O(E log V)), summing to O((V + E) log V).',
+        difficulty: 'Advanced',
+        marks: 10
+      },
+      {
+        id: 'q-goog-3',
+        category: 'System Design',
+        type: 'mcq',
+        prompt: 'In distributed computing frameworks like Google MapReduce or Apache Spark, what is the purpose of the "Shuffle & Sort" phase between Map and Reduce?',
+        options: [
+          'To encrypt disk blocks with AES-256',
+          'To partition and group intermediate (Key, Value) pairs by key so that all values for a given key arrive at the same Reducer node',
+          'To eliminate duplicate web pages from crawling spiders',
+          'To compress video streams for YouTube playback'
+        ],
+        correctIndex: 1,
+        explanation: 'The Shuffle phase routes all intermediate outputs sharing identical keys across cluster network partitions to the designated worker node hosting that key reducer.',
+        difficulty: 'Advanced',
+        marks: 10
+      },
+      {
+        id: 'q-goog-4',
+        category: 'Dynamic Programming',
         type: 'true_false',
-        prompt: 'Constrained decoding with JSON Schema guarantees valid function calling structure at the token sampler level.',
+        prompt: 'Top-Down DP with Memoization and Bottom-Up DP with Tabulation share the same asymptotic asymptotic Big-O time and state space complexities for the 0/1 Knapsack problem.',
         options: ['True', 'False'],
         correctIndex: 0,
-        explanation: 'True! Grammar-guided constrained decoding masks disallowed tokens during logits sampling.',
+        explanation: 'True! Both approaches evaluate the exact same subproblem state space grid of O(N * W), with top-down leveraging recursive memoization and bottom-up building the iterative matrix.',
+        difficulty: 'Intermediate',
         marks: 10
       },
       {
-        id: 'q-ai-3',
-        category: 'AI & Engineering',
+        id: 'q-goog-5',
+        category: 'Operating Systems',
         type: 'mcq',
-        prompt: 'What strategy minimizes agentic tool loop latency in multi-turn assistant workflows?',
+        prompt: 'Why do high-performance servers prefer asynchronous non-blocking epoll (Linux) / kqueue (BSD) event polling over traditional select() or poll() syscalls for handling 100,000 concurrent socket connections?',
         options: [
-          'Polling the LLM synchronously every 500ms',
-          'Semantic response caching and streaming tokens to the client canvas',
-          'Disabling JSON schema validation completely',
-          'Running tools in single-threaded blocking queues'
+          'epoll runs without any operating system kernel context',
+          'epoll is O(1) per ready event by returning only active file descriptors via kernel event queues, whereas select/poll require O(N) linear array scanning of all 100,000 descriptors on every tick',
+          'select() limits memory buffers to 64 bytes per request',
+          'epoll disables TCP packet checksums'
         ],
         correctIndex: 1,
-        explanation: 'Semantic response caching skips redundant model inferences while streaming provides instant visual feedback to users.',
+        explanation: 'epoll uses a kernel-managed ready list (O(1) active event dispatch), avoiding the O(N) descriptor iteration penalty that degrades select() and poll() under high concurrency (C10K/C100K problem).',
+        difficulty: 'Advanced',
         marks: 10
       }
     ]
   },
+
+  // 2. AMAZON / AWS CLOUD ARCHITECT & SDE INTERVIEW
+  {
+    id: 'quiz-amazon-sde',
+    title: 'Amazon AWS: Scalable Distributed Systems & Cloud Architecture',
+    description: 'Amazon SDE and Solutions Architect interview questions covering the CAP theorem, DynamoDB single-table design, asynchronous SQS/Lambda decoupled pipelines, and multi-region fault tolerance.',
+    category: 'Top Tech Giants',
+    company: 'Amazon',
+    targetRole: 'AWS Solutions Architect / SDE II',
+    difficulty: 'Advanced',
+    durationMinutes: 15,
+    totalMarks: 50,
+    passingPercentage: 80,
+    rewardXp: 250,
+    createdAt: '2026-08-25T00:00:00Z',
+    questions: [
+      {
+        id: 'q-amz-1',
+        category: 'Cloud Architecture',
+        type: 'mcq',
+        prompt: 'According to Eric Brewer\'s CAP Theorem, when an unavoidable network partition (P) occurs between AWS availability zones, what fundamental architectural trade-off must a distributed database make?',
+        options: [
+          'It must sacrifice storage encryption',
+          'It must choose between Consistency (returning latest write or erroring) vs Availability (returning stale data without errors)',
+          'It must switch from IPv6 to IPv4',
+          'It must convert all relational tables into flat CSV files'
+        ],
+        correctIndex: 1,
+        explanation: 'During a network partition, a distributed system cannot guarantee both immediate strong consistency across isolated nodes and 100% availability for incoming writes.',
+        difficulty: 'Advanced',
+        marks: 10
+      },
+      {
+        id: 'q-amz-2',
+        category: 'Database Design',
+        type: 'mcq',
+        prompt: 'What is the primary motivation for adopting DynamoDB "Single-Table Design" in high-scale Amazon retail and Prime microservices?',
+        options: [
+          'To reduce the total number of AWS accounts required',
+          'To retrieve multiple heterogeneous related entities (e.g. Order + OrderItems + Customer) in a single ultra-fast indexed query without relational JOIN latency',
+          'To prevent DynamoDB from creating secondary indexes',
+          'To enforce strict SQL foreign key constraints'
+        ],
+        correctIndex: 1,
+        explanation: 'Single-table design co-locates related items under shared Partition Keys (PK) and composite Sort Keys (SK), fetching full hierarchical documents in a single predictable sub-10ms query.',
+        difficulty: 'Advanced',
+        marks: 10
+      },
+      {
+        id: 'q-amz-3',
+        category: 'System Resilience',
+        type: 'mcq',
+        prompt: 'How does an Amazon SQS Dead-Letter Queue (DLQ) paired with Exponential Backoff and Jitter protect downstream payment APIs during traffic spikes?',
+        options: [
+          'It automatically deletes failed transactions without notification',
+          'It isolates poison-pill messages after max retry thresholds and desynchronizes retry thundering herds across distributed clients',
+          'It bypasses credit card fraud validation rules',
+          'It forces all HTTP requests to use port 80'
+        ],
+        correctIndex: 1,
+        explanation: 'DLQs capture unprocessable messages for root cause inspection, while exponential backoff with randomized jitter prevents synchronized retry storms from crashing recovered services.',
+        difficulty: 'Intermediate',
+        marks: 10
+      },
+      {
+        id: 'q-amz-4',
+        category: 'Cloud Architecture',
+        type: 'true_false',
+        prompt: 'Amazon S3 provides strong read-after-write consistency for PUT and DELETE requests of objects in all AWS Regions with zero extra latency penalty.',
+        options: ['True', 'False'],
+        correctIndex: 0,
+        explanation: 'True! Since December 2020, Amazon S3 delivers automatic strong read-after-write consistency for all HTTP GET, PUT, and LIST operations across all regions.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-amz-5',
+        category: 'Distributed Systems',
+        type: 'mcq',
+        prompt: 'When designing an Idempotent API endpoint for Amazon checkout orders, what is the best practice to prevent double-charging on network retries?',
+        options: [
+          'Ask the user to refresh their browser after 5 seconds',
+          'Include a unique client-generated Idempotency-Key in the request header and verify it against a distributed cache/DB before processing payment',
+          'Disable TLS SSL encryption during checkout',
+          'Execute charges asynchronously on a random timer'
+        ],
+        correctIndex: 1,
+        explanation: 'An Idempotency Key guarantees that duplicate payment requests containing the same unique token return the original transaction receipt without executing duplicate charges.',
+        difficulty: 'Intermediate',
+        marks: 10
+      }
+    ]
+  },
+
+  // 3. MICROSOFT ENTERPRISE SOFTWARE ENGINEERING
+  {
+    id: 'quiz-microsoft-swe',
+    title: 'Microsoft Software Engineering: OOP Design Patterns & Concurrency',
+    description: 'Microsoft technical interview assessment evaluating SOLID architecture principles, GoF Design Patterns, Thread Pool management, and resilient Cloud Microservices.',
+    category: 'Top Tech Giants',
+    company: 'Microsoft',
+    targetRole: 'Software Engineer II (Azure / Core Apps)',
+    difficulty: 'Intermediate',
+    durationMinutes: 12,
+    totalMarks: 50,
+    passingPercentage: 80,
+    rewardXp: 200,
+    createdAt: '2026-08-25T00:00:00Z',
+    questions: [
+      {
+        id: 'q-ms-1',
+        category: 'OOP & Architecture',
+        type: 'mcq',
+        prompt: 'Which SOLID principle is violated when a derived subclass overrides a base class method with an implementation that throws a `NotSupportedException`?',
+        options: [
+          'Single Responsibility Principle (SRP)',
+          'Liskov Substitution Principle (LSP)',
+          'Interface Segregation Principle (ISP)',
+          'Open-Closed Principle (OCP)'
+        ],
+        correctIndex: 1,
+        explanation: 'LSP requires that objects of a superclass should be replaceable with objects of a subclass without breaking application correctness or throwing unexpected unsupported exceptions.',
+        difficulty: 'Intermediate',
+        marks: 10
+      },
+      {
+        id: 'q-ms-2',
+        category: 'Design Patterns',
+        type: 'mcq',
+        prompt: 'In Microsoft Azure microservice architectures, which design pattern prevents an application from repeatedly attempting an operation that is guaranteed to fail (e.g. downstream service outage)?',
+        options: [
+          'Singleton Pattern',
+          'Circuit Breaker Pattern',
+          'Decorator Pattern',
+          'Flyweight Pattern'
+        ],
+        correctIndex: 1,
+        explanation: 'The Circuit Breaker pattern trips from CLOSED to OPEN state upon reaching failure thresholds, instantly failing fast and allowing downstream dependencies time to heal before transitioning to HALF-OPEN.',
+        difficulty: 'Intermediate',
+        marks: 10
+      },
+      {
+        id: 'q-ms-3',
+        category: 'Concurrency',
+        type: 'true_false',
+        prompt: 'In asynchronous C# (.NET) / TypeScript async-await programming, awaiting an I/O-bound Task releases the current thread back to the runtime Thread Pool while waiting for I/O completion.',
+        options: ['True', 'False'],
+        correctIndex: 0,
+        explanation: 'True! Non-blocking async/await registers a continuation callback with the OS I/O completion port and frees the caller thread to handle other CPU work.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-ms-4',
+        category: 'Memory Management',
+        type: 'mcq',
+        prompt: 'What causes a memory leak in a managed runtime environment with automatic Garbage Collection (e.g. .NET CLR or Java JVM)?',
+        options: [
+          'Using too many integer variables',
+          'Unreleased object references remaining rooted in active static fields, global event listeners, or singleton caches',
+          'Garbage collectors running out of CPU cycles',
+          'Compiling in Release mode instead of Debug'
+        ],
+        correctIndex: 1,
+        explanation: 'Garbage collectors trace reachable objects from GC Roots (static fields, active thread stacks). Retaining unneeded object pointers in event handlers or long-lived caches prevents reclamation.',
+        difficulty: 'Intermediate',
+        marks: 10
+      },
+      {
+        id: 'q-ms-5',
+        category: 'Design Patterns',
+        type: 'mcq',
+        prompt: 'Which GoF behavioral design pattern is utilized when creating a decoupled Event Broker where publishers emit domain events without knowing which subscriber components will handle them?',
+        options: [
+          'Observer / Publish-Subscribe Pattern',
+          'Factory Method Pattern',
+          'Adapter Pattern',
+          'Proxy Pattern'
+        ],
+        correctIndex: 0,
+        explanation: 'The Observer/Pub-Sub pattern defines a one-to-many dependency between objects so that when one object changes state, all its registered dependents are notified automatically without tight coupling.',
+        difficulty: 'Beginner',
+        marks: 10
+      }
+    ]
+  },
+
+  // 4. META FRONT-END & FULL-STACK ENGINEER INTERVIEW
+  {
+    id: 'quiz-meta-fe',
+    title: 'Meta: Front-End Architecture, React 19 & Web Performance',
+    description: 'Meta technical interview round on React 19 Fiber Reconciler, JavaScript V8 Event Loop microtasks, browser DOM rendering pipeline, and high-frequency real-time web optimization.',
+    category: 'Top Tech Giants',
+    company: 'Meta',
+    targetRole: 'Front-End / UI Software Engineer',
+    difficulty: 'Advanced',
+    durationMinutes: 12,
+    totalMarks: 50,
+    passingPercentage: 80,
+    rewardXp: 200,
+    createdAt: '2026-08-25T00:00:00Z',
+    questions: [
+      {
+        id: 'q-meta-1',
+        category: 'React Internals',
+        type: 'mcq',
+        prompt: 'What major capability does the React Fiber reconciler architecture provide over the legacy recursive Virtual DOM stack reconciler?',
+        options: [
+          'It compiles React code directly into WebAssembly binaries',
+          'It enables interruptible incremental rendering by breaking UI render work into prioritizable chunks across requestIdleCallback time slices',
+          'It eliminates the need for CSS stylesheets',
+          'It forces all state variables into global window scope'
+        ],
+        correctIndex: 1,
+        explanation: 'Fiber models the component tree as a linked-list work loop, allowing React to pause, prioritize, and resume rendering work to keep the browser main thread smooth and responsive at 60/120fps.',
+        difficulty: 'Advanced',
+        marks: 10
+      },
+      {
+        id: 'q-meta-2',
+        category: 'JavaScript Runtime',
+        type: 'mcq',
+        prompt: 'Given: `console.log(1); setTimeout(() => console.log(2), 0); Promise.resolve().then(() => console.log(3)); console.log(4);` — What is the exact output order in modern V8 engines?',
+        options: [
+          '1, 2, 3, 4',
+          '1, 4, 3, 2',
+          '1, 4, 2, 3',
+          '3, 1, 4, 2'
+        ],
+        correctIndex: 1,
+        explanation: 'Synchronous statements log 1 and 4. The call stack empties and the Event Loop processes all microtasks (Promise -> 3) before executing the next macrotask queue item (setTimeout -> 2). Result: 1, 4, 3, 2.',
+        difficulty: 'Intermediate',
+        marks: 10
+      },
+      {
+        id: 'q-meta-3',
+        category: 'Web Performance',
+        type: 'mcq',
+        prompt: 'Which CSS property change triggers ONLY a fast GPU Compositing step without causing expensive Layout (Reflow) or Paint re-calculations?',
+        options: [
+          '`width` and `height`',
+          '`transform: translate3d()` and `opacity`',
+          '`top` and `left`',
+          '`margin` and `padding`'
+        ],
+        correctIndex: 1,
+        explanation: '`transform` and `opacity` promote elements to dedicated GPU compositor layers, executing smooth hardware-accelerated animations without triggering CPU layout reflows.',
+        difficulty: 'Intermediate',
+        marks: 10
+      },
+      {
+        id: 'q-meta-4',
+        category: 'Web Architecture',
+        type: 'true_false',
+        prompt: 'Server-Sent Events (SSE) provide unidirectional server-to-client streaming over HTTP/2, whereas WebSockets establish a full-duplex bidirectional TCP communication channel.',
+        options: ['True', 'False'],
+        correctIndex: 0,
+        explanation: 'True! SSE uses standard HTTP streaming to push notifications from server to browser, while WebSockets establish persistent two-way socket messaging.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-meta-5',
+        category: 'React Performance',
+        type: 'mcq',
+        prompt: 'Why should you avoid using array indices as `key` props on dynamic lists that support reordering, insertion, or deletion in React?',
+        options: [
+          'Array keys crash modern web browsers',
+          'Index keys confuse React DOM reconciliation diffing, causing incorrect component state preservation and broken form input values',
+          'React does not allow numeric keys',
+          'Indices require 10x more memory'
+        ],
+        correctIndex: 1,
+        explanation: 'When items are inserted or removed, array indices shift. React matches existing elements by key identity, erroneously associating previous component state with the shifted element.',
+        difficulty: 'Beginner',
+        marks: 10
+      }
+    ]
+  },
+
+  // 5. QUANTITATIVE & LOGICAL APTITUDE (CAMPUS PLACEMENTS / TECH GIANTS)
+  {
+    id: 'quiz-quant-aptitude',
+    title: 'Campus Placement: Quantitative Aptitude & Numerical Reasoning',
+    description: 'Essential quantitative aptitude assessment for software engineering recruitment drives (TCS, Infosys, Wipro, Accenture, Cognizant, Google, Amazon). Tests speed math, time & work, probability, and percentages.',
+    category: 'Quantitative Aptitude',
+    company: 'General / IT Giants',
+    targetRole: 'All Engineering Graduates',
+    difficulty: 'Intermediate',
+    durationMinutes: 15,
+    totalMarks: 50,
+    passingPercentage: 75,
+    rewardXp: 180,
+    createdAt: '2026-08-25T00:00:00Z',
+    questions: [
+      {
+        id: 'q-apt-1',
+        category: 'Time & Work',
+        type: 'mcq',
+        prompt: 'Worker A can complete a software sprint module in 12 days, and Worker B can complete it in 24 days. If they collaborate together, how many days will it take to finish the module?',
+        options: [
+          '6 days',
+          '8 days',
+          '10 days',
+          '18 days'
+        ],
+        correctIndex: 1,
+        explanation: 'Combined 1-day rate = (1/12) + (1/24) = (2 + 1)/24 = 3/24 = 1/8. Total time required = 8 days.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-apt-2',
+        category: 'Speed, Time & Distance',
+        type: 'mcq',
+        prompt: 'A train traveling at a constant speed of 72 km/h crosses an electric pole in 15 seconds. What is the length of the train in meters?',
+        options: [
+          '200 meters',
+          '300 meters',
+          '360 meters',
+          '450 meters'
+        ],
+        correctIndex: 1,
+        explanation: 'Speed in m/s = 72 * (5/18) = 20 m/s. Distance (Train Length) = Speed * Time = 20 m/s * 15 s = 300 meters.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-apt-3',
+        category: 'Probability & Combinatorics',
+        type: 'mcq',
+        prompt: 'Two fair 6-sided dice are rolled simultaneously. What is the mathematical probability that the sum of the rolled numbers equals exactly 8?',
+        options: [
+          '5/36',
+          '1/6 (6/36)',
+          '7/36',
+          '1/9 (4/36)'
+        ],
+        correctIndex: 0,
+        explanation: 'Total sample space = 6 * 6 = 36 outcomes. Pairs summing to 8 are: (2,6), (3,5), (4,4), (5,3), (6,2) = 5 outcomes. Probability = 5/36.',
+        difficulty: 'Intermediate',
+        marks: 10
+      },
+      {
+        id: 'q-apt-4',
+        category: 'Percentages & Profit/Loss',
+        type: 'mcq',
+        prompt: 'An online course is listed with a marked price of $200. The platform applies successive discounts of 20% followed by an additional 10%. What is the final checkout price?',
+        options: [
+          '$140',
+          '$144',
+          '$150',
+          '$160'
+        ],
+        correctIndex: 1,
+        explanation: 'After 1st discount (20%): $200 * 0.80 = $160. After 2nd discount (10%): $160 * 0.90 = $144.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-apt-5',
+        category: 'Permutations & Combinations',
+        type: 'mcq',
+        prompt: 'In how many distinct ways can the letters of the word "REACT" be arranged such that the vowels (E, A) are always kept together as a single block?',
+        options: [
+          '24 ways',
+          '48 ways',
+          '120 ways',
+          '240 ways'
+        ],
+        correctIndex: 1,
+        explanation: 'Treat (EA) as 1 unit + 3 consonants (R, C, T) = 4 units arranged in 4! = 24 ways. The vowels (E, A) can internally arrange in 2! = 2 ways. Total = 24 * 2 = 48 ways.',
+        difficulty: 'Intermediate',
+        marks: 10
+      }
+    ]
+  },
+
+  // 6. LOGICAL REASONING & CRITICAL THINKING
+  {
+    id: 'quiz-logical-reasoning',
+    title: 'Placement Assessment: Logical Reasoning, Data Sufficiency & Puzzles',
+    description: 'Comprehensive logical reasoning exam covering Syllogisms, Pattern Sequences, Coding-Decoding, Seating Arrangements, and Critical Deduction for campus and off-campus placements.',
+    category: 'Logical Reasoning',
+    company: 'General / IT Giants',
+    targetRole: 'Software Developer / Analyst',
+    difficulty: 'Intermediate',
+    durationMinutes: 15,
+    totalMarks: 50,
+    passingPercentage: 75,
+    rewardXp: 180,
+    createdAt: '2026-08-25T00:00:00Z',
+    questions: [
+      {
+        id: 'q-log-1',
+        category: 'Syllogisms',
+        type: 'mcq',
+        prompt: 'Statements: "All developers write code." "Some code writers drink coffee." Conclusions: I. All developers drink coffee. II. Some developers may drink coffee.',
+        options: [
+          'Only Conclusion I follows',
+          'Only Conclusion II follows',
+          'Both I and II follow',
+          'Neither follows'
+        ],
+        correctIndex: 1,
+        explanation: 'Conclusion I is an overgeneralization not supported by "some". Conclusion II represents a valid logical possibility. Hence only Conclusion II follows.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-log-2',
+        category: 'Number Series',
+        type: 'mcq',
+        prompt: 'Identify the next number in the sequence: 3, 7, 15, 31, 63, ?',
+        options: [
+          '125',
+          '127',
+          '128',
+          '131'
+        ],
+        correctIndex: 1,
+        explanation: 'Pattern is `(previous * 2) + 1`. (3*2)+1=7, (7*2)+1=15, (15*2)+1=31, (31*2)+1=63, (63*2)+1 = 127.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-log-3',
+        category: 'Coding-Decoding',
+        type: 'mcq',
+        prompt: 'If in a certain cryptographic code, "ALGORITHM" is encoded as "BMHPSJUIN" (each letter shifted forward by +1), how is "PYTHON" encoded?',
+        options: [
+          'QZUIPO',
+          'QZUIOP',
+          'RAMIPO',
+          'QZUJPO'
+        ],
+        correctIndex: 0,
+        explanation: 'P(+1)->Q, Y(+1)->Z, T(+1)->U, H(+1)->I, O(+1)->P, N(+1)->O. Result = QZUIPO.',
+        difficulty: 'Beginner',
+        marks: 10
+      },
+      {
+        id: 'q-log-4',
+        category: 'Blood Relations',
+        type: 'mcq',
+        prompt: 'Pointing to a portrait of a software engineer, Alex said: "His father is the only son of my father." Who is in the portrait?',
+        options: [
+          'Alex\'s brother',
+          'Alex\'s son',
+          'Alex\'s father',
+          'Alex himself'
+        ],
+        correctIndex: 1,
+        explanation: '"The only son of my father" = Alex himself. "His father is Alex" means the person in the portrait is Alex\'s son.',
+        difficulty: 'Intermediate',
+        marks: 10
+      },
+      {
+        id: 'q-log-5',
+        category: 'Direction Sense',
+        type: 'mcq',
+        prompt: 'A robotics engineer walks 20 meters North, turns right and walks 30 meters, turns right again and walks 20 meters. How far and in which direction is she from the starting point?',
+        options: [
+          '30 meters East',
+          '30 meters West',
+          '50 meters North-East',
+          '20 meters South'
+        ],
+        correctIndex: 0,
+        explanation: 'The North (+20) and South (-20) displacements cancel out, leaving a net displacement of 30 meters directly East.',
+        difficulty: 'Beginner',
+        marks: 10
+      }
+    ]
+  },
+
+  // 7. CS50x HARVARD MASTERCLASS QUIZ
+  {
+    id: 'quiz-course-yt-cs50',
+    courseId: 'course-yt-cs50',
+    courseTitle: 'CS50x: Introduction to Computer Science',
+    moduleId: 'mod-cs50-1',
+    moduleTitle: 'Module 1: Computer Science Fundamentals',
+    title: 'CS50x: Computer Science & Algorithmic Thinking Mastery Quiz',
+    description: 'Harvard CS50 mastery assessment covering binary representations, C memory pointer arithmetic, hash collision resolution, and algorithm time complexity.',
+    category: 'Course Milestone',
+    company: 'Harvard University',
+    targetRole: 'Computer Science Fundamentalist',
+    difficulty: 'Intermediate',
+    durationMinutes: 15,
+    totalMarks: 50,
+    passingPercentage: 80,
+    rewardXp: 150,
+    createdAt: '2026-08-25T00:00:00Z',
+    questions: [
+      {
+        id: 'q-cs50-1',
+        category: 'DSA',
+        type: 'mcq',
+        prompt: 'In C programming, what does the dereference operator `*ptr` evaluate to when `ptr` holds a valid memory address?',
+        options: [
+          'The hexadecimal address where pointer ptr is stored on the stack',
+          'The actual value stored in the heap/stack memory location that ptr points to',
+          'The size of pointer ptr in bytes',
+          'A null pointer exception'
+        ],
+        correctIndex: 1,
+        explanation: 'The asterisk dereferences the pointer, directly accessing or mutating the value stored at the target memory address.',
+        marks: 10
+      },
+      {
+        id: 'q-cs50-2',
+        category: 'DSA',
+        type: 'mcq',
+        prompt: 'What is the average lookup time complexity in a well-distributed Hash Table with N keys and B buckets using chaining for collision handling?',
+        options: [
+          'O(N^2)',
+          'O(1) average time',
+          'O(N log N)',
+          'O(log N)'
+        ],
+        correctIndex: 1,
+        explanation: 'A good hash function distributes keys uniformly across buckets with load factor N/B ≈ 1, achieving constant O(1) expected lookup time.',
+        marks: 10
+      },
+      {
+        id: 'q-cs50-3',
+        category: 'Algorithms',
+        type: 'true_false',
+        prompt: 'Merge Sort is a stable sorting algorithm with guaranteed O(N log N) worst-case time complexity, whereas QuickSort can degrade to O(N^2) on poorly chosen pivots.',
+        options: ['True', 'False'],
+        correctIndex: 0,
+        explanation: 'True! Merge Sort always halves the array evenly (O(N log N)), while naive QuickSort can degrade to O(N^2) if the pivot is already the minimum/maximum element.',
+        marks: 10
+      },
+      {
+        id: 'q-cs50-4',
+        category: 'Memory Management',
+        type: 'mcq',
+        prompt: 'What severe runtime error occurs in C when dynamic memory allocated with `malloc()` is never released with `free()` before pointers lose scope?',
+        options: [
+          'Segmentation Fault',
+          'Memory Leak',
+          'Stack Overflow',
+          'Bus Error'
+        ],
+        correctIndex: 1,
+        explanation: 'Unfreed heap allocations remain reserved by the process OS memory map, gradually exhausting available system RAM (Memory Leak).',
+        marks: 10
+      },
+      {
+        id: 'q-cs50-5',
+        category: 'Binary & Architecture',
+        type: 'mcq',
+        prompt: 'How many distinct integer values can be represented using an 8-bit unsigned binary byte (00000000 to 11111111)?',
+        options: [
+          '128 values (0 to 127)',
+          '256 values (0 to 255)',
+          '512 values',
+          '1024 values'
+        ],
+        correctIndex: 1,
+        explanation: '2^8 = 256 unique combinations, representing unsigned decimal numbers from 0 to 255.',
+        marks: 10
+      }
+    ]
+  },
+
+  // 8. JAVA CORE VERIFIED MASTERCLASS QUIZ
   {
     id: 'quiz-course-java',
     courseId: 'course-java',
     courseTitle: 'Java Core & Modern Enterprise Architecture',
     moduleId: 'mod-jv-1',
-    moduleTitle: 'Module 1: Java 21 & Concurrency',
-    title: 'Java 21 Virtual Threads & JVM Memory Quiz',
+    moduleTitle: 'Module 1: Java 21, JVM & Concurrency',
+    title: 'Java 21 Virtual Threads, Metaspace & Concurrency Quiz',
+    description: 'Verified assessment on JVM bytecode, Virtual Threads in Project Loom, ZGC garbage collection, and lock-free concurrency.',
+    category: 'Course Milestone',
+    company: 'LMS Verified Faculty',
+    targetRole: 'Java Systems Architect',
     difficulty: 'Intermediate',
-    totalMarks: 30,
+    durationMinutes: 15,
+    totalMarks: 50,
     passingPercentage: 80,
+    rewardXp: 150,
     createdAt: '2026-08-21T11:00:00Z',
     questions: [
       {
-        id: 'q-jv-q1',
+        id: 'q-jv-1',
         category: 'Java',
         type: 'mcq',
-        prompt: 'In Java 21, what happens to a Virtual Thread when it encounters a blocking network socket read?',
+        prompt: 'In Java 21 Project Loom, what happens when a Virtual Thread executes a blocking socket read or sleep?',
         options: [
-          'It halts the entire JVM process until the packet arrives',
-          'It is unmounted from its carrier platform thread, freeing the carrier to execute other virtual tasks',
-          'It terminates and throws an InterruptedException',
-          'It switches to synchronous OS kernel polling'
+          'The underlying OS kernel thread is halted until the packet arrives',
+          'The JVM unmounts the virtual thread from its carrier thread, allowing other virtual tasks to run',
+          'An unrecoverable ThreadBlockedException is thrown',
+          'The JVM converts the thread into a 1MB native C-stack allocation'
         ],
         correctIndex: 1,
-        explanation: 'Project Loom unmounts virtual threads upon blocking I/O, allowing a handful of carrier OS threads to multiplex millions of virtual tasks.',
+        explanation: 'Virtual Threads are lightweight heap objects. When blocking I/O occurs, the JVM unmounts them from the carrier platform thread so other tasks can execute.',
         marks: 10
       },
       {
-        id: 'q-jv-q2',
+        id: 'q-jv-2',
+        category: 'Java',
+        type: 'mcq',
+        prompt: 'Where are class bytecode metadata, runtime constant pools, and method definitions stored in modern JVMs (Java 8+)?',
+        options: [
+          'PermGen memory space',
+          'Off-heap Metaspace backed directly by native OS memory',
+          'Young Generation Eden Space',
+          'Thread Local Allocation Buffer (TLAB)'
+        ],
+        correctIndex: 1,
+        explanation: 'Metaspace replaced PermGen in Java 8, allocating class metadata directly into native memory up to MaxMetaspaceSize.',
+        marks: 10
+      },
+      {
+        id: 'q-jv-3',
+        category: 'Java',
+        type: 'mcq',
+        prompt: 'How does Java 21 Record Pattern Matching enhance type safety and developer productivity?',
+        options: [
+          'It forces all record fields to be mutable at runtime',
+          'It deconstructs record components directly in switch and instanceof expressions without manual casting',
+          'It compiles Java records into JavaScript objects dynamically',
+          'It eliminates JVM garbage collection cycles'
+        ],
+        correctIndex: 1,
+        explanation: 'Record pattern matching allows developers to test types and extract component variables in one concise syntax block without redundant type casts.',
+        marks: 10
+      },
+      {
+        id: 'q-jv-4',
         category: 'Java',
         type: 'true_false',
-        prompt: 'Java 21 Structured Concurrency guarantees that subtasks spawned in a scope are completed or cancelled before the scope block exits.',
+        prompt: 'StructuredTaskScope in Java 21 guarantees that child subtasks spawned in a scope complete or cancel before the enclosing code block exits.',
         options: ['True', 'False'],
         correctIndex: 0,
-        explanation: 'True! StructuredTaskScope enforces syntactic boundaries ensuring no leaked background threads.',
+        explanation: 'True! Structured Concurrency treats groups of related tasks as a single atomic unit of work, preventing thread leaks and orphaned background tasks.',
         marks: 10
-      }
-    ]
-  },
-  {
-    id: 'quiz-course-dsa',
-    courseId: 'course-dsa',
-    courseTitle: 'Data Structures & Algorithms for FAANG Interviews',
-    moduleId: 'mod-dsa-1',
-    moduleTitle: 'Module 1: Graph Primitives',
-    title: 'Graph Traversals & Complexity Quiz',
-    difficulty: 'Advanced',
-    totalMarks: 20,
-    passingPercentage: 80,
-    createdAt: '2026-08-22T09:00:00Z',
-    questions: [
+      },
       {
-        id: 'q-dsa-q1',
-        category: 'DSA',
+        id: 'q-jv-5',
+        category: 'Java',
         type: 'mcq',
-        prompt: 'Which data structure is optimal for cycle detection in an undirected graph with Disjoint Set Union?',
-        options: ['Trie with prefix arrays', 'DSU with Union by Rank and Path Compression', 'Min-Heap Priority Queue', 'Red-Black BST'],
+        prompt: 'What architectural benefit do VarHandle atomic operations provide over traditional synchronized blocks in high-concurrency Java systems?',
+        options: [
+          'They eliminate CPU memory barriers completely',
+          'They execute low-level atomic CAS (Compare-And-Swap) instructions with fine-grained memory fences without thread descheduling',
+          'They write data directly to SSD flash sectors',
+          'They run bytecode in kernel ring 0'
+        ],
         correctIndex: 1,
-        explanation: 'DSU with path compression provides near-constant inverse Ackermann O(α(N)) time per find/union query.',
-        marks: 20
+        explanation: 'VarHandles offer lock-free atomic read/write access and memory barriers (Volatile, Acquire/Release, Opaque) without incurring heavyweight thread context switches.',
+        marks: 10
       }
     ]
   }
 ];
 
+// SINGLE COURSE ASSIGNMENT
 export const INITIAL_ASSIGNMENTS: Assignment[] = [
-  {
-    id: 'ass-course-1',
-    courseId: 'course-1',
-    courseTitle: 'Full-Stack Modern AI Architecture & Agentic Workflows',
-    moduleId: 'mod-1',
-    moduleTitle: 'Module 1: AI Agent Foundations',
-    title: 'Enterprise AI Agent & RAG Pipeline Capstone Assignment',
-    instructions: 'Build a production-grade multi-agent workflow that integrates Qdrant vector search with JSON Schema output guardrails. Include fallback retry handlers and latency telemetry. Submit your architectural summary, key code snippets, or GitHub repository URL.',
-    dueDate: '2026-09-30T23:59:59Z',
-    maxMarks: 100,
-    submissionType: 'code',
-    submissions: [
-      {
-        id: 'sub-101',
-        assignmentId: 'ass-course-1',
-        userId: 'user-student',
-        userName: 'User 001',
-        submittedAt: '2026-08-25T14:30:00Z',
-        content: 'https://github.com/demo-user001/agentic-rag-pipeline\nImplemented tool-calling agents with fallback validation loops, Qdrant hybrid search, and FastAPI streaming endpoints.',
-        status: 'graded',
-        marksAwarded: 96,
-        feedback: 'Superb architecture! The semantic caching layer reduced P99 latency by 45%.'
-      }
-    ],
-    createdAt: '2026-08-18T10:00:00Z'
-  },
   {
     id: 'ass-course-java',
     courseId: 'course-java',
@@ -1170,385 +1926,57 @@ export const INITIAL_ASSIGNMENTS: Assignment[] = [
     dueDate: '2026-09-30T23:59:59Z',
     maxMarks: 100,
     submissionType: 'code',
-    submissions: [
-      {
-        id: 'sub-102',
-        assignmentId: 'ass-course-java',
-        userId: 'user-student',
-        userName: 'User 001',
-        submittedAt: '2026-08-24T16:00:00Z',
-        content: 'Benchmark Repo: https://github.com/demo-user001/loom-virtual-threads-bench\nResults: 100,000 concurrent socket connections handled with 180MB RAM vs 1.2GB with platform threads.',
-        status: 'graded',
-        marksAwarded: 98,
-        feedback: 'Outstanding benchmark analysis and clear structured concurrency scopes.'
-      }
-    ],
+    submissions: [],
     createdAt: '2026-08-19T11:00:00Z'
-  },
-  {
-    id: 'ass-course-dsa',
-    courseId: 'course-dsa',
-    courseTitle: 'Data Structures & Algorithms for FAANG Interviews',
-    moduleId: 'mod-dsa-1',
-    moduleTitle: 'Module 1: Graph Primitives',
-    title: 'FAANG Graph Algorithms & Sliding Window Capstone',
-    instructions: 'Implement Kahn’s algorithm for topological sorting and an optimal variable-size sliding window algorithm. Provide Big-O space and time complexity mathematical proofs and test cases.',
-    dueDate: '2026-09-30T23:59:59Z',
-    maxMarks: 100,
-    submissionType: 'code',
-    submissions: [],
-    createdAt: '2026-08-20T12:00:00Z'
-  },
-  {
-    id: 'ass-course-dbms',
-    courseId: 'course-dbms',
-    courseTitle: 'Relational Database Management & SQL Mastery',
-    moduleId: 'mod-dbms-1',
-    moduleTitle: 'Module 1: Query Engines',
-    title: 'Relational Index Optimization & Lock Contention Analysis',
-    instructions: 'Analyze PostgreSQL explain plans on 5 million records. Configure clustered index keys vs covering non-clustered indexes to eliminate sequential scans.',
-    dueDate: '2026-09-30T23:59:59Z',
-    maxMarks: 100,
-    submissionType: 'text',
-    submissions: [],
-    createdAt: '2026-08-21T13:00:00Z'
-  },
-  {
-    id: 'ass-course-2',
-    courseId: 'course-2',
-    courseTitle: 'Advanced TypeScript & Production Design Patterns',
-    moduleId: 'mod-21',
-    moduleTitle: 'Module 1: Type Systems',
-    title: 'Type-Level State Machine & Generic Builder Assignment',
-    instructions: 'Implement an end-to-end type-safe finite state machine without external libraries. Ensure illegal state transitions trigger compile-time type errors.',
-    dueDate: '2026-09-30T23:59:59Z',
-    maxMarks: 100,
-    submissionType: 'code',
-    submissions: [],
-    createdAt: '2026-08-22T14:00:00Z'
-  },
-  {
-    id: 'ass-course-3',
-    courseId: 'course-3',
-    courseTitle: 'Micro-Interactions & Modern Motion Design with Framer Motion',
-    moduleId: 'mod-31',
-    moduleTitle: 'Module 1: Spring Physics',
-    title: 'Framer Motion Gestural Interaction Sandbox Assignment',
-    instructions: 'Construct a responsive component with drag physics, spring velocity snapping, and layoutId shared morphing in React.',
-    dueDate: '2026-09-30T23:59:59Z',
-    maxMarks: 100,
-    submissionType: 'code',
-    submissions: [],
-    createdAt: '2026-08-23T15:00:00Z'
   }
 ];
 
 export const INITIAL_ARTICLES: ArticleNote[] = [];
-
-export const INITIAL_APPROVAL_QUEUE: ContentApprovalItem[] = [
-  {
-    id: 'appr-1',
-    contentType: 'course',
-    contentId: 'course-spring-adv',
-    title: 'Spring Cloud Microservices with Kubernetes & Istio Service Mesh (5 Reels)',
-    categoryOrSubject: 'Java & Cloud Architecture',
-    creatorId: 'user-mentor',
-    creatorName: 'Mentor 001',
-    creatorRole: 'Mentor',
-    status: 'submitted',
-    submissionDate: '2026-08-24T14:30:00Z',
-    feedbackHistory: [
-      {
-        date: '2026-08-24T14:30:00Z',
-        adminName: 'System Gateway',
-        action: 'submitted',
-        feedback: 'Course submitted with 5 vertical learning reels by Mentor 001 for curriculum vetting.'
-      }
-    ]
-  },
-  {
-    id: 'appr-2',
-    contentType: 'reel',
-    contentId: 'reel-cand-1',
-    title: 'C++ Move Semantics & Rvalue References (&&) in 60s',
-    categoryOrSubject: 'C++',
-    creatorId: 'user-mentor-2',
-    creatorName: 'Mentor 002',
-    creatorRole: 'Mentor',
-    status: 'under_review',
-    submissionDate: '2026-08-24T16:00:00Z',
-    reviewedBy: 'Administrator',
-    reviewedDate: '2026-08-25T09:00:00Z',
-    feedbackHistory: [
-      {
-        date: '2026-08-24T16:00:00Z',
-        adminName: 'System Gateway',
-        action: 'submitted',
-        feedback: 'Educational reel submitted for quality assurance.'
-      },
-      {
-        date: '2026-08-25T09:00:00Z',
-        adminName: 'Administrator',
-        action: 'under_review',
-        feedback: 'Assigned to Administrator for technical accuracy verification.'
-      }
-    ]
-  }
-];
-
-export const INITIAL_MENTOR_APPLICATIONS: MentorApplication[] = [
-  {
-    id: 'app-101',
-    userId: 'user-learner-3',
-    applicantName: 'User 003',
-    applicantEmail: 'user003@lms.ai',
-    applicantAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-    expertise: 'Distributed Systems & Cloud Architecture',
-    skills: ['Java', 'Spring Boot', 'Kubernetes', 'Microservices', 'Kafka'],
-    experienceYears: 5,
-    bio: 'Software engineer with 5 years experience building distributed systems. Completed 3 assessments with a 96% average score.',
-    portfolioUrl: 'https://github.com/demo-learner/systems-portfolio',
-    assessmentsCompleted: 3,
-    averageScore: 96,
-    status: 'submitted',
-    submissionDate: '2026-08-26T10:00:00Z'
-  },
-  {
-    id: 'app-102',
-    userId: 'user-learner-5',
-    applicantName: 'User 005',
-    applicantEmail: 'user005@lms.ai',
-    applicantAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
-    expertise: 'Database Management & OS Internals',
-    skills: ['PostgreSQL', 'OS Internals', 'Concurrency', 'SQL Optimization'],
-    experienceYears: 4,
-    bio: 'Systems engineer specializing in database performance and operating systems.',
-    portfolioUrl: 'https://github.com/demo-learner/dbms-research',
-    assessmentsCompleted: 3,
-    averageScore: 89,
-    status: 'under_review',
-    submissionDate: '2026-08-25T14:30:00Z',
-    reviewedDate: '2026-08-26T09:00:00Z',
-    reviewedBy: 'Administrator'
-  },
-  {
-    id: 'app-103',
-    userId: 'user-learner-2',
-    applicantName: 'User 002',
-    applicantEmail: 'user002@lms.ai',
-    applicantAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-    expertise: 'Data Structures & Algorithms',
-    skills: ['DSA', 'C++', 'Python', 'System Design'],
-    experienceYears: 2,
-    bio: 'Competitive programmer and DSA coach.',
-    portfolioUrl: 'https://github.com/demo-learner/dsa-code',
-    assessmentsCompleted: 3,
-    averageScore: 84,
-    status: 'changes_requested',
-    submissionDate: '2026-08-24T11:00:00Z',
-    reviewedDate: '2026-08-25T08:00:00Z',
-    reviewedBy: 'Administrator',
-    adminFeedback: 'Please provide more details on previous teaching experience or course curriculum outlines.'
-  }
-];
-
-export const INITIAL_COURSE_FEEDBACK: CourseFeedback[] = [
-  {
-    id: 'fb-1',
-    courseId: 'course-1',
-    courseTitle: 'Full-Stack Modern AI Architecture & Agentic Workflows',
-    userId: 'user-student',
-    userName: 'User 001',
-    rating: 5,
-    comment: 'Exceptional course! The 5 bite-sized reels and interactive modules made complex agentic workflows easy to understand.',
-    createdAt: '2026-08-24T12:00:00Z'
-  },
-  {
-    id: 'fb-2',
-    courseId: 'course-java',
-    courseTitle: 'Java Core & Modern Enterprise Architecture',
-    userId: 'user-learner-3',
-    userName: 'User 003',
-    rating: 5,
-    comment: 'The Virtual Threads and Loom 5-reel breakdown was well explained with clear code examples.',
-    createdAt: '2026-08-25T09:30:00Z'
-  }
-];
-
-export const INITIAL_COMMENTS: Comment[] = [
-  {
-    id: 'comm-1',
-    reelId: 'reel-1',
-    userId: 'user-student',
-    userName: 'User 001',
-    content: 'Python memory references explained so clearly in 60s! 🔥',
-    createdAt: '2026-08-24T12:30:00Z',
-    likes: 14,
-  },
-  {
-    id: 'comm-2',
-    reelId: 'reel-2',
-    userId: 'user-learner-2',
-    userName: 'User 002',
-    content: 'Virtual threads make high-throughput I/O in Java 21 so straightforward!',
-    createdAt: '2026-08-24T13:10:00Z',
-    likes: 8,
-  },
-  {
-    id: 'comm-3',
-    reelId: 'reel-4',
-    userId: 'user-learner-3',
-    userName: 'User 003',
-    content: 'The sliding window visualization makes the O(N) expansion intuition click immediately.',
-    createdAt: '2026-08-24T14:00:00Z',
-    likes: 5,
-  }
-];
-
-export const INITIAL_ENROLLED_STUDENTS: EnrolledStudent[] = [
-  {
-    id: 'enr-1',
-    userId: 'user-student',
-    userName: 'User 001',
-    userEmail: 'user@lms.ai',
-    courseId: 'course-1',
-    courseTitle: 'Full-Stack Modern AI Architecture & Agentic Workflows',
-    enrolledAt: '2026-08-21T09:00:00Z',
-    progressPercent: 68,
-    lastActive: '2026-08-25T11:45:00Z',
-    quizAverage: 94
-  },
-  {
-    id: 'enr-2',
-    userId: 'user-student',
-    userName: 'User 001',
-    userEmail: 'user@lms.ai',
-    courseId: 'course-java',
-    courseTitle: 'Java Core & Modern Enterprise Architecture',
-    enrolledAt: '2026-08-15T10:00:00Z',
-    progressPercent: 100,
-    completedAt: '2026-08-23T16:00:00Z',
-    lastActive: '2026-08-23T16:00:00Z',
-    quizAverage: 96
-  },
-  {
-    id: 'enr-3',
-    userId: 'user-learner-2',
-    userName: 'User 002',
-    userEmail: 'user002@lms.ai',
-    courseId: 'course-dsa',
-    courseTitle: 'Data Structures & Algorithms for FAANG Interviews',
-    enrolledAt: '2026-08-22T11:30:00Z',
-    progressPercent: 45,
-    lastActive: '2026-08-25T08:15:00Z',
-    quizAverage: 84
-  },
-  {
-    id: 'enr-4',
-    userId: 'user-learner-3',
-    userName: 'User 003',
-    userEmail: 'user003@lms.ai',
-    courseId: 'course-java',
-    courseTitle: 'Java Core & Modern Enterprise Architecture',
-    enrolledAt: '2026-08-18T14:00:00Z',
-    progressPercent: 100,
-    completedAt: '2026-08-24T18:00:00Z',
-    lastActive: '2026-08-25T10:30:00Z',
-    quizAverage: 98
-  },
-  {
-    id: 'enr-5',
-    userId: 'user-learner-5',
-    userName: 'User 005',
-    userEmail: 'user005@lms.ai',
-    courseId: 'course-dbms',
-    courseTitle: 'Relational Database Management & SQL Mastery',
-    enrolledAt: '2026-08-20T10:00:00Z',
-    progressPercent: 20,
-    lastActive: '2026-08-25T09:40:00Z',
-    quizAverage: 89
-  }
-];
-
-export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 'notif-1',
-    userId: 'user-student',
-    title: '🏆 Perfect Score on Micro-Assessment!',
-    message: 'You scored 100% on the automated assessment. +100 XP and a 25% Course Voucher added to your wallet!',
-    type: 'reward',
-    read: false,
-    createdAt: '2026-08-24T10:00:00Z'
-  },
-  {
-    id: 'notif-2',
-    userId: 'user-student',
-    title: '⚡ Badge Unlocked: Streak Master',
-    message: 'You have completed reels for 7 days in a row! +200 bonus points credited.',
-    type: 'reward',
-    read: false,
-    createdAt: '2026-08-22T14:30:00Z'
-  },
-  {
-    id: 'notif-3',
-    userId: 'user-mentor',
-    title: '📚 Course Approved by Admin',
-    message: 'Your course "Java Core & Modern Enterprise Architecture" (5 Reels) is now live on the catalog!',
-    type: 'course',
-    read: true,
-    createdAt: '2026-08-24T11:05:00Z'
-  }
-];
+export const INITIAL_APPROVAL_QUEUE: ContentApprovalItem[] = [];
+export const INITIAL_MENTOR_APPLICATIONS: MentorApplication[] = [];
+export const INITIAL_COURSE_FEEDBACK: CourseFeedback[] = [];
+export const INITIAL_COMMENTS: Comment[] = [];
+export const INITIAL_ENROLLED_STUDENTS: EnrolledStudent[] = [];
+export const INITIAL_NOTIFICATIONS: NotificationItem[] = [];
 
 export const INITIAL_ANALYTICS: AdminAnalytics = {
-  totalUsers: 14850,
-  activeUsersDAU: 4210,
-  activeUsersMAU: 12900,
-  totalReelsWatched: 184500,
-  totalAssessmentsCompleted: 36900,
-  overallPassRate: 84.6,
-  totalCourses: 6,
-  approvedMentorsCount: 3,
-  pendingCourseReviews: 2,
-  totalMarketplaceRevenue: 28450,
+  totalUsers: 3,
+  activeUsersDAU: 1,
+  activeUsersMAU: 3,
+  totalReelsWatched: 0,
+  totalAssessmentsCompleted: 0,
+  overallPassRate: 100,
+  totalCourses: 1,
+  approvedMentorsCount: 1,
+  pendingCourseReviews: 0,
+  totalMarketplaceRevenue: 0,
   dailyEngagement: [
-    { day: 'Mon', views: 24000, assessments: 4800 },
-    { day: 'Tue', views: 27500, assessments: 5500 },
-    { day: 'Wed', views: 31000, assessments: 6200 },
-    { day: 'Thu', views: 29000, assessments: 5800 },
-    { day: 'Fri', views: 34500, assessments: 6900 },
-    { day: 'Sat', views: 39000, assessments: 7800 },
-    { day: 'Sun', views: 42000, assessments: 8400 },
+    { day: 'Mon', views: 0, assessments: 0 },
+    { day: 'Tue', views: 0, assessments: 0 },
+    { day: 'Wed', views: 0, assessments: 0 },
+    { day: 'Thu', views: 0, assessments: 0 },
+    { day: 'Fri', views: 0, assessments: 0 },
+    { day: 'Sat', views: 0, assessments: 0 },
+    { day: 'Sun', views: 0, assessments: 0 },
   ],
   userGrowthData: [
-    { date: 'Aug 19', learners: 1320, mentors: 38, activeUsers: 3400 },
-    { date: 'Aug 20', learners: 1380, mentors: 39, activeUsers: 3620 },
-    { date: 'Aug 21', learners: 1450, mentors: 40, activeUsers: 3850 },
-    { date: 'Aug 22', learners: 1520, mentors: 41, activeUsers: 3990 },
-    { date: 'Aug 23', learners: 1610, mentors: 41, activeUsers: 4150 },
-    { date: 'Aug 24', learners: 1720, mentors: 42, activeUsers: 4210 },
-    { date: 'Aug 25', learners: 1850, mentors: 43, activeUsers: 4350 },
+    { date: 'Aug 31', learners: 1, mentors: 1, activeUsers: 2 },
   ],
   coursePerformanceData: [
-    { courseId: 'course-java', title: 'Java Core & Modern Enterprise Architecture (5 Reels)', enrolled: 2350, completed: 890, completionRate: 37.8, avgRating: 4.95 },
-    { courseId: 'course-dsa', title: 'Data Structures & Algorithms for FAANG Interviews (5 Reels)', enrolled: 3100, completed: 940, completionRate: 30.3, avgRating: 4.88 },
-    { courseId: 'course-1', title: 'Full-Stack Modern AI Architecture & Agentic Workflows (5 Reels)', enrolled: 1420, completed: 510, completionRate: 35.9, avgRating: 4.90 },
-    { courseId: 'course-dbms', title: 'Relational Database Management & SQL Mastery (5 Reels)', enrolled: 1890, completed: 480, completionRate: 25.4, avgRating: 4.92 },
-    { courseId: 'course-2', title: 'Advanced TypeScript & Production Design Patterns (5 Reels)', enrolled: 860, completed: 290, completionRate: 33.7, avgRating: 4.85 },
-    { courseId: 'course-3', title: 'Micro-Interactions & Modern Motion Design (5 Reels)', enrolled: 45, completed: 32, completionRate: 71.1, avgRating: 5.0 },
+    { courseId: 'course-java', title: 'Java Core & Modern Enterprise Architecture (5 Reels)', enrolled: 0, completed: 0, completionRate: 0, avgRating: 5.0 },
   ],
   contentPerformanceData: [
-    { reelId: 'reel-1', title: 'Python Variables & Memory References in 60s', views: 31200, completions: 26400, likes: 2450 },
-    { reelId: 'reel-2', title: 'Java 21: Virtual Threads vs OS Threads in 60s', views: 38400, completions: 31200, likes: 3150 },
-    { reelId: 'reel-3', title: 'Spring Boot 3: Transaction Proxies & Self-Invocation', views: 34100, completions: 27900, likes: 2890 },
-    { reelId: 'reel-4', title: 'DSA: Two Pointers vs Sliding Window Visualized', views: 49800, completions: 41000, likes: 4100 },
-    { reelId: 'reel-5', title: 'SQL: Clustered vs Non-Clustered Indexes in 60s', views: 32900, completions: 25800, likes: 2750 },
-    { reelId: 'reel-6', title: 'Computer Networks: TCP 3-Way Handshake & SYN Floods', views: 41500, completions: 34200, likes: 3400 },
+    { reelId: 'reel-1', title: 'Python Variables & Memory References in 60s', views: 0, completions: 0, likes: 0 },
+    { reelId: 'reel-2', title: 'JavaScript Event Loop & Microtasks in 60s', views: 0, completions: 0, likes: 0 },
+    { reelId: 'reel-3', title: 'System Design: API Gateways vs Load Balancers in 60s', views: 0, completions: 0, likes: 0 },
+    { reelId: 'reel-4', title: 'DSA: Two Pointers vs Sliding Window Visualized', views: 0, completions: 0, likes: 0 },
+    { reelId: 'reel-5', title: 'SQL: Clustered vs Non-Clustered Indexes in 60s', views: 0, completions: 0, likes: 0 },
+    { reelId: 'reel-6', title: 'AI & LLMs: How Transformers & Self-Attention Work', views: 0, completions: 0, likes: 0 },
   ],
   learningAnalyticsData: {
-    totalHours: 18450,
-    avgScore: 84.6,
-    quizAccuracy: 88.2,
-    assignmentCompletionRate: 78.5
+    totalHours: 0,
+    avgScore: 0,
+    quizAccuracy: 0,
+    assignmentCompletionRate: 0
   }
 };

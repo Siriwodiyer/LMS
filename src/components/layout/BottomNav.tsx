@@ -5,12 +5,10 @@ import {
   PlaySquare,
   BookOpen,
   Award,
-  CheckSquare,
-  Lock,
   PlusCircle,
   Users,
-  Bell,
-  User
+  User,
+  CheckSquare
 } from 'lucide-react';
 
 interface BottomNavProps {
@@ -19,168 +17,132 @@ interface BottomNavProps {
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
-  const { watchedLearnReelIds, adminSettings, isAssessmentUnlocked, currentUser, isViewAsLearner, notifications } = useApp();
+  const { watchedLearnReelIds, currentUser, isViewAsLearner } = useApp();
 
-  // If Admin is in native Admin experience, bottom nav is not needed (sidebar handles admin navigation)
+  // If Admin is in native Admin experience, bottom nav is not needed (sidebar/drawer handles admin navigation)
   if (currentUser.role === 'admin' && !isViewAsLearner) {
     return null;
   }
 
   const currentRole = currentUser.role.toLowerCase().replace('role_', '');
   const isMentor = currentRole === 'mentor' && !isViewAsLearner;
-  const unreadNotifs = notifications.filter(n => !n.read).length;
-  const completedLearnCount = watchedLearnReelIds.length;
 
   if (isMentor) {
     return (
-      <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 flex items-center justify-around shadow-lg">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-2 flex items-center justify-around shadow-lg pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-colors duration-150">
         {/* 1. Dashboard */}
         <button
           onClick={() => setActiveTab('mentor-dashboard')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'mentor-dashboard' ? 'text-emerald-600 font-bold' : 'text-slate-500'
+          className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'mentor-dashboard' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
-          <LayoutDashboard size={18} />
-          <span className="text-[9px]">Dashboard</span>
+          <LayoutDashboard size={19} />
+          <span className="text-[11px] font-medium leading-none">Dashboard</span>
         </button>
 
-        {/* 2. My Courses */}
+        {/* 2. Courses */}
         <button
           onClick={() => setActiveTab('mentor-courses')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'mentor-courses' ? 'text-emerald-600 font-bold' : 'text-slate-500'
+          className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'mentor-courses' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
-          <BookOpen size={18} />
-          <span className="text-[9px]">Courses</span>
+          <BookOpen size={19} />
+          <span className="text-[11px] font-medium leading-none">Courses</span>
         </button>
 
-        {/* 3. Create Course */}
+        {/* 3. Create */}
         <button
           onClick={() => setActiveTab('mentor-create-course')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'mentor-create-course' ? 'text-emerald-600 font-bold' : 'text-slate-500'
+          className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'mentor-create-course' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
-          <PlusCircle size={18} />
-          <span className="text-[9px]">Create (5 Reels)</span>
+          <PlusCircle size={19} />
+          <span className="text-[11px] font-medium leading-none">Create</span>
         </button>
 
         {/* 4. Students */}
         <button
           onClick={() => setActiveTab('mentor-students')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'mentor-students' ? 'text-emerald-600 font-bold' : 'text-slate-500'
+          className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'mentor-students' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
-          <Users size={18} />
-          <span className="text-[9px]">Students</span>
+          <Users size={19} />
+          <span className="text-[11px] font-medium leading-none">Learners</span>
         </button>
 
-        {/* 5. Notifications */}
-        <button
-          onClick={() => setActiveTab('mentor-notifications')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all relative cursor-pointer ${
-            activeTab === 'mentor-notifications' ? 'text-emerald-600 font-bold' : 'text-slate-500'
-          }`}
-        >
-          <div className="relative">
-            <Bell size={18} />
-            {unreadNotifs > 0 && (
-              <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-[8px] font-bold px-1 rounded-full">
-                {unreadNotifs}
-              </span>
-            )}
-          </div>
-          <span className="text-[9px]">Alerts</span>
-        </button>
-
-        {/* 6. Profile */}
+        {/* 5. Profile */}
         <button
           onClick={() => setActiveTab('mentor-profile')}
-          className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-            activeTab === 'mentor-profile' ? 'text-emerald-600 font-bold' : 'text-slate-500'
+          className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+            activeTab === 'mentor-profile' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
-          <User size={18} />
-          <span className="text-[9px]">Profile</span>
+          <User size={19} />
+          <span className="text-[11px] font-medium leading-none">Profile</span>
         </button>
       </nav>
     );
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 flex items-center justify-around shadow-lg">
-      {/* 1. Dashboard */}
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 py-2 flex items-center justify-around shadow-lg pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-colors duration-150">
+      {/* 1. Home */}
       <button
         onClick={() => setActiveTab('home')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-          activeTab === 'home' || activeTab === 'dashboard' ? 'text-blue-600 font-bold' : 'text-slate-500'
+        className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+          activeTab === 'home' || activeTab === 'dashboard' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
         }`}
       >
-        <LayoutDashboard size={18} />
-        <span className="text-[9px]">Home</span>
+        <LayoutDashboard size={19} />
+        <span className="text-[11px] font-medium leading-none">Home</span>
       </button>
 
-      {/* 2. Learn Reels */}
+      {/* 2. Reels */}
       <button
         onClick={() => setActiveTab('learn')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all relative cursor-pointer ${
-          activeTab === 'learn' || activeTab === 'reels' ? 'text-blue-600 font-bold' : 'text-slate-500'
+        className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+          activeTab === 'learn' || activeTab === 'reels' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
         }`}
       >
-        <div className="relative">
-          <PlaySquare size={18} />
-          <span className="absolute -top-1 -right-2 bg-blue-600 text-white text-[8px] font-bold px-1 rounded-full">
-            {completedLearnCount}/6
-          </span>
-        </div>
-        <span className="text-[9px]">Learn (6)</span>
+        <PlaySquare size={19} />
+        <span className="text-[11px] font-medium leading-none">Reels</span>
       </button>
 
       {/* 3. Courses */}
       <button
         onClick={() => setActiveTab('courses')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-          activeTab === 'courses' ? 'text-blue-600 font-bold' : 'text-slate-500'
+        className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+          activeTab === 'courses' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
         }`}
       >
-        <BookOpen size={18} />
-        <span className="text-[9px]">Courses</span>
+        <BookOpen size={19} />
+        <span className="text-[11px] font-medium leading-none">Courses</span>
       </button>
 
-      {/* 4. Assessments */}
+      {/* 4. Quizzes */}
       <button
         onClick={() => setActiveTab('assessments')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-          activeTab === 'assessments' ? 'text-blue-600 font-bold' : 'text-slate-500'
+        className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+          activeTab === 'assessments' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
         }`}
       >
-        {isAssessmentUnlocked ? <CheckSquare size={18} /> : <Lock size={18} className="text-amber-500" />}
-        <span className="text-[9px]">Assess</span>
+        <CheckSquare size={19} />
+        <span className="text-[11px] font-medium leading-none">Quizzes</span>
       </button>
 
-      {/* 5. Rewards */}
+      {/* 5. Achievements */}
       <button
         onClick={() => setActiveTab('rewards')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-          activeTab === 'rewards' ? 'text-blue-600 font-bold' : 'text-slate-500'
+        className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-1 px-2 py-1 rounded-xl transition-all cursor-pointer ${
+          activeTab === 'rewards' ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
         }`}
       >
-        <Award size={18} />
-        <span className="text-[9px]">Rewards</span>
-      </button>
-
-      {/* 6. Profile */}
-      <button
-        onClick={() => setActiveTab('profile')}
-        className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all cursor-pointer ${
-          activeTab === 'profile' ? 'text-blue-600 font-bold' : 'text-slate-500'
-        }`}
-      >
-        <User size={18} />
-        <span className="text-[9px]">Profile</span>
+        <Award size={19} />
+        <span className="text-[11px] font-medium leading-none">Achievements</span>
       </button>
     </nav>
   );

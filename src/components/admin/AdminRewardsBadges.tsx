@@ -6,13 +6,7 @@ import {
   Plus,
   Power,
   Edit,
-  Trash2,
-  Sparkles,
-  CheckCircle2,
-  X,
-  Target,
-  BookOpen,
-  HelpCircle
+  X
 } from 'lucide-react';
 
 export const AdminRewardsBadges: React.FC = () => {
@@ -101,203 +95,170 @@ export const AdminRewardsBadges: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200 pb-16">
-      {/* Header */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      {/* Header Banner */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 flex items-center gap-1">
-              <Award size={13} /> Gamification Engine
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Credentials Authority</span>
+            <span className="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-[10px] font-semibold border border-amber-200 dark:border-amber-800">
+              Badges & Certificates Only
             </span>
-            <span className="text-xs text-slate-500">• Badges & Honors</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 font-display mt-2">
-            Rewards & Achievement Governance
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
-            Configure system badges, set automated unlocking criteria for quiz scores, course graduations, and learning streaks.
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-display mt-1">Milestone Badges Management</h1>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-xl">
+            Configure verifiable achievement badges earned when learners pass evaluations and finish masterclasses.
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all shrink-0"
+          className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
         >
-          <Plus size={16} />
-          <span>+ Create Badge</span>
+          <Plus size={15} />
+          <span>Create New Badge</span>
         </button>
       </div>
 
       {/* Badges Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {badgeDefinitions.map(badge => (
           <div
             key={badge.id}
-            className="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-amber-300 transition-all flex flex-col justify-between space-y-4"
+            className={`p-5 rounded-2xl border transition-all flex flex-col justify-between ${
+              badge.isActive
+                ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xs'
+                : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 opacity-60'
+            }`}
           >
-            <div>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-2xl shadow-xs shrink-0">
-                    {badge.icon}
-                  </div>
-                  <div>
-                    <strong className="text-slate-900 font-bold block text-sm">{badge.title}</strong>
-                    <span className="px-2 py-0.2 rounded bg-slate-100 text-slate-700 text-[10px] font-bold uppercase">
-                      {badge.rarity}
-                    </span>
-                  </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-2xl shadow-2xs">
+                  {badge.icon}
                 </div>
-
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    badge.isActive
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : 'bg-slate-100 text-slate-500'
-                  }`}
-                >
-                  {badge.isActive ? 'ACTIVE' : 'DISABLED'}
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                  badge.isActive
+                    ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300'
+                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                }`}>
+                  {badge.isActive ? 'Active' : 'Disabled'}
                 </span>
               </div>
 
-              <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-                {badge.description}
-              </p>
+              <div>
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white">{badge.title}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{badge.description}</p>
+              </div>
 
-              <div className="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-[11px]">
-                <strong className="block text-slate-900 font-bold mb-0.5">Criteria:</strong>
+              <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300">
+                <strong className="text-slate-800 dark:text-slate-200 block mb-0.5">Criteria:</strong>
                 <span>{badge.conditionText}</span>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+            <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
               <button
-                onClick={() => handleOpenEdit(badge)}
-                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1"
-              >
-                <Edit size={13} />
-                <span>Edit</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  toggleBadgeActive(badge.id);
-                  showToast(`Badge ${badge.isActive ? 'disabled' : 'activated'}.`, 'info');
-                }}
-                className={`p-1.5 rounded-lg border text-xs font-bold ${
+                onClick={() => toggleBadgeActive(badge.id)}
+                className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer ${
                   badge.isActive
-                    ? 'text-rose-600 border-slate-200 hover:bg-rose-50'
-                    : 'text-emerald-600 border-slate-200 hover:bg-emerald-50'
+                    ? 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+                    : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                 }`}
                 title={badge.isActive ? 'Disable Badge' : 'Enable Badge'}
               >
-                <Power size={14} />
+                <Power size={13} />
+                <span>{badge.isActive ? 'Deactivate' : 'Activate'}</span>
+              </button>
+              <button
+                onClick={() => handleOpenEdit(badge)}
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+                title="Edit Badge Criteria"
+              >
+                <Edit size={13} />
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Badge Create/Edit Modal */}
+      {/* Create / Edit Badge Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <h3 className="font-bold text-base text-slate-900">
-                {editingBadge ? 'Edit Achievement Badge' : 'Create Achievement Badge'}
-              </h3>
-              <button onClick={() => setIsCreateModalOpen(false)} className="p-2 rounded-full hover:bg-slate-200 text-slate-400">
-                <X size={18} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col text-slate-900 dark:text-white">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60">
+              <div className="flex items-center gap-2">
+                <Award size={18} className="text-amber-500" />
+                <h3 className="font-bold text-sm">{editingBadge ? 'Edit Milestone Badge' : 'Create New Milestone Badge'}</h3>
+              </div>
+              <button
+                onClick={() => setIsCreateModalOpen(false)}
+                className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+              >
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveBadge} className="p-6 overflow-y-auto space-y-4 text-xs">
+            <form onSubmit={handleSaveBadge} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Badge Title *</label>
+                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">Badge Title *</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Master Architect"
+                  placeholder="e.g. Masterclass Achiever"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900"
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-800 mb-1">Icon</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={icon}
-                      onChange={e => setIcon(e.target.value)}
-                      className="w-12 p-2 rounded-xl border border-slate-200 text-center text-lg"
-                    />
-                    <div className="flex flex-wrap gap-1">
-                      {emojiPresets.slice(0, 5).map(em => (
-                        <button
-                          key={em}
-                          type="button"
-                          onClick={() => setIcon(em)}
-                          className="p-1 rounded hover:bg-slate-100 text-sm"
-                        >
-                          {em}
-                        </button>
-                      ))}
-                    </div>
+              <div>
+                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">Badge Icon (Emoji)</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={icon}
+                    onChange={e => setIcon(e.target.value)}
+                    className="w-16 p-2 text-center text-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"
+                  />
+                  <div className="flex flex-wrap gap-1.5">
+                    {emojiPresets.map(em => (
+                      <button
+                        key={em}
+                        type="button"
+                        onClick={() => setIcon(em)}
+                        className={`p-1.5 rounded-lg border text-base cursor-pointer ${icon === em ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/40' : 'border-slate-200 dark:border-slate-700'}`}
+                      >
+                        {em}
+                      </button>
+                    ))}
                   </div>
                 </div>
-
-                <div>
-                  <label className="block font-bold text-slate-800 mb-1">Rarity</label>
-                  <select
-                    value={rarity}
-                    onChange={e => setRarity(e.target.value as any)}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 bg-white"
-                  >
-                    <option value="common">Common</option>
-                    <option value="rare">Rare</option>
-                    <option value="epic">Epic</option>
-                    <option value="legendary">Legendary</option>
-                  </select>
-                </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Description</label>
-                <textarea
-                  rows={2}
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
-                  placeholder="Awarded for mastering core concepts..."
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Criteria Text *</label>
+                <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">Unlock Rule & Criteria</label>
                 <input
                   type="text"
                   required
                   value={conditionText}
                   onChange={e => setConditionText(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900"
+                  placeholder="e.g. Complete all 5 course reels and score >= 80% on assessment"
+                  className="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold"
+                  className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-xs cursor-pointer"
                 >
-                  Save Badge
+                  {editingBadge ? 'Save Changes' : 'Create Badge'}
                 </button>
               </div>
             </form>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ThemeProvider } from './context/ThemeContext';
 import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/layout/Navbar';
 import { BottomNav } from './components/layout/BottomNav';
@@ -25,19 +26,31 @@ const MainContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile-sim' | 'tablet-sim'>('desktop');
 
-  // Sync default tab when user role changes
+  // Sync default tab when user role changes and enforce RBAC
   useEffect(() => {
     if (!isAuthenticated) return;
+    
+    // RBAC: Block non-mentors from mentor tabs
+    const isMentorRole = currentUser.role === 'mentor' || currentUser.role === 'ROLE_MENTOR';
+    if (activeTab.startsWith('mentor-') && !isMentorRole && !canAccessAdminPortal()) {
+      setActiveTab('home');
+      return;
+    }
+
     if (canAccessAdminPortal() && isViewAsMentor) {
       setActiveTab('mentor-dashboard');
-    } else if (currentUser.role === 'mentor' || currentUser.role === 'seller' || currentUser.role === 'ROLE_MENTOR') {
-      setActiveTab('mentor-dashboard');
+    } else if (isMentorRole) {
+      if (!activeTab.startsWith('mentor-') && activeTab !== 'profile') {
+        setActiveTab('mentor-dashboard');
+      }
     } else if (canAccessAdminPortal() && !isViewAsLearner) {
       setActiveTab('admin-dashboard');
     } else {
-      setActiveTab('home');
+      if (activeTab.startsWith('mentor-') || activeTab === 'admin-dashboard') {
+        setActiveTab('home');
+      }
     }
-  }, [currentUser.role, isViewAsLearner, isViewAsMentor, isAuthenticated]);
+  }, [currentUser.role, isViewAsLearner, isViewAsMentor, isAuthenticated, activeTab]);
 
   // Require login/signup before any dashboard is reachable
   if (!isAuthenticated) {
@@ -134,7 +147,7 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-150">
       {/* Top Header Navigation Bar */}
       <Navbar
         activeTab={activeTab}
@@ -144,7 +157,7 @@ const MainContent: React.FC = () => {
       />
 
       {/* Main View Container */}
-      <main className="flex-1 w-full bg-slate-50">
+      <main className="flex-1 w-full bg-slate-50 dark:bg-slate-950 transition-colors duration-150">
         {renderActiveView()}
       </main>
 
@@ -165,9 +178,11 @@ const MainContent: React.FC = () => {
 
 export function App() {
   return (
-    <AppProvider>
-      <MainContent />
-    </AppProvider>
+    <ThemeProvider>
+      <AppProvider>
+        <MainContent />
+      </AppProvider>
+    </ThemeProvider>
   );
 }
 
