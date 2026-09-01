@@ -1,6 +1,6 @@
 export type UserRole = 'student' | 'mentor' | 'admin' | 'learner' | 'seller' | 'ROLE_ADMIN' | 'ROLE_MENTOR' | 'ROLE_LEARNER';
 
-export type UserStatus = 'active' | 'inactive';
+export type UserStatus = 'active' | 'inactive' | 'pending' | 'pending_approval' | 'rejected' | 'suspended';
 
 export interface UserActivity {
   id: string;
@@ -64,7 +64,14 @@ export interface MentorApplication {
   reviewedDate?: string;
   reviewedBy?: string;
   adminFeedback?: string;
+  feedbackHistory?: {
+    date: string;
+    adminName: string;
+    action: string;
+    feedback: string;
+  }[];
 }
+
 
 export interface CourseFeedback {
   id: string;
@@ -241,13 +248,13 @@ export type ApprovalStatus = 'draft' | 'submitted' | 'under_review' | 'pending_r
 
 export interface ContentApprovalItem {
   id: string;
-  contentType: 'course' | 'reel' | 'lesson' | 'quiz' | 'assignment' | 'article';
+  contentType: 'course' | 'reel' | 'lesson' | 'quiz' | 'assignment' | 'article' | 'mentor_application';
   contentId: string;
   title: string;
   categoryOrSubject: string;
   creatorId: string;
   creatorName: string;
-  creatorRole: 'Mentor' | 'Admin' | 'Creator';
+  creatorRole: 'Mentor' | 'Admin' | 'Creator' | 'mentor' | 'admin' | 'creator';
   status: ApprovalStatus;
   submissionDate: string;
   reviewedDate?: string;
@@ -399,14 +406,20 @@ export interface AdminAnalytics {
 }
 
 export interface AdminSettings {
+  platformName?: string;
+  allowNewRegistrations?: boolean;
+  requireApprovalForCourses?: boolean;
+  requireApprovalForReels?: boolean;
+  reelsRequiredForAssessment?: number;
   passingScoreThreshold: number;
-  reelsPerAssessment: number;
+  reelsPerAssessment?: number;
   pointsPerCorrectAnswer: number;
-  streakBonusMultiplier: number;
+  streakBonusMultiplier?: number;
   mentorEligibilityMinAssessments: number;
   mentorEligibilityMinScore: number;
   mentorEligibilityAvgScore: number;
 }
+
 
 export interface PlatformOverviewStats {
   totalLearners: number;
