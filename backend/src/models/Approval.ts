@@ -25,7 +25,7 @@ const ApprovalSchema = new Schema(
     id: { type: String, required: true, unique: true, index: true },
     contentType: {
       type: String,
-      enum: ['course', 'reel', 'lesson', 'quiz', 'assignment', 'article'],
+      enum: ['course', 'reel', 'lesson', 'quiz', 'assignment', 'article', 'mentor_application'],
       required: true
     },
     contentId: { type: String, required: true, index: true },

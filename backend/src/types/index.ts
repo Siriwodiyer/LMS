@@ -418,6 +418,9 @@ export interface AdminSettings {
   mentorEligibilityMinAssessments: number;
   mentorEligibilityMinScore: number;
   mentorEligibilityAvgScore: number;
+  defaultVoucherDiscountPercent?: number;
+  voucherValidityDays?: number;
+  maxDailyReelLimit?: number;
 }
 
 

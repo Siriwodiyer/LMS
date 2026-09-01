@@ -166,8 +166,8 @@ export const mentorApply = async (req: Request, res: Response): Promise<void> =>
     const skillsArray = Array.isArray(skills)
       ? skills
       : typeof skills === 'string'
-      ? skills.split(',').map((s: string) => s.trim()).filter(Boolean)
-      : ['Software Engineering'];
+        ? skills.split(',').map((s: string) => s.trim()).filter(Boolean)
+        : ['Software Engineering'];
 
     const newApplication: MentorApplication = {
       id: appId,
@@ -194,9 +194,10 @@ export const mentorApply = async (req: Request, res: Response): Promise<void> =>
       contentId: appId,
       contentType: 'mentor_application',
       title: `Mentor Application: ${name.trim()} (${expertise || 'Engineering'})`,
+      categoryOrSubject: expertise ? expertise.trim() : 'Software Engineering',
       creatorId: userId,
       creatorName: name.trim(),
-      creatorRole: 'mentor',
+      creatorRole: 'Mentor',
       submissionDate: new Date().toISOString(),
       status: 'submitted'
     });
@@ -299,7 +300,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     db.updateUser(user.id, { lastActive: user.lastActive });
 
     if (isMongoConnected()) {
-      UserModel.findOneAndUpdate({ email: trimmedEmail }, { lastActive: user.lastActive }).catch(() => {});
+      UserModel.findOneAndUpdate({ email: trimmedEmail }, { lastActive: user.lastActive }).catch(() => { });
     }
 
     // Generate JWT containing userId, role, and email
