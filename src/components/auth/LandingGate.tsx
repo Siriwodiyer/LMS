@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 
 export const LandingGate: React.FC = () => {
-  const { openAuthModal, loginAsRole, courses, reels } = useApp();
+  const { openAuthModal, courses, reels } = useApp();
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -281,46 +281,7 @@ export const LandingGate: React.FC = () => {
             </button>
           </p>
 
-          {/* Quick 1-Click Demo Logins Banner */}
-          <div className="pt-4 max-w-xl mx-auto">
-            <div className="p-3 sm:p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-sm">
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-amber-500" />
-                  Instant 1-Click Demo Access
-                </span>
-                <span className="text-[10px] text-slate-400">No typing needed</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => loginAsRole('student')}
-                  className="py-2 px-2.5 rounded-xl bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-900/60 hover:border-blue-400 hover:shadow-xs text-center transition-all group cursor-pointer"
-                >
-                  <span className="block text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform">Learner</span>
-                  <span className="text-[10px] text-slate-400 font-mono">user@lms.ai</span>
-                </button>
 
-                <button
-                  type="button"
-                  onClick={() => loginAsRole('mentor')}
-                  className="py-2 px-2.5 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-900/60 hover:border-indigo-400 hover:shadow-xs text-center transition-all group cursor-pointer"
-                >
-                  <span className="block text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">Mentor</span>
-                  <span className="text-[10px] text-slate-400 font-mono">mentor@lms.ai</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => loginAsRole('admin')}
-                  className="py-2 px-2.5 rounded-xl bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-900/60 hover:border-purple-400 hover:shadow-xs text-center transition-all group cursor-pointer"
-                >
-                  <span className="block text-xs font-bold text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">Admin</span>
-                  <span className="text-[10px] text-slate-400 font-mono">admin@lms.ai</span>
-                </button>
-              </div>
-            </div>
-          </div>
 
           {/* ===================================================
               3. HERO PRODUCT PREVIEW VISUAL

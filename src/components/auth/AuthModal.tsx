@@ -33,7 +33,6 @@ export const AuthModal: React.FC = () => {
     authRegisterLearner,
     authMentorApply,
     forgotPassword,
-    loginAsRole,
     showToast
   } = useApp();
 
@@ -504,75 +503,7 @@ export const AuthModal: React.FC = () => {
                 )}
               </button>
 
-              {/* Quick 1-Click Demo Access Cards */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold tracking-wider uppercase text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5 text-amber-500" />
-                    Quick 1-Click Demo Logins
-                  </span>
-                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Click to login</span>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {/* Student */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLoginEmail('user@lms.ai');
-                      setLoginPassword('password123');
-                      setIsHumanVerified(true);
-                      loginAsRole('student');
-                    }}
-                    className="p-2.5 rounded-xl bg-blue-50/70 hover:bg-blue-100/80 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 border border-blue-200/80 dark:border-blue-800/60 text-left transition-all group cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-blue-700 dark:text-blue-300">Learner</span>
-                      <Award className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
-                    </div>
-                    <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">user@lms.ai</p>
-                    <p className="text-[9px] text-blue-600 dark:text-blue-400 font-mono mt-0.5 font-medium">password123</p>
-                  </button>
-
-                  {/* Mentor */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLoginEmail('mentor@lms.ai');
-                      setLoginPassword('password123');
-                      setIsHumanVerified(true);
-                      loginAsRole('mentor');
-                    }}
-                    className="p-2.5 rounded-xl bg-indigo-50/70 hover:bg-indigo-100/80 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/60 text-left transition-all group cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300">Mentor</span>
-                      <Briefcase className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
-                    </div>
-                    <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">mentor@lms.ai</p>
-                    <p className="text-[9px] text-indigo-600 dark:text-indigo-400 font-mono mt-0.5 font-medium">password123</p>
-                  </button>
-
-                  {/* Admin */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLoginEmail('admin@lms.ai');
-                      setLoginPassword('admin123');
-                      setIsHumanVerified(true);
-                      loginAsRole('admin');
-                    }}
-                    className="p-2.5 rounded-xl bg-purple-50/70 hover:bg-purple-100/80 dark:bg-purple-950/40 dark:hover:bg-purple-900/60 border border-purple-200/80 dark:border-purple-800/60 text-left transition-all group cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-purple-700 dark:text-purple-300">Admin</span>
-                      <ShieldCheck className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform" />
-                    </div>
-                    <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate mt-0.5">admin@lms.ai</p>
-                    <p className="text-[9px] text-purple-600 dark:text-purple-400 font-mono mt-0.5 font-medium">admin123</p>
-                  </button>
-                </div>
-              </div>
 
               <div className="text-center pt-2">
                 <p className="text-xs text-slate-500 dark:text-slate-400">

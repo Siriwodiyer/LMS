@@ -182,8 +182,9 @@ export const UniversalReelPlayer: React.FC<UniversalReelPlayerProps> = ({
         <div className="relative w-full h-full flex items-center justify-center bg-black pointer-events-none">
           {isActive ? (
             <iframe
-              src={`https://www.instagram.com/reel/${mediaSource.id}/embed/`}
+              src={`https://www.youtube-nocookie.com/embed/${reel.platformEmbedId || 'aircAruvnKk'}?autoplay=1&mute=${isMuted ? 1 : 0}&loop=1&playlist=${reel.platformEmbedId || 'aircAruvnKk'}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`}
               title={reel.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="w-full h-full border-0 object-cover"
             />

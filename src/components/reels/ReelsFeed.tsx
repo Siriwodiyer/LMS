@@ -388,7 +388,7 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
             className="px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-md text-white text-xs font-bold border border-white/20 shadow-lg flex items-center gap-1.5 cursor-pointer"
           >
             <Menu size={13} />
-            <span>Topics & Quiz ({completedCount}/6)</span>
+            <span>Topics & Quiz ({completedCount}/5)</span>
           </button>
 
           {isAssessmentUnlocked && (
@@ -458,6 +458,85 @@ export const ReelsFeed: React.FC<ReelsFeedProps> = () => {
           </div>
         )}
       </div>
+
+      {/* Desktop Right Sidebar: Lesson Insights & Shortcuts Panel */}
+      {activeReel && (
+        <div className="hidden lg:flex w-80 shrink-0 border-l border-slate-200 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/60 backdrop-blur-md flex-col p-5 space-y-5 overflow-y-auto custom-scrollbar z-20">
+          {/* Active Lesson Header */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-mono">
+                Lesson Overview
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                {activeReel.difficulty || 'Intermediate'}
+              </span>
+            </div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
+              {activeReel.title}
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              {activeReel.description}
+            </p>
+          </div>
+
+          {/* Topic & Subject Metadata */}
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-500 dark:text-slate-400">Subject</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200">{activeReel.subject}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-500 dark:text-slate-400">Topic</span>
+              <span className="font-bold text-blue-600 dark:text-blue-400">{activeReel.topic}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-500 dark:text-slate-400">Creator</span>
+              <span className="font-medium text-slate-700 dark:text-slate-300">{activeReel.creatorName}</span>
+            </div>
+          </div>
+
+          {/* Key Concept / Question Preview */}
+          {activeReel.questions && activeReel.questions.length > 0 && (
+            <div className="p-3.5 rounded-xl bg-blue-50/60 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-900/60 space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-blue-800 dark:text-blue-300">
+                <Sparkles size={14} className="text-blue-600 dark:text-blue-400" />
+                <span>Key Assessment Concept</span>
+              </div>
+              <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+                "{activeReel.questions[0].prompt}"
+              </p>
+            </div>
+          )}
+
+          {/* Keyboard Shortcuts Helper */}
+          <div className="p-3.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 space-y-2">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
+              Quick Controls
+            </span>
+            <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
+              <div className="flex items-center justify-between">
+                <span>Next / Prev Reel</span>
+                <span className="font-mono bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">
+                  ↓ / ↑
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Play / Pause</span>
+                <span className="font-mono bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">
+                  Click Video
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>Like Reel</span>
+                <span className="font-mono bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 text-[10px] font-bold">
+                  Double Click
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

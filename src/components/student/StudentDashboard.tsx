@@ -84,7 +84,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         {/* High-Level Milestone Counts */}
         <div className="grid grid-cols-3 gap-2.5 sm:gap-3 text-center">
           <div className="p-3 px-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-            <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white block">{completedLearnCount}/6</span>
+            <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white block">{completedLearnCount}/5</span>
             <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Reels</span>
           </div>
           <div className="p-3 px-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">

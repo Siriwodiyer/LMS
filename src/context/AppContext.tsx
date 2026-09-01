@@ -889,7 +889,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
     if (!found) {
-      return { success: false, error: 'Account not found with this email. Please click "Create Account" or use Quick Demo Logins.' };
+      return { success: false, error: 'Account not found with this email. Please check your email or click "Create Account".' };
     }
     
     // Check password: match stored password or standard default passwords
@@ -903,7 +903,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       (found.email === 'mentor@lms.ai' && password === 'password123');
 
     if (!isPasswordValid) {
-      return { success: false, error: 'Invalid password. For demo accounts use: admin123 (Admin) or password123 (Learner/Mentor).' };
+      return { success: false, error: 'Invalid password. Please check your password and try again.' };
     }
 
     if (role) {
