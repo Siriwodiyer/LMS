@@ -19,12 +19,13 @@ interface BottomNavProps {
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab }) => {
   const { watchedLearnReelIds, currentUser, isViewAsLearner } = useApp();
 
+  const currentRole = (currentUser?.role || '').toLowerCase().replace('role_', '');
+
   // If Admin is in native Admin experience, bottom nav is not needed (sidebar/drawer handles admin navigation)
-  if (currentUser.role === 'admin' && !isViewAsLearner) {
+  if (currentRole === 'admin' && !isViewAsLearner) {
     return null;
   }
 
-  const currentRole = currentUser.role.toLowerCase().replace('role_', '');
   const isMentor = currentRole === 'mentor' && !isViewAsLearner;
 
   if (isMentor) {

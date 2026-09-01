@@ -66,7 +66,7 @@ const MainContent: React.FC = () => {
   // If Admin is logged in and not explicitly viewing as learner/mentor, render Admin Portal
   if (canAccessAdminPortal() && !isViewAsLearner && !isViewAsMentor) {
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-150">
         <AdminPortal />
         <AssessmentModal />
         <AuthModal />

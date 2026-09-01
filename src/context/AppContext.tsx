@@ -1041,15 +1041,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const canAccessAdminPortal = (): boolean => {
-    return currentUser.role === 'admin' || currentUser.role === 'ROLE_ADMIN';
+    const role = (currentUser?.role || '').toLowerCase().replace('role_', '');
+    return role === 'admin';
   };
 
   const canManageContent = (): boolean => {
-    return currentUser.role === 'admin' || currentUser.role === 'mentor';
+    const role = (currentUser?.role || '').toLowerCase().replace('role_', '');
+    return role === 'admin' || role === 'mentor';
   };
 
   const canApproveContent = (): boolean => {
-    return currentUser.role === 'admin' || currentUser.role === 'ROLE_ADMIN';
+    const role = (currentUser?.role || '').toLowerCase().replace('role_', '');
+    return role === 'admin';
   };
 
   // User Management

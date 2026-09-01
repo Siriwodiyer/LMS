@@ -25,8 +25,7 @@ export const sanitizeMongoUri = (uri: string): string => {
 
 export const getMongoUri = (): string => {
   const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    console.warn('⚠️ [MongoDB Config] MONGODB_URI environment variable is missing.');
+  if (!uri || uri.includes('<db_username>') || uri.includes('<password>') || uri.includes('<username>')) {
     return '';
   }
   return uri;
@@ -41,7 +40,8 @@ export const connectMongoDB = async (): Promise<typeof mongoose> => {
 
   const mongoUri = getMongoUri();
   if (!mongoUri) {
-    throw new Error('MONGODB_URI environment variable is not defined.');
+    console.warn('⚠️ [MongoDB Config] MONGODB_URI is not set or contains unreplaced template placeholders. Running in local file-backed mode.');
+    return mongoose;
   }
 
   try {

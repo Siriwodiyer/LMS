@@ -37,8 +37,11 @@ export const MentorDashboard: React.FC<MentorDashboardProps> = ({
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
 
   // Filter courses created by current mentor
+  const normalizedRole = (currentUser.role || '').toLowerCase().replace('role_', '');
+  const isAdmin = normalizedRole === 'admin';
+
   const myCourses = courses.filter(
-    c => c.instructorId === currentUser.id || currentUser.role === 'admin' || currentUser.role === 'mentor'
+    c => c.instructorId === currentUser.id || c.instructorName === currentUser.name || isAdmin
   );
 
   const totalCourses = myCourses.length;

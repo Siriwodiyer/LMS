@@ -26,8 +26,10 @@ export const MentorStudentsView: React.FC = () => {
 
   // Find courses owned by current mentor
   const mentorCourseIds = useMemo(() => {
+    const normalizedRole = (currentUser.role || '').toLowerCase().replace('role_', '');
+    const isAdmin = normalizedRole === 'admin';
     return courses
-      .filter(c => c.instructorId === currentUser.id || currentUser.role === 'admin' || currentUser.role === 'mentor')
+      .filter(c => c.instructorId === currentUser.id || c.instructorName === currentUser.name || isAdmin)
       .map(c => c.id);
   }, [courses, currentUser]);
 

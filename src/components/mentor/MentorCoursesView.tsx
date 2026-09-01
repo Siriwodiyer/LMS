@@ -40,8 +40,10 @@ export const MentorCoursesView: React.FC<MentorCoursesViewProps> = ({
 
   // Filter courses owned by or assigned to current mentor
   const mentorCourses = useMemo(() => {
+    const normalizedRole = (currentUser.role || '').toLowerCase().replace('role_', '');
+    const isAdmin = normalizedRole === 'admin';
     return courses.filter(
-      c => c.instructorId === currentUser.id || currentUser.role === 'admin' || currentUser.role === 'mentor'
+      c => c.instructorId === currentUser.id || c.instructorName === currentUser.name || isAdmin
     );
   }, [courses, currentUser]);
 

@@ -1,6 +1,6 @@
 import app from './app.js';
 import dotenv from 'dotenv';
-import { connectMongoDB, disconnectMongoDB, isMongoConnected } from './config/mongo.js';
+import { connectMongoDB, disconnectMongoDB, isMongoConnected, getMongoUri } from './config/mongo.js';
 import { db } from './config/database.js';
 
 dotenv.config();
@@ -9,13 +9,14 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    // 1. Connect to MongoDB Atlas
-    if (process.env.MONGODB_URI) {
+    // 1. Connect to MongoDB Atlas if URI is valid
+    const mongoUri = getMongoUri();
+    if (mongoUri) {
       await connectMongoDB();
       // 2. Synchronize memory state with live MongoDB collections
       await db.syncWithMongoDB();
     } else {
-      console.warn('⚠️ [MongoDB] MONGODB_URI not configured in .env; running in file-backed mode.');
+      console.warn('⚠️ [MongoDB] MONGODB_URI not configured or using template placeholder; running in local file-backed mode.');
     }
   } catch (err: any) {
     console.error('⚠️ [MongoDB Warning] Server starting with local fallback due to connection error:', err.message);
