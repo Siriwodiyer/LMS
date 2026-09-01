@@ -3,7 +3,34 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/lms_db';
+/**
+ * Safely sanitizes MongoDB connection string for console logging so passwords/credentials are never exposed.
+ */
+export const sanitizeMongoUri = (uri: string): string => {
+  if (!uri) return '';
+  try {
+    const parsed = new URL(uri);
+    if (parsed.password) {
+      parsed.password = '****';
+    }
+    if (parsed.username) {
+      parsed.username = '****';
+    }
+    return parsed.toString();
+  } catch {
+    // Regex fallback if URL constructor fails on special characters
+    return uri.replace(/\/\/[^:]+:[^@]+@/, '//****:****@').replace(/:([^:@]+)@/, ':****@');
+  }
+};
+
+export const getMongoUri = (): string => {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    console.warn('⚠️ [MongoDB Config] MONGODB_URI environment variable is missing.');
+    return '';
+  }
+  return uri;
+};
 
 let isConnected = false;
 
@@ -12,10 +39,16 @@ export const connectMongoDB = async (): Promise<typeof mongoose> => {
     return mongoose;
   }
 
+  const mongoUri = getMongoUri();
+  if (!mongoUri) {
+    throw new Error('MONGODB_URI environment variable is not defined.');
+  }
+
   try {
-    console.log(`Connecting to MongoDB Atlas at ${MONGODB_URI.replace(/:([^:@]{4})[^:@]*@/, ':****@')}...`);
+    const maskedUri = sanitizeMongoUri(mongoUri);
+    console.log(`Connecting to MongoDB Atlas at ${maskedUri}...`);
     
-    const conn = await mongoose.connect(MONGODB_URI, {
+    const conn = await mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 15000,
       socketTimeoutMS: 45000,
       autoIndex: true
@@ -26,7 +59,7 @@ export const connectMongoDB = async (): Promise<typeof mongoose> => {
     console.log(`🌐 [MongoDB Host] ${conn.connection.host}`);
 
     mongoose.connection.on('error', (err) => {
-      console.error('❌ [MongoDB Error]', err);
+      console.error('❌ [MongoDB Error]', err.message || err);
     });
 
     mongoose.connection.on('disconnected', () => {
@@ -41,8 +74,8 @@ export const connectMongoDB = async (): Promise<typeof mongoose> => {
 
     return conn;
   } catch (error: any) {
-    console.error('❌ [MongoDB Atlas Connection Failed]:', error.message);
-    console.error('👉 Please make sure MongoDB Atlas Network Access (IP Whitelist) allows your current IP or 0.0.0.0/0.');
+    console.error('❌ [MongoDB Atlas Connection Failed]:', error.message || error);
+    console.error('👉 Ensure MONGODB_URI is set correctly and MongoDB Atlas Network Access IP Whitelist includes your server IP (or 0.0.0.0/0).');
     throw error;
   }
 };
@@ -60,3 +93,4 @@ export const disconnectMongoDB = async (): Promise<void> => {
 };
 
 export default connectMongoDB;
+
