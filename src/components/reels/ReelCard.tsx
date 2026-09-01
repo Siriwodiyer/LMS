@@ -16,9 +16,7 @@ import {
   Video,
   ExternalLink,
   Volume2,
-  VolumeX,
-  ChevronUp,
-  ChevronDown
+  VolumeX
 } from 'lucide-react';
 import { CommentSheet } from './CommentSheet';
 import { ShareModal } from './ShareModal';
@@ -175,7 +173,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
             {/* Mark Done Pill */}
             <button
               onClick={toggleCompletion}
-              className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 shadow-sm cursor-pointer ${
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 shadow-sm cursor-pointer ${
                 isCompleted
                   ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                   : 'bg-black/60 text-white hover:bg-black/80 backdrop-blur-md border border-white/20'
@@ -212,43 +210,6 @@ export const ReelCard: React.FC<ReelCardProps> = ({
               </a>
             )}
           </div>
-        </div>
-
-        {/* On-Screen Touch Navigation Arrows (Visible ONLY on user touch / hover) */}
-        <div
-          className={`absolute inset-y-0 left-2 flex items-center z-30 pointer-events-auto transition-opacity duration-300 ${
-            showControls && reelIndex > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onPrev?.();
-              triggerUserInteraction();
-            }}
-            className="w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white border border-white/20 flex items-center justify-center shadow-lg transition-all cursor-pointer"
-            title="Previous Reel"
-          >
-            <ChevronUp size={18} />
-          </button>
-        </div>
-
-        <div
-          className={`absolute inset-y-0 right-16 flex items-center z-30 pointer-events-auto transition-opacity duration-300 ${
-            showControls && reelIndex < totalReels - 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onNext?.();
-              triggerUserInteraction();
-            }}
-            className="w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white border border-white/20 flex items-center justify-center shadow-lg transition-all cursor-pointer"
-            title="Next Reel"
-          >
-            <ChevronDown size={18} />
-          </button>
         </div>
 
         {/* Right Action Sidebar (Instagram / TikTok Style) */}
@@ -323,9 +284,9 @@ export const ReelCard: React.FC<ReelCardProps> = ({
         </div>
 
         {/* Bottom Content Metadata Overlay */}
-        <div className="absolute left-4 right-16 bottom-4 z-20 text-left pointer-events-auto">
+        <div className="absolute left-3 right-16 bottom-3 z-20 text-left pointer-events-auto p-3 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 shadow-lg space-y-1">
           {/* Creator Profile & Category */}
-          <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-2 mb-1">
             <div className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold text-[10px] flex items-center justify-center border border-white/30 shrink-0 shadow-md">
               {reel.creatorName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
             </div>
@@ -341,7 +302,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
           </div>
 
           {/* Title */}
-          <h2 className="font-bold text-sm text-white leading-snug drop-shadow line-clamp-2 mb-1">
+          <h2 className="font-bold text-xs sm:text-sm text-white leading-snug drop-shadow line-clamp-2">
             {reel.title}
           </h2>
 
@@ -351,7 +312,7 @@ export const ReelCard: React.FC<ReelCardProps> = ({
               e.stopPropagation();
               setIsDescExpanded(!isDescExpanded);
             }}
-            className={`text-xs text-slate-200 drop-shadow cursor-pointer ${
+            className={`text-[11px] text-slate-200 drop-shadow cursor-pointer ${
               isDescExpanded ? 'line-clamp-none' : 'line-clamp-2'
             }`}
           >
@@ -360,9 +321,9 @@ export const ReelCard: React.FC<ReelCardProps> = ({
           </p>
 
           {/* Connected Assessment Tag */}
-          <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-blue-200">
-            <Award size={12} className="text-blue-400" />
-            <span>Includes 1 Question in the 5-Reel Assessment</span>
+          <div className="pt-0.5 flex items-center gap-1.5 text-[10px] text-blue-200 font-medium">
+            <Award size={11} className="text-blue-400 shrink-0" />
+            <span className="truncate">1 Assessment Question Connected</span>
           </div>
         </div>
       </div>

@@ -20,6 +20,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   if (!isOpen) return null;
 
   const title = courseTitle || certificateTitle || 'Java Core & Modern Enterprise Architecture';
+  const certId = `CERT-LMS-${currentUser.id.substring(0, 8).toUpperCase()}-2026`;
 
   const handlePrint = () => {
     window.print();
@@ -77,8 +78,8 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
 
           <div className="flex items-center justify-between text-xs text-slate-400 max-w-md mx-auto pt-4 border-t border-slate-800 mt-4">
             <div className="text-left">
-              <span className="block text-[10px] text-slate-500 uppercase">Issue Date</span>
-              <strong className="text-slate-200">{new Date().toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</strong>
+              <span className="block text-[10px] text-slate-500 uppercase">Credential ID</span>
+              <strong className="text-slate-200 font-mono text-[11px] block">{certId}</strong>
             </div>
 
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">

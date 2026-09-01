@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
   PlaySquare,
@@ -12,8 +12,13 @@ import {
   Unlock,
   CheckSquare,
   Sparkles,
-  Zap
+  Zap,
+  Bot,
+  Trophy
 } from 'lucide-react';
+import { AiTutorDrawer } from '../ai/AiTutorDrawer';
+import { LeaderboardModal } from '../rewards/LeaderboardModal';
+import { CertificateModal } from '../rewards/CertificateModal';
 
 interface StudentDashboardProps {
   onNavigateToReels: () => void;
@@ -41,6 +46,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     badges,
     assignments
   } = useApp();
+
+  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
+  const [isCertificateOpen, setIsCertificateOpen] = useState(false);
 
   const completedLearnCount = watchedLearnReelIds.length;
   const currentCourse = courses[0];
@@ -98,7 +107,44 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       </div>
 
-      {/* 2. "WHAT SHOULD I DO NEXT?" HERO ACTION CARD */}
+      {/* 2. QUICK INTERACTIVE LEARNING WIDGETS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        {/* AI Tutor Button */}
+        <button
+          onClick={() => setIsAiOpen(true)}
+          className="p-4 rounded-2xl bg-gradient-to-br from-blue-900/90 via-indigo-900/80 to-slate-900 border border-blue-500/30 text-white text-left hover:border-blue-400 transition-all shadow-md group cursor-pointer flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform shrink-0">
+              <Bot size={22} className="animate-pulse" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-white font-display">LMS AI Companion</h4>
+              <p className="text-[10px] text-blue-200/70 mt-0.5">Ask questions, explain code & practice quizzes</p>
+            </div>
+          </div>
+          <ArrowRight size={16} className="text-blue-300 group-hover:translate-x-1 transition-transform" />
+        </button>
+
+        {/* Leaderboard Button */}
+        <button
+          onClick={() => setIsLeaderboardOpen(true)}
+          className="p-4 rounded-2xl bg-gradient-to-br from-indigo-950 via-purple-950/80 to-slate-900 border border-amber-500/30 text-white text-left hover:border-amber-400 transition-all shadow-md group cursor-pointer flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/30 border border-amber-400/30 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform shrink-0">
+              <Trophy size={22} />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-white font-display">Leaderboard & XP Ranks</h4>
+              <p className="text-[10px] text-amber-200/70 mt-0.5">View Weekly Ranks & Level Status</p>
+            </div>
+          </div>
+          <ArrowRight size={16} className="text-amber-300 group-hover:translate-x-1 transition-transform" />
+        </button>
+      </div>
+
+      {/* 3. "WHAT SHOULD I DO NEXT?" HERO ACTION CARD */}
       <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2 max-w-xl">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-blue-200 text-xs font-semibold backdrop-blur-md">
@@ -153,7 +199,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       </div>
 
-      {/* 3. CORE TWO-COLUMN DASHBOARD GRID */}
+      {/* 4. CORE TWO-COLUMN DASHBOARD GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN: ACTIVE COURSE & ASSIGNMENT (7 Cols) */}
         <div className="lg:col-span-7 space-y-6">
@@ -341,14 +387,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
 
               <div
-                onClick={onNavigateToRewards}
+                onClick={() => setIsCertificateOpen(true)}
                 className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all cursor-pointer space-y-1"
               >
                 <div className="flex items-center justify-between">
                   <ShieldCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
                   <span className="text-xs font-bold text-slate-900 dark:text-white">{isCourseFinished ? 1 : 0}</span>
                 </div>
-                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Certificates</p>
+                <p className="text-xs font-bold text-slate-800 dark:text-slate-200 font-display">Certificates</p>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400">Verified credentials</p>
               </div>
             </div>
@@ -365,6 +411,24 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Interactive Feature Modals & Drawers */}
+      <AiTutorDrawer
+        isOpen={isAiOpen}
+        onClose={() => setIsAiOpen(false)}
+        contextTopic={currentCourse?.title || 'Java Core & Virtual Threads'}
+      />
+
+      <LeaderboardModal
+        isOpen={isLeaderboardOpen}
+        onClose={() => setIsLeaderboardOpen(false)}
+      />
+
+      <CertificateModal
+        isOpen={isCertificateOpen}
+        onClose={() => setIsCertificateOpen(false)}
+        courseTitle={currentCourse?.title}
+      />
     </div>
   );
 };
