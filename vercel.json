@@ -1,0 +1,13 @@
+{
+  "experimentalServices": {
+    "web": {
+      "root": ".",
+      "mountPath": "/",
+      "framework": "vite"
+    },
+    "backend": {
+      "root": "backend",
+      "mountPath": "/api"
+    }
+  }
+}
