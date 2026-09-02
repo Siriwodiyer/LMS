@@ -33,7 +33,7 @@ export const getMongoUri = (): string => {
 
 let isConnected = false;
 
-export const connectMongoDB = async (): Promise<typeof mongoose> => {
+export const connectMongoDB = async (): Promise<any> => {
   if (isConnected) {
     return mongoose;
   }
@@ -58,7 +58,7 @@ export const connectMongoDB = async (): Promise<typeof mongoose> => {
     console.log(`✅ [MongoDB Atlas] Successfully connected to database: ${conn.connection.name}`);
     console.log(`🌐 [MongoDB Host] ${conn.connection.host}`);
 
-    mongoose.connection.on('error', (err) => {
+    mongoose.connection.on('error', (err: any) => {
       console.error('❌ [MongoDB Error]', err.message || err);
     });
 
